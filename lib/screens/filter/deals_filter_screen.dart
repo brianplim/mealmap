@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import '../../models/app_models.dart';
 
 class DealsFilterScreen extends StatefulWidget {
   const DealsFilterScreen({super.key});
@@ -23,7 +22,7 @@ class _DealsFilterScreenState extends State<DealsFilterScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              statusBar(time: '9:41', color: Theme.of(context).colorScheme.onSurface),
+
               Row(
                 children: [
                   Text(

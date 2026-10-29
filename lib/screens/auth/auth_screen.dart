@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import '../../models/app_models.dart';
 
 class AuthScreen extends StatefulWidget {
   const AuthScreen({super.key});
@@ -107,7 +106,6 @@ class _AuthScreenState extends State<AuthScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  statusBar(time: '9:41', color: Theme.of(context).colorScheme.onSurface),
                   const SizedBox(height: 12),
                   IconButton(
                     icon: Icon(Icons.arrow_back, color: Theme.of(context).colorScheme.onSurface),

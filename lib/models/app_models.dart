@@ -146,26 +146,6 @@ final List<Eatery> mockEateries = [
   ),
 ];
 
-Widget statusBar({String time = '9:41', Color color = const Color(0xFF1E1E1E)}) {
-  return Padding(
-    padding: const EdgeInsets.only(left: 16, right: 16, top: 10, bottom: 6),
-    child: Row(
-      children: [
-        Text(
-          time,
-          style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: color),
-        ),
-        const Spacer(),
-        Icon(Icons.signal_cellular_4_bar, size: 14, color: color),
-        const SizedBox(width: 4),
-        Icon(Icons.wifi, size: 14, color: color),
-        const SizedBox(width: 4),
-        Icon(Icons.battery_full, size: 14, color: color),
-      ],
-    ),
-  );
-}
-
 Widget placeholderImage({required double width, required double height}) {
   return Container(
     width: width,

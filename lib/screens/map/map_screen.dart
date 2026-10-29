@@ -78,7 +78,7 @@ class MapScreenContent extends StatelessWidget {
               padding: const EdgeInsets.symmetric(horizontal: 16),
               child: Column(
                 children: [
-                  statusBar(time: '9:41', color: const Color(0xFF1E2D2A)),
+
                   const SizedBox(height: 8),
                   Row(
                     children: [

@@ -27,7 +27,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       body: SafeArea(
         child: Column(
           children: [
-            statusBar(time: '9:41', color: Theme.of(context).colorScheme.onSurface),
+
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               child: Row(

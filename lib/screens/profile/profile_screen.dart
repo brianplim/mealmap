@@ -153,7 +153,7 @@ class _ProfileScreenContentState extends State<ProfileScreenContent> {
     return SafeArea(
       child: Column(
         children: [
-          statusBar(time: '9:41', color: Theme.of(context).colorScheme.onSurface),
+
           Container(
             margin: const EdgeInsets.symmetric(horizontal: 16),
             padding: const EdgeInsets.symmetric(vertical: 20),

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import '../../models/app_models.dart';
 
 class NotificationsScreen extends StatelessWidget {
   const NotificationsScreen({super.key});
@@ -44,7 +43,7 @@ class NotificationsScreen extends StatelessWidget {
       body: SafeArea(
         child: Column(
           children: [
-            statusBar(time: '9:41', color: Theme.of(context).colorScheme.onSurface),
+
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               child: Row(
