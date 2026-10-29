@@ -210,6 +210,13 @@ class _AuthScreenState extends State<AuthScreen> {
                       decoration: InputDecoration(
                         labelText: 'Confirm Password',
                         prefixIcon: const Icon(Icons.lock_reset, color: Color(0xFF0F7A5B)),
+                        suffixIcon: IconButton(
+                          icon: Icon(
+                            _obscurePassword ? Icons.visibility_off : Icons.visibility,
+                            color: const Color(0xFF0F7A5B),
+                          ),
+                          onPressed: () => setState(() => _obscurePassword = !_obscurePassword),
+                        ),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(14),
                         ),
