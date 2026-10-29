@@ -123,8 +123,8 @@ class _AuthScreenState extends State<AuthScreen> {
                   const SizedBox(height: 6),
                   Text(
                     _isLogin
-                        ? 'Log in with Firebase to access Tagum student deals near ACES Tagum College.'
-                        : 'Sign up with Firebase to save your favorite eateries and deals.',
+                        ? 'Log in to access Tagum student deals near ACES Tagum College.'
+                        : 'Sign up to save your favorite eateries and deals.',
                     style: TextStyle(
                       fontSize: 13,
                       color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
@@ -209,7 +209,7 @@ class _AuthScreenState extends State<AuthScreen> {
                               ),
                             )
                           : Text(
-                              _isLogin ? 'Log In with Firebase' : 'Sign Up with Firebase',
+                              _isLogin ? 'Log In' : 'Sign Up',
                               style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
                             ),
                     ),

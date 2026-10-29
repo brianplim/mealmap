@@ -14,7 +14,7 @@ void main() {
 
     expect(find.text('Welcome Back!'), findsOneWidget);
 
-    await tester.tap(find.text('Log In with Firebase'));
+    await tester.tap(find.text('Log In'));
     await tester.pumpAndSettle();
 
     expect(find.text('Please enter your student email or ID'), findsOneWidget);
@@ -23,7 +23,7 @@ void main() {
     await tester.enterText(find.byType(TextField).at(1), 'password123');
     await tester.pump();
 
-    await tester.tap(find.text('Log In with Firebase'));
+    await tester.tap(find.text('Log In'));
     await tester.pumpAndSettle();
   });
 }
