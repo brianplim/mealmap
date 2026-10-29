@@ -91,7 +91,7 @@ class WelcomeScreen extends StatelessWidget {
                       elevation: 4,
                     ),
                     child: const Text(
-                      'Get Started',
+                      'Login',
                       style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
                     ),
                   ),
@@ -100,7 +100,7 @@ class WelcomeScreen extends StatelessWidget {
                 TextButton(
                   onPressed: () => Navigator.pushNamed(context, '/auth'),
                   child: Text(
-                    'Log In',
+                    'Register',
                     style: TextStyle(
                       color: Theme.of(context).colorScheme.onSurface,
                       fontWeight: FontWeight.w700,

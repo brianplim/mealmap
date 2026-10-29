@@ -7,9 +7,9 @@ void main() {
     await tester.pumpWidget(const MealMapApp());
 
     expect(find.text('MealMap'), findsWidgets);
-    expect(find.text('Get Started'), findsOneWidget);
+    expect(find.text('Login'), findsOneWidget);
 
-    await tester.tap(find.text('Get Started'));
+    await tester.tap(find.text('Login'));
     await tester.pumpAndSettle();
 
     expect(find.text('Welcome Back!'), findsOneWidget);
