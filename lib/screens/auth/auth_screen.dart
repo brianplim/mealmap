@@ -13,6 +13,7 @@ class _AuthScreenState extends State<AuthScreen> {
   bool _obscurePassword = true;
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
+  final _confirmPasswordController = TextEditingController();
   final _nameController = TextEditingController();
   bool _isLoading = false;
 
@@ -20,6 +21,7 @@ class _AuthScreenState extends State<AuthScreen> {
   void dispose() {
     _emailController.dispose();
     _passwordController.dispose();
+    _confirmPasswordController.dispose();
     _nameController.dispose();
     super.dispose();
   }
@@ -36,6 +38,20 @@ class _AuthScreenState extends State<AuthScreen> {
         const SnackBar(content: Text('Please enter your password')),
       );
       return;
+    }
+    if (!_isLogin) {
+      if (_confirmPasswordController.text.trim().isEmpty) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Please confirm your password')),
+        );
+        return;
+      }
+      if (_passwordController.text != _confirmPasswordController.text) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Passwords do not match')),
+        );
+        return;
+      }
     }
 
     setState(() => _isLoading = true);
@@ -186,6 +202,24 @@ class _AuthScreenState extends State<AuthScreen> {
                       ),
                     ),
                   ),
+                  if (!_isLogin) ...[
+                    const SizedBox(height: 16),
+                    TextField(
+                      controller: _confirmPasswordController,
+                      obscureText: _obscurePassword,
+                      decoration: InputDecoration(
+                        labelText: 'Confirm Password',
+                        prefixIcon: const Icon(Icons.lock_reset, color: Color(0xFF0F7A5B)),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(14),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(14),
+                          borderSide: const BorderSide(color: Color(0xFF0F7A5B), width: 2),
+                        ),
+                      ),
+                    ),
+                  ],
                   const SizedBox(height: 24),
                   SizedBox(
                     width: double.infinity,
@@ -196,7 +230,7 @@ class _AuthScreenState extends State<AuthScreen> {
                         foregroundColor: Colors.white,
                         padding: const EdgeInsets.symmetric(vertical: 16),
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(14),
+                          borderRadius: BorderRadius.circular(16),
                         ),
                       ),
                       child: _isLoading
