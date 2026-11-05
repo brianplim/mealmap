@@ -78,8 +78,6 @@ class MapScreenContent extends StatelessWidget {
               padding: const EdgeInsets.symmetric(horizontal: 16),
               child: Column(
                 children: [
-
-                  const SizedBox(height: 8),
                   Row(
                     children: [
                       CircleAvatar(
@@ -141,6 +139,12 @@ class MapScreenContent extends StatelessWidget {
             top: 215,
             left: 210,
             onTap: () => Navigator.pushNamed(context, '/restaurant', arguments: mockEateries[1]),
+          ),
+          GreenFoodPin(
+            label: 'Coffee Shop',
+            top: 310,
+            left: 240,
+            onTap: () => Navigator.pushNamed(context, '/restaurant', arguments: mockEateries[5]),
           ),
           Positioned(
             top: 410,
@@ -218,7 +222,7 @@ class MapScreenContent extends StatelessWidget {
             label: 'Halo-Halo',
             top: 615,
             left: 225,
-            onTap: () => launchAcesMap(context),
+            onTap: () => Navigator.pushNamed(context, '/restaurant', arguments: mockEateries[4]),
           ),
           Positioned(
             bottom: 24,

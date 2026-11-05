@@ -82,7 +82,7 @@ final List<FoodOrder> globalOrders = [
   ),
 ];
 
-final List<String> globalFavoriteIds = ['1', '2', '3', '4'];
+final List<String> globalFavoriteIds = ['1', '2', '3', '4', '5', '6'];
 
 final List<Eatery> mockEateries = [
   Eatery(
@@ -144,7 +144,57 @@ final List<Eatery> mockEateries = [
       MenuItem(name: 'Beef Satay Rice', price: '₱90', imageUrl: 'https://images.unsplash.com/photo-1565299585323-38d6b0865b47?auto=format&fit=crop&w=300&q=80'),
     ],
   ),
+  Eatery(
+    id: '5',
+    name: 'Tagum Halo-Halo & Refreshments',
+    cuisine: 'Desserts',
+    distance: 0.2,
+    rating: 4.7,
+    reviewsCount: 145,
+    imageUrl: 'https://images.unsplash.com/photo-1563805042-7684c019e1cb?auto=format&fit=crop&w=400&q=80',
+    description: 'Special creamy shaved ice halo-halo with leche flan, ube ice cream, and sweet tropical fruits near ACES Tagum College.',
+    hasStudentDiscount: true,
+    menu: [
+      MenuItem(name: 'Special Student Halo-Halo', price: '₱75', imageUrl: 'https://images.unsplash.com/photo-1563805042-7684c019e1cb?auto=format&fit=crop&w=300&q=80'),
+      MenuItem(name: 'Mais Con Yelo', price: '₱55', imageUrl: 'https://images.unsplash.com/photo-1570197788417-0e82375c9371?auto=format&fit=crop&w=300&q=80'),
+    ],
+  ),
+  Eatery(
+    id: '6',
+    name: 'Mindanao Brew & Coffee',
+    cuisine: 'Coffee',
+    distance: 0.25,
+    rating: 4.8,
+    reviewsCount: 160,
+    imageUrl: 'https://images.unsplash.com/photo-1509042239860-f550ce710b93?auto=format&fit=crop&w=400&q=80',
+    description: 'Cozy study cafe near ACES Tagum College serving iced lattes, local barako coffee, and pastries.',
+    hasStudentDiscount: true,
+    menu: [
+      MenuItem(name: 'Iced Caramel Macchiato', price: '₱90', imageUrl: 'https://images.unsplash.com/photo-1461023058943-07fcbe16d735?auto=format&fit=crop&w=300&q=80'),
+      MenuItem(name: 'Student Barako Brew', price: '₱50', imageUrl: 'https://images.unsplash.com/photo-1509042239860-f550ce710b93?auto=format&fit=crop&w=300&q=80'),
+    ],
+  ),
 ];
+
+Widget statusBar({String time = '9:41', Color color = const Color(0xFF1E1E1E)}) {
+  return Padding(
+    padding: const EdgeInsets.only(left: 16, right: 16, top: 10, bottom: 6),
+    child: Row(
+      children: [
+        Text(
+          time,
+          style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: color),
+        ),
+        const Spacer(),
+        Icon(Icons.signal_cellular_4_bar, size: 14, color: color),
+        const SizedBox(width: 4),
+        Icon(Icons.wifi, size: 14, color: color),
+        const SizedBox(width: 4),
+        Icon(Icons.battery_full, size: 14, color: color),
+      ],
+    ),
+  );
+}
 
 Widget placeholderImage({required double width, required double height}) {
   return Container(
