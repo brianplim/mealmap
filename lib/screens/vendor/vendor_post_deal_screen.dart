@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
+import 'dart:io';
 import '../../models/app_models.dart';
 
 class VendorPostDealScreen extends StatefulWidget {
@@ -13,9 +15,7 @@ class _VendorPostDealScreenState extends State<VendorPostDealScreen> {
   final _dealTitleController = TextEditingController();
   final _priceController = TextEditingController();
   final _discountController = TextEditingController();
-  final _imageUrlController = TextEditingController(
-    text: 'https://images.unsplash.com/photo-1555939594-58d7cb561ad1?auto=format&fit=crop&w=400&q=80',
-  );
+  String _imageUrl = 'https://images.unsplash.com/photo-1555939594-58d7cb561ad1?auto=format&fit=crop&w=400&q=80';
 
   @override
   void dispose() {
@@ -23,8 +23,77 @@ class _VendorPostDealScreenState extends State<VendorPostDealScreen> {
     _dealTitleController.dispose();
     _priceController.dispose();
     _discountController.dispose();
-    _imageUrlController.dispose();
     super.dispose();
+  }
+
+  Future<void> _pickImage() async {
+    try {
+      final picker = ImagePicker();
+      final pickedFile = await picker.pickImage(source: ImageSource.gallery);
+      if (pickedFile != null) {
+        setState(() {
+          _imageUrl = pickedFile.path;
+        });
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Food photo selected from gallery!')),
+          );
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Image picker note: using preset photo (${e.toString()})')),
+        );
+      }
+    }
+  }
+
+  void _showPresetImagePicker() {
+    final presets = [
+      'https://images.unsplash.com/photo-1555939594-58d7cb561ad1?auto=format&fit=crop&w=400&q=80',
+      'https://images.unsplash.com/photo-1563805042-7684c019e1cb?auto=format&fit=crop&w=400&q=80',
+      'https://images.unsplash.com/photo-1509042239860-f550ce710b93?auto=format&fit=crop&w=400&q=80',
+      'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=400&q=80',
+    ];
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Choose Food Photo'),
+          content: SizedBox(
+            width: 300,
+            height: 250,
+            child: GridView.builder(
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2, crossAxisSpacing: 8, mainAxisSpacing: 8),
+              itemCount: presets.length,
+              itemBuilder: (context, index) {
+                final url = presets[index];
+                return GestureDetector(
+                  onTap: () {
+                    setState(() => _imageUrl = url);
+                    Navigator.pop(context);
+                  },
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(10),
+                    child: Image.network(url, fit: BoxFit.cover),
+                  ),
+                );
+              },
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+                _pickImage();
+              },
+              child: const Text('Upload from Gallery'),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   void _postDeal() {
@@ -42,7 +111,7 @@ class _VendorPostDealScreenState extends State<VendorPostDealScreen> {
       distance: 0.2,
       rating: 5.0,
       reviewsCount: 1,
-      imageUrl: _imageUrlController.text.trim(),
+      imageUrl: _imageUrl,
       description: _discountController.text.trim().isNotEmpty
           ? _discountController.text.trim()
           : 'Special daily offering near ACES Tagum College.',
@@ -51,7 +120,7 @@ class _VendorPostDealScreenState extends State<VendorPostDealScreen> {
         MenuItem(
           name: _dealTitleController.text.trim(),
           price: _priceController.text.trim().isNotEmpty ? _priceController.text.trim() : '₱75',
-          imageUrl: _imageUrlController.text.trim(),
+          imageUrl: _imageUrl,
         ),
       ],
     );
@@ -169,11 +238,42 @@ class _VendorPostDealScreenState extends State<VendorPostDealScreen> {
                     ),
                   ),
                   const SizedBox(height: 16),
-                  TextField(
-                    controller: _imageUrlController,
-                    decoration: InputDecoration(
-                      labelText: 'Food Photo URL',
-                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(14)),
+                  const Text('Food Photo', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 13)),
+                  const SizedBox(height: 8),
+                  GestureDetector(
+                    onTap: _showPresetImagePicker,
+                    child: Container(
+                      height: 130,
+                      width: double.infinity,
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).cardColor,
+                        borderRadius: BorderRadius.circular(14),
+                        border: Border.all(color: const Color(0xFF0F7A5B), width: 1.5),
+                      ),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(13),
+                        child: Stack(
+                          fit: StackFit.expand,
+                          children: [
+                            _imageUrl.startsWith('http')
+                                ? Image.network(_imageUrl, fit: BoxFit.cover)
+                                : Image.file(File(_imageUrl), fit: BoxFit.cover),
+                            Container(
+                              color: Colors.black.withValues(alpha: 0.35),
+                              child: const Center(
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Icon(Icons.camera_alt, color: Colors.white),
+                                    SizedBox(width: 8),
+                                    Text('Tap to Choose Food Photo', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
                     ),
                   ),
                   const SizedBox(height: 24),
