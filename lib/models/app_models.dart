@@ -221,3 +221,66 @@ Future<void> launchAcesMap(BuildContext context) async {
     }
   }
 }
+
+class AppLogo extends StatelessWidget {
+  const AppLogo({super.key, this.size = 96});
+
+  final double size;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Stack(
+          alignment: Alignment.center,
+          children: [
+            Container(
+              width: size,
+              height: size,
+              decoration: BoxDecoration(
+                color: const Color(0xFFE53935),
+                shape: BoxShape.circle,
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.2),
+                    blurRadius: 10,
+                    offset: const Offset(0, 5),
+                  ),
+                ],
+              ),
+              child: Icon(
+                Icons.location_on,
+                size: size * 0.7,
+                color: Colors.white,
+              ),
+            ),
+            Positioned(
+              top: size * 0.22,
+              child: const Icon(Icons.restaurant, size: 22, color: Colors.white),
+            ),
+          ],
+        ),
+        const SizedBox(height: 8),
+        Text(
+          'MealMap',
+          style: TextStyle(
+            fontSize: 22,
+            fontWeight: FontWeight.w900,
+            color: Theme.of(context).colorScheme.onSurface,
+            letterSpacing: 1.5,
+          ),
+        ),
+        const Text(
+          'LOCATION',
+          style: TextStyle(
+            fontSize: 10,
+            fontWeight: FontWeight.w700,
+            color: Color(0xFF5A6A64),
+            letterSpacing: 4.0,
+          ),
+        ),
+      ],
+    );
+  }
+}
