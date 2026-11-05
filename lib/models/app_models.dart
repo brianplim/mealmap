@@ -223,61 +223,59 @@ Future<void> launchAcesMap(BuildContext context) async {
 }
 
 class AppLogo extends StatelessWidget {
-  const AppLogo({super.key, this.size = 96});
+  const AppLogo({super.key, this.size = 100});
 
   final double size;
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final logoColor = isDark ? Colors.white : const Color(0xFF1E2D2A);
+
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Stack(
-          alignment: Alignment.center,
-          children: [
-            Container(
-              width: size,
-              height: size,
-              decoration: BoxDecoration(
-                color: const Color(0xFFE53935),
-                shape: BoxShape.circle,
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.2),
-                    blurRadius: 10,
-                    offset: const Offset(0, 5),
-                  ),
-                ],
+        Container(
+          width: size,
+          height: size,
+          decoration: BoxDecoration(
+            color: logoColor,
+            shape: BoxShape.circle,
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.15),
+                blurRadius: 8,
+                offset: const Offset(0, 4),
               ),
-              child: Icon(
-                Icons.location_on,
-                size: size * 0.7,
-                color: Colors.white,
+            ],
+          ),
+          child: Stack(
+            alignment: Alignment.center,
+            children: [
+              Container(
+                width: size * 0.55,
+                height: size * 0.55,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  border: Border.all(color: isDark ? const Color(0xFF121816) : Colors.white, width: 3),
+                ),
               ),
-            ),
-            Positioned(
-              top: size * 0.22,
-              child: const Icon(Icons.restaurant, size: 22, color: Colors.white),
-            ),
-          ],
+              Icon(
+                Icons.restaurant_menu,
+                size: size * 0.45,
+                color: isDark ? const Color(0xFF121816) : Colors.white,
+              ),
+            ],
+          ),
         ),
-        const SizedBox(height: 8),
+        const SizedBox(height: 12),
         Text(
           'MealMap',
           style: TextStyle(
-            fontSize: 22,
+            fontSize: 28,
             fontWeight: FontWeight.w900,
             color: Theme.of(context).colorScheme.onSurface,
-            letterSpacing: 1.5,
-          ),
-        ),
-        const Text(
-          'LOCATION',
-          style: TextStyle(
-            fontSize: 10,
-            fontWeight: FontWeight.w700,
-            color: Color(0xFF5A6A64),
-            letterSpacing: 4.0,
+            letterSpacing: -0.5,
           ),
         ),
       ],
