@@ -103,10 +103,10 @@ class _VendorPostDealScreenState extends State<VendorPostDealScreen> {
         return StatefulBuilder(
           builder: (context, setStateDialog) {
             return AlertDialog(
-              title: const Text('Student Orders & Confirmations'),
+              title: const Text('Student Orders & Notifications'),
               content: SizedBox(
                 width: 400,
-                height: 350,
+                height: 380,
                 child: globalOrders.isEmpty
                     ? const Center(child: Text('No student orders yet.'))
                     : ListView.builder(
@@ -141,6 +141,8 @@ class _VendorPostDealScreenState extends State<VendorPostDealScreen> {
                                   const SizedBox(height: 4),
                                   Text(order.itemName, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
                                   Text('${order.eateryName} • ${order.price} • ${order.fulfillmentType}', style: const TextStyle(fontSize: 11, color: Colors.grey)),
+                                  const SizedBox(height: 4),
+                                  Text('Status: ${order.status}', style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: Color(0xFF1E2D2A))),
                                   const SizedBox(height: 8),
                                   Row(
                                     mainAxisAlignment: MainAxisAlignment.end,
@@ -155,11 +157,10 @@ class _VendorPostDealScreenState extends State<VendorPostDealScreen> {
                                             }
                                           });
                                           setStateDialog(() {});
-                                          setState(() {});
                                         },
                                         icon: Icon(isReceived ? Icons.refresh : Icons.check_circle, size: 16, color: const Color(0xFF0F7A5B)),
                                         label: Text(
-                                          isReceived ? 'Mark In Progress' : 'Confirm Received',
+                                          isReceived ? 'Mark Preparing' : 'Confirm Received',
                                           style: const TextStyle(fontSize: 11, color: Color(0xFF0F7A5B)),
                                         ),
                                       ),
@@ -256,7 +257,7 @@ class _VendorPostDealScreenState extends State<VendorPostDealScreen> {
                         backgroundColor: Theme.of(context).cardColor,
                         child: IconButton(
                           icon: const Icon(Icons.notifications_none, color: Color(0xFF0F7A5B)),
-                          tooltip: 'Student Orders & Confirmations',
+                          tooltip: 'Student Orders & Notifications',
                           onPressed: () => _showVendorOrdersDialog(context),
                         ),
                       ),
