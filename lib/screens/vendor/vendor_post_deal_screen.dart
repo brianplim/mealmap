@@ -158,32 +158,32 @@ class _VendorPostDealScreenState extends State<VendorPostDealScreen> {
                                     mainAxisAlignment: MainAxisAlignment.end,
                                     children: [
                                       OutlinedButton.icon(
-                                        onPressed: () {
+                                        onPressed: isReceived ? null : () {
                                           setState(() {
                                             order.status = 'Preparing order';
                                           });
                                           setStateDialog(() {});
                                         },
-                                        icon: Icon(Icons.kitchen, size: 14, color: isPreparing ? const Color(0xFF0F7A5B) : Colors.grey),
+                                        icon: Icon(Icons.kitchen, size: 14, color: isReceived ? Colors.grey : (isPreparing ? const Color(0xFF0F7A5B) : Colors.grey)),
                                         label: const Text('Preparing', style: TextStyle(fontSize: 11)),
                                         style: OutlinedButton.styleFrom(
-                                          foregroundColor: isPreparing ? const Color(0xFF0F7A5B) : Colors.grey,
-                                          side: BorderSide(color: isPreparing ? const Color(0xFF0F7A5B) : Colors.grey[300]!),
+                                          foregroundColor: isReceived ? Colors.grey : (isPreparing ? const Color(0xFF0F7A5B) : Colors.grey),
+                                          side: BorderSide(color: isReceived ? Colors.grey[300]! : (isPreparing ? const Color(0xFF0F7A5B) : Colors.grey[300]!)),
                                         ),
                                       ),
                                       const SizedBox(width: 8),
                                       OutlinedButton.icon(
-                                        onPressed: () {
+                                        onPressed: isReceived ? null : () {
                                           setState(() {
                                             order.status = 'Out for Delivery';
                                           });
                                           setStateDialog(() {});
                                         },
-                                        icon: Icon(Icons.delivery_dining, size: 14, color: isDelivering ? Colors.blue : Colors.grey),
+                                        icon: Icon(Icons.delivery_dining, size: 14, color: isReceived ? Colors.grey : (isDelivering ? Colors.blue : Colors.grey)),
                                         label: const Text('Delivering', style: TextStyle(fontSize: 11)),
                                         style: OutlinedButton.styleFrom(
-                                          foregroundColor: isDelivering ? Colors.blue : Colors.grey,
-                                          side: BorderSide(color: isDelivering ? Colors.blue : Colors.grey[300]!),
+                                          foregroundColor: isReceived ? Colors.grey : (isDelivering ? Colors.blue : Colors.grey),
+                                          side: BorderSide(color: isReceived ? Colors.grey[300]! : (isDelivering ? Colors.blue : Colors.grey[300]!)),
                                         ),
                                       ),
                                     ],
