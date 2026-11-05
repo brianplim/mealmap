@@ -105,8 +105,8 @@ class _VendorPostDealScreenState extends State<VendorPostDealScreen> {
             return AlertDialog(
               title: const Text('Student Orders & Notifications'),
               content: SizedBox(
-                width: 400,
-                height: 380,
+                width: 420,
+                height: 420,
                 child: globalOrders.isEmpty
                     ? const Center(child: Text('No student orders yet.'))
                     : ListView.builder(
@@ -114,8 +114,11 @@ class _VendorPostDealScreenState extends State<VendorPostDealScreen> {
                         itemBuilder: (context, index) {
                           final order = globalOrders[index];
                           final isReceived = order.status.contains('Taken') || order.status.contains('Delivered') || order.status.contains('Received');
+                          final isPreparing = order.status.contains('Preparing');
+                          final isDelivering = order.status.contains('Delivery') || order.status.contains('Out');
+
                           return Card(
-                            margin: const EdgeInsets.only(bottom: 10),
+                            margin: const EdgeInsets.only(bottom: 12),
                             child: Padding(
                               padding: const EdgeInsets.all(12),
                               child: Column(
@@ -125,16 +128,23 @@ class _VendorPostDealScreenState extends State<VendorPostDealScreen> {
                                     children: [
                                       Text(order.id, style: const TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF0F7A5B))),
                                       const Spacer(),
-                                      Container(
-                                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                                        decoration: BoxDecoration(
-                                          color: isReceived ? Colors.green.withValues(alpha: 0.1) : Colors.orange.withValues(alpha: 0.1),
-                                          borderRadius: BorderRadius.circular(6),
-                                        ),
-                                        child: Text(
-                                          isReceived ? 'Received by Student' : 'Pending / Out',
-                                          style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: isReceived ? Colors.green : Colors.orange),
-                                        ),
+                                      Row(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          Checkbox(
+                                            value: isReceived,
+                                            onChanged: null,
+                                            activeColor: Colors.green,
+                                          ),
+                                          Text(
+                                            isReceived ? 'Received' : 'Not Received',
+                                            style: TextStyle(
+                                              fontSize: 11,
+                                              fontWeight: FontWeight.bold,
+                                              color: isReceived ? Colors.green : Colors.grey,
+                                            ),
+                                          ),
+                                        ],
                                       ),
                                     ],
                                   ),
@@ -143,25 +153,37 @@ class _VendorPostDealScreenState extends State<VendorPostDealScreen> {
                                   Text('${order.eateryName} • ${order.price} • ${order.fulfillmentType}', style: const TextStyle(fontSize: 11, color: Colors.grey)),
                                   const SizedBox(height: 4),
                                   Text('Status: ${order.status}', style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: Color(0xFF1E2D2A))),
-                                  const SizedBox(height: 8),
+                                  const SizedBox(height: 10),
                                   Row(
                                     mainAxisAlignment: MainAxisAlignment.end,
                                     children: [
-                                      TextButton.icon(
+                                      OutlinedButton.icon(
                                         onPressed: () {
                                           setState(() {
-                                            if (isReceived) {
-                                              order.status = 'Preparing order';
-                                            } else {
-                                              order.status = 'Food Received by Student Successfully';
-                                            }
+                                            order.status = 'Preparing order';
                                           });
                                           setStateDialog(() {});
                                         },
-                                        icon: Icon(isReceived ? Icons.refresh : Icons.check_circle, size: 16, color: const Color(0xFF0F7A5B)),
-                                        label: Text(
-                                          isReceived ? 'Mark Preparing' : 'Confirm Received',
-                                          style: const TextStyle(fontSize: 11, color: Color(0xFF0F7A5B)),
+                                        icon: Icon(Icons.kitchen, size: 14, color: isPreparing ? const Color(0xFF0F7A5B) : Colors.grey),
+                                        label: const Text('Preparing', style: TextStyle(fontSize: 11)),
+                                        style: OutlinedButton.styleFrom(
+                                          foregroundColor: isPreparing ? const Color(0xFF0F7A5B) : Colors.grey,
+                                          side: BorderSide(color: isPreparing ? const Color(0xFF0F7A5B) : Colors.grey[300]!),
+                                        ),
+                                      ),
+                                      const SizedBox(width: 8),
+                                      OutlinedButton.icon(
+                                        onPressed: () {
+                                          setState(() {
+                                            order.status = 'Out for Delivery';
+                                          });
+                                          setStateDialog(() {});
+                                        },
+                                        icon: Icon(Icons.delivery_dining, size: 14, color: isDelivering ? Colors.blue : Colors.grey),
+                                        label: const Text('Delivering', style: TextStyle(fontSize: 11)),
+                                        style: OutlinedButton.styleFrom(
+                                          foregroundColor: isDelivering ? Colors.blue : Colors.grey,
+                                          side: BorderSide(color: isDelivering ? Colors.blue : Colors.grey[300]!),
                                         ),
                                       ),
                                     ],
