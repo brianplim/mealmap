@@ -96,6 +96,95 @@ class _VendorPostDealScreenState extends State<VendorPostDealScreen> {
     );
   }
 
+  void _showVendorOrdersDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return StatefulBuilder(
+          builder: (context, setStateDialog) {
+            return AlertDialog(
+              title: const Text('Student Orders & Confirmations'),
+              content: SizedBox(
+                width: 400,
+                height: 350,
+                child: globalOrders.isEmpty
+                    ? const Center(child: Text('No student orders yet.'))
+                    : ListView.builder(
+                        itemCount: globalOrders.length,
+                        itemBuilder: (context, index) {
+                          final order = globalOrders[index];
+                          final isReceived = order.status.contains('Taken') || order.status.contains('Delivered') || order.status.contains('Received');
+                          return Card(
+                            margin: const EdgeInsets.only(bottom: 10),
+                            child: Padding(
+                              padding: const EdgeInsets.all(12),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Row(
+                                    children: [
+                                      Text(order.id, style: const TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF0F7A5B))),
+                                      const Spacer(),
+                                      Container(
+                                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                        decoration: BoxDecoration(
+                                          color: isReceived ? Colors.green.withValues(alpha: 0.1) : Colors.orange.withValues(alpha: 0.1),
+                                          borderRadius: BorderRadius.circular(6),
+                                        ),
+                                        child: Text(
+                                          isReceived ? 'Received by Student' : 'Pending / Out',
+                                          style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: isReceived ? Colors.green : Colors.orange),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  const SizedBox(height: 4),
+                                  Text(order.itemName, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+                                  Text('${order.eateryName} • ${order.price} • ${order.fulfillmentType}', style: const TextStyle(fontSize: 11, color: Colors.grey)),
+                                  const SizedBox(height: 8),
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.end,
+                                    children: [
+                                      TextButton.icon(
+                                        onPressed: () {
+                                          setState(() {
+                                            if (isReceived) {
+                                              order.status = 'Preparing order';
+                                            } else {
+                                              order.status = 'Food Received by Student Successfully';
+                                            }
+                                          });
+                                          setStateDialog(() {});
+                                          setState(() {});
+                                        },
+                                        icon: Icon(isReceived ? Icons.refresh : Icons.check_circle, size: 16, color: const Color(0xFF0F7A5B)),
+                                        label: Text(
+                                          isReceived ? 'Mark In Progress' : 'Confirm Received',
+                                          style: const TextStyle(fontSize: 11, color: Color(0xFF0F7A5B)),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: const Text('Close'),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+  }
+
   void _postDeal() {
     if (_eateryNameController.text.trim().isEmpty || _dealTitleController.text.trim().isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -155,10 +244,39 @@ class _VendorPostDealScreenState extends State<VendorPostDealScreen> {
                   Text(
                     'Eatery Vendor Portal',
                     style: TextStyle(
-                      fontSize: 20,
+                      fontSize: 18,
                       fontWeight: FontWeight.w800,
                       color: Theme.of(context).colorScheme.onSurface,
                     ),
+                  ),
+                  const Spacer(),
+                  Stack(
+                    children: [
+                      CircleAvatar(
+                        backgroundColor: Theme.of(context).cardColor,
+                        child: IconButton(
+                          icon: const Icon(Icons.notifications_none, color: Color(0xFF0F7A5B)),
+                          tooltip: 'Student Orders & Confirmations',
+                          onPressed: () => _showVendorOrdersDialog(context),
+                        ),
+                      ),
+                      if (globalOrders.isNotEmpty)
+                        Positioned(
+                          right: 8,
+                          top: 8,
+                          child: Container(
+                            padding: const EdgeInsets.all(4),
+                            decoration: const BoxDecoration(
+                              color: Colors.red,
+                              shape: BoxShape.circle,
+                            ),
+                            child: Text(
+                              '${globalOrders.length}',
+                              style: const TextStyle(color: Colors.white, fontSize: 9, fontWeight: FontWeight.bold),
+                            ),
+                          ),
+                        ),
+                    ],
                   ),
                 ],
               ),
