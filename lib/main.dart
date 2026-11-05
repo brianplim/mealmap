@@ -10,6 +10,7 @@ import 'screens/filter/deals_filter_screen.dart';
 import 'screens/notifications/notifications_screen.dart';
 import 'screens/orders/orders_screen.dart';
 import 'screens/settings/settings_screen.dart';
+import 'screens/vendor/vendor_post_deal_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -78,6 +79,7 @@ class MealMapApp extends StatelessWidget {
             '/notifications': (context) => const NotificationsScreen(),
             '/orders': (context) => const OrdersScreen(),
             '/settings': (context) => const SettingsScreen(),
+            '/vendor': (context) => const VendorPostDealScreen(),
           },
         );
       },
