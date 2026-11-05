@@ -2,20 +2,28 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 class AuthScreen extends StatefulWidget {
-  const AuthScreen({super.key});
+  const AuthScreen({super.key, this.isLogin = true});
+
+  final bool isLogin;
 
   @override
   State<AuthScreen> createState() => _AuthScreenState();
 }
 
 class _AuthScreenState extends State<AuthScreen> {
-  bool _isLogin = true;
+  late bool _isLogin;
   bool _obscurePassword = true;
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
   final _nameController = TextEditingController();
   bool _isLoading = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _isLogin = widget.isLogin;
+  }
 
   @override
   void dispose() {
@@ -83,7 +91,7 @@ class _AuthScreenState extends State<AuthScreen> {
       } else {
         String message = 'Authentication failed';
         if (e is FirebaseAuthException) {
-          if (e.code == 'user-not-found' || errorStr.contains('user-not-found') || errorStr.contains('no user record')) {
+          if (e.code == 'user-not-found' || errorStr.contains('user-not-found' ) || errorStr.contains('no user record')) {
             message = 'Couldn’t find this account';
           } else if (e.code == 'wrong-password' || e.code == 'invalid-credential' || errorStr.contains('wrong-password') || errorStr.contains('invalid-credential')) {
             message = 'Incorrect password or credentials';

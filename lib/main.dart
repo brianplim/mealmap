@@ -64,7 +64,10 @@ class MealMapApp extends StatelessWidget {
           initialRoute: '/',
           routes: {
             '/': (context) => const WelcomeScreen(),
-            '/auth': (context) => const AuthScreen(),
+            '/auth': (context) {
+              final isLogin = ModalRoute.of(context)?.settings.arguments as bool? ?? true;
+              return AuthScreen(isLogin: isLogin);
+            },
             '/home': (context) => const MainShell(initialTab: 0),
             '/map': (context) => const MainShell(initialTab: 1),
             '/deals': (context) => const MainShell(initialTab: 2),

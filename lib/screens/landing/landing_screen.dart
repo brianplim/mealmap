@@ -23,7 +23,6 @@ class WelcomeScreen extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-
                 const SizedBox(height: 36),
                 Container(
                   width: 96,
@@ -80,7 +79,7 @@ class WelcomeScreen extends StatelessWidget {
                 SizedBox(
                   width: double.infinity,
                   child: ElevatedButton(
-                    onPressed: () => Navigator.pushNamed(context, '/auth'),
+                    onPressed: () => Navigator.pushNamed(context, '/auth', arguments: true),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFF0A8E6A),
                       foregroundColor: Colors.white,
@@ -98,7 +97,7 @@ class WelcomeScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 12),
                 TextButton(
-                  onPressed: () => Navigator.pushNamed(context, '/auth'),
+                  onPressed: () => Navigator.pushNamed(context, '/auth', arguments: false),
                   child: Text(
                     'Register',
                     style: TextStyle(
