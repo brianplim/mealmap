@@ -230,20 +230,7 @@ class _ProfileScreenContentState extends State<ProfileScreenContent> {
                   badge: '${globalOrders.where((o) => !o.status.contains('Taken') && !o.status.contains('Delivered')).length}',
                   onTap: () => Navigator.pushNamed(context, '/orders'),
                 ),
-                ProfileMenuItem(
-                  icon: Icons.favorite_border,
-                  label: 'My Favorites',
-                  badge: '${globalFavoriteIds.length}',
-                  onTap: () async {
-                    await Navigator.pushNamed(context, '/favorites');
-                    setState(() {});
-                  },
-                ),
-                ProfileMenuItem(
-                  icon: Icons.local_offer_outlined,
-                  label: 'My Deals',
-                  onTap: () => Navigator.pushNamed(context, '/deals'),
-                ),
+
 
                 ProfileMenuItem(
                   icon: Icons.notifications_none,
