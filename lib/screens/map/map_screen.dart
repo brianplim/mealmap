@@ -28,8 +28,8 @@ class MapScreenContent extends StatelessWidget {
                   markers: [
                     Marker(
                       point: const LatLng(7.4578, 125.7921),
-                      width: 110,
-                      height: 85,
+                      width: 130,
+                      height: 90,
                       child: GestureDetector(
                         onTap: () => launchAcesMap(context),
                         child: Column(
@@ -239,14 +239,14 @@ class MapScreenContent extends StatelessWidget {
         Container(
           padding: const EdgeInsets.all(8),
           decoration: BoxDecoration(
-            color: const Color(0xFFE53935),
+            color: const Color(0xFF0F7A5B),
             shape: BoxShape.circle,
-            border: Border.all(color: Colors.white, width: 2.5),
+            border: Border.all(color: Colors.white, width: 2),
             boxShadow: [
-              BoxShadow(color: Colors.black.withValues(alpha: 0.3), blurRadius: 6, offset: const Offset(0, 3)),
+              BoxShadow(color: Colors.black.withValues(alpha: 0.2), blurRadius: 4, offset: const Offset(0, 2)),
             ],
           ),
-          child: const Icon(Icons.restaurant, color: Colors.white, size: 18),
+          child: const Icon(Icons.location_on, color: Colors.white, size: 20),
         ),
       ],
     );
