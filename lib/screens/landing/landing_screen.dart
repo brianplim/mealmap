@@ -4,50 +4,6 @@ import '../../models/app_models.dart';
 class WelcomeScreen extends StatelessWidget {
   const WelcomeScreen({super.key});
 
-  void _showVendorLoginDialog(BuildContext context) {
-    final passwordController = TextEditingController();
-    showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: const Text('Eatery Vendor Portal'),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const Text('Enter vendor password to access portal:', style: TextStyle(fontSize: 13, color: Colors.grey)),
-              const SizedBox(height: 12),
-              TextField(
-                controller: passwordController,
-                obscureText: true,
-                decoration: const InputDecoration(labelText: 'Password', hintText: 'e.g. aces2026'),
-              ),
-            ],
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text('Cancel'),
-            ),
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF0F7A5B), foregroundColor: Colors.white),
-              onPressed: () {
-                if (passwordController.text.trim() == 'aces2026') {
-                  Navigator.pop(context);
-                  Navigator.pushNamed(context, '/vendor');
-                } else {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Incorrect vendor password')),
-                  );
-                }
-              },
-              child: const Text('Enter Portal'),
-            ),
-          ],
-        );
-      },
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -124,7 +80,7 @@ class WelcomeScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 8),
                 TextButton.icon(
-                  onPressed: () => _showVendorLoginDialog(context),
+                  onPressed: () => Navigator.pushNamed(context, '/vendor-auth'),
                   icon: const Icon(Icons.storefront, size: 16, color: Color(0xFF0F7A5B)),
                   label: const Text(
                     'Eatery Vendor Access',

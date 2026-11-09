@@ -11,6 +11,7 @@ import 'screens/notifications/notifications_screen.dart';
 import 'screens/orders/orders_screen.dart';
 import 'screens/settings/settings_screen.dart';
 import 'screens/vendor/vendor_post_deal_screen.dart';
+import 'screens/vendor/vendor_auth_screen.dart';
 import 'screens/search/search_screen.dart';
 
 void main() async {
@@ -81,6 +82,7 @@ class MealMapApp extends StatelessWidget {
             '/orders': (context) => const OrdersScreen(),
             '/settings': (context) => const SettingsScreen(),
             '/vendor': (context) => const VendorPostDealScreen(),
+            '/vendor-auth': (context) => const VendorAuthScreen(),
             '/search': (context) => const SearchScreen(),
           },
         );
