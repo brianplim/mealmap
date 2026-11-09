@@ -54,6 +54,15 @@ class MapScreenContent extends StatelessWidget {
                         ),
                       ),
                     ),
+                    ...globalVendorPins.map((pin) => Marker(
+                          point: pin.location,
+                          width: 80,
+                          height: 80,
+                          child: GestureDetector(
+                            onTap: () => Navigator.pushNamed(context, '/restaurant', arguments: pin.eatery),
+                            child: _eateryMarkerContent(),
+                          ),
+                        )),
                     Marker(
                       point: const LatLng(7.4568, 125.7925),
                       width: 80,
@@ -239,14 +248,14 @@ class MapScreenContent extends StatelessWidget {
         Container(
           padding: const EdgeInsets.all(8),
           decoration: BoxDecoration(
-            color: const Color(0xFF0F7A5B),
+            color: const Color(0xFFE53935),
             shape: BoxShape.circle,
-            border: Border.all(color: Colors.white, width: 2),
+            border: Border.all(color: Colors.white, width: 2.5),
             boxShadow: [
-              BoxShadow(color: Colors.black.withValues(alpha: 0.2), blurRadius: 4, offset: const Offset(0, 2)),
+              BoxShadow(color: Colors.black.withValues(alpha: 0.3), blurRadius: 6, offset: const Offset(0, 3)),
             ],
           ),
-          child: const Icon(Icons.location_on, color: Colors.white, size: 20),
+          child: const Icon(Icons.restaurant, color: Colors.white, size: 18),
         ),
       ],
     );

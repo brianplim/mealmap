@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:latlong2/latlong.dart';
 
 final ValueNotifier<ThemeMode> themeNotifier = ValueNotifier(ThemeMode.light);
 
@@ -60,6 +61,22 @@ class FoodOrder {
     required this.timestamp,
   });
 }
+
+class CustomVendorPin {
+  final String id;
+  final String label;
+  final LatLng location;
+  final Eatery eatery;
+
+  CustomVendorPin({
+    required this.id,
+    required this.label,
+    required this.location,
+    required this.eatery,
+  });
+}
+
+final List<CustomVendorPin> globalVendorPins = [];
 
 final List<FoodOrder> globalOrders = [
   FoodOrder(
