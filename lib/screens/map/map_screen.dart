@@ -10,66 +10,175 @@ class MapScreenContent extends StatelessWidget {
       body: Stack(
         children: [
           Positioned.fill(
-            child: Container(
-              color: const Color(0xFFD9E7DC),
-              child: Stack(
-                children: [
-                  Positioned(top: 50, left: 150, width: 150, height: 180, child: Container(decoration: BoxDecoration(color: const Color(0xFFCEE0D2), borderRadius: BorderRadius.circular(24)))),
-                  Positioned(top: 250, left: 230, width: 130, height: 160, child: Container(decoration: BoxDecoration(color: const Color(0xFFCEE0D2), borderRadius: BorderRadius.circular(24)))),
-                  Positioned(top: 520, left: 30, width: 140, height: 150, child: Container(decoration: BoxDecoration(color: const Color(0xFFCEE0D2), borderRadius: BorderRadius.circular(24)))),
-                  Positioned(top: 660, left: 190, width: 160, height: 140, child: Container(decoration: BoxDecoration(color: const Color(0xFFCEE0D2), borderRadius: BorderRadius.circular(24)))),
+            child: InteractiveViewer(
+              boundaryMargin: const EdgeInsets.all(300),
+              minScale: 0.5,
+              maxScale: 4.0,
+              child: SizedBox(
+                width: 900,
+                height: 1100,
+                child: Stack(
+                  children: [
+                    Container(
+                      color: const Color(0xFFD9E7DC),
+                      child: Stack(
+                        children: [
+                          Positioned(top: 50, left: 150, width: 250, height: 280, child: Container(decoration: BoxDecoration(color: const Color(0xFFCEE0D2), borderRadius: BorderRadius.circular(24)))),
+                          Positioned(top: 350, left: 330, width: 230, height: 260, child: Container(decoration: BoxDecoration(color: const Color(0xFFCEE0D2), borderRadius: BorderRadius.circular(24)))),
+                          Positioned(top: 620, left: 80, width: 240, height: 250, child: Container(decoration: BoxDecoration(color: const Color(0xFFCEE0D2), borderRadius: BorderRadius.circular(24)))),
+                          Positioned(top: 760, left: 290, width: 260, height: 240, child: Container(decoration: BoxDecoration(color: const Color(0xFFCEE0D2), borderRadius: BorderRadius.circular(24)))),
 
-                  Positioned(
-                    top: 170,
-                    left: -50,
-                    right: -50,
-                    height: 45,
-                    child: Transform.rotate(
-                      angle: -0.12,
-                      child: Container(color: Colors.white),
+                          Positioned(
+                            top: 270,
+                            left: -100,
+                            right: -100,
+                            height: 65,
+                            child: Transform.rotate(
+                              angle: -0.12,
+                              child: Container(color: Colors.white),
+                            ),
+                          ),
+                          Positioned(
+                            top: 450,
+                            left: -100,
+                            right: -100,
+                            height: 62,
+                            child: Transform.rotate(
+                              angle: 0.18,
+                              child: Container(color: Colors.white),
+                            ),
+                          ),
+                          Positioned(
+                            top: 620,
+                            left: -100,
+                            right: -100,
+                            height: 66,
+                            child: Transform.rotate(
+                              angle: -0.05,
+                              child: Container(color: Colors.white),
+                            ),
+                          ),
+                          Positioned(
+                            top: 0,
+                            bottom: 0,
+                            left: 210,
+                            width: 64,
+                            child: Transform.rotate(
+                              angle: 0.22,
+                              child: Container(color: Colors.white),
+                            ),
+                          ),
+                          Positioned(
+                            top: 0,
+                            bottom: 0,
+                            right: 200,
+                            width: 68,
+                            child: Transform.rotate(
+                              angle: -0.25,
+                              child: Container(color: Colors.white),
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
-                  Positioned(
-                    top: 350,
-                    left: -50,
-                    right: -50,
-                    height: 42,
-                    child: Transform.rotate(
-                      angle: 0.18,
-                      child: Container(color: Colors.white),
+                    GreenFoodPin(
+                      label: 'BBQ & Inihaw',
+                      top: 230,
+                      left: 195,
+                      onTap: () => Navigator.pushNamed(context, '/restaurant', arguments: mockEateries[2]),
                     ),
-                  ),
-                  Positioned(
-                    top: 520,
-                    left: -50,
-                    right: -50,
-                    height: 46,
-                    child: Transform.rotate(
-                      angle: -0.05,
-                      child: Container(color: Colors.white),
+                    GreenFoodPin(
+                      label: 'Lutong Bahay',
+                      top: 215,
+                      left: 350,
+                      onTap: () => Navigator.pushNamed(context, '/restaurant', arguments: mockEateries[1]),
                     ),
-                  ),
-                  Positioned(
-                    top: 0,
-                    bottom: 0,
-                    left: 110,
-                    width: 44,
-                    child: Transform.rotate(
-                      angle: 0.22,
-                      child: Container(color: Colors.white),
+                    GreenFoodPin(
+                      label: 'Coffee Shop',
+                      top: 350,
+                      left: 380,
+                      onTap: () => Navigator.pushNamed(context, '/restaurant', arguments: mockEateries[5]),
                     ),
-                  ),
-                  Positioned(
-                    top: 0,
-                    bottom: 0,
-                    right: 100,
-                    width: 48,
-                    child: Transform.rotate(
-                      angle: -0.25,
-                      child: Container(color: Colors.white),
+                    Positioned(
+                      top: 470,
+                      left: 300,
+                      child: GestureDetector(
+                        onTap: () => launchAcesMap(context),
+                        child: Stack(
+                          clipBehavior: Clip.none,
+                          alignment: Alignment.center,
+                          children: [
+                            Positioned(
+                              top: -38,
+                              left: 20,
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(10),
+                                  boxShadow: [
+                                    BoxShadow(color: Colors.black.withValues(alpha: 0.15), blurRadius: 6),
+                                  ],
+                                ),
+                                child: const Text(
+                                  'NEAR ACES SCHOOL',
+                                  style: TextStyle(fontSize: 9, fontWeight: FontWeight.w900, color: Color(0xFF1E2D2A)),
+                                ),
+                              ),
+                            ),
+                            Column(
+                              children: [
+                                Container(
+                                  padding: const EdgeInsets.all(10),
+                                  decoration: BoxDecoration(
+                                    color: Colors.blue,
+                                    shape: BoxShape.circle,
+                                    border: Border.all(color: Colors.white, width: 3),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.black.withValues(alpha: 0.3),
+                                        blurRadius: 8,
+                                        offset: const Offset(0, 4),
+                                      ),
+                                    ],
+                                  ),
+                                  child: const Icon(Icons.school, color: Colors.white, size: 22),
+                                ),
+                                const SizedBox(height: 4),
+                                Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.circular(8),
+                                    boxShadow: [
+                                      BoxShadow(color: Colors.black.withValues(alpha: 0.15), blurRadius: 4),
+                                    ],
+                                  ),
+                                  child: const Text(
+                                    'ACES School',
+                                    style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: Color(0xFF1E2D2A)),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
                     ),
-                  ),
-                ],
+                    GreenFoodPin(
+                      label: 'Sisig & Rice',
+                      top: 615,
+                      left: 190,
+                      onTap: () => Navigator.pushNamed(context, '/restaurant', arguments: mockEateries[0]),
+                    ),
+                    GreenFoodPin(
+                      label: 'Halo-Halo',
+                      top: 675,
+                      left: 360,
+                      onTap: () => Navigator.pushNamed(context, '/restaurant', arguments: mockEateries[4]),
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
@@ -127,102 +236,6 @@ class MapScreenContent extends StatelessWidget {
                 ],
               ),
             ),
-          ),
-          GreenFoodPin(
-            label: 'BBQ & Inihaw',
-            top: 230,
-            left: 115,
-            onTap: () => Navigator.pushNamed(context, '/restaurant', arguments: mockEateries[2]),
-          ),
-          GreenFoodPin(
-            label: 'Lutong Bahay',
-            top: 215,
-            left: 210,
-            onTap: () => Navigator.pushNamed(context, '/restaurant', arguments: mockEateries[1]),
-          ),
-          GreenFoodPin(
-            label: 'Coffee Shop',
-            top: 310,
-            left: 240,
-            onTap: () => Navigator.pushNamed(context, '/restaurant', arguments: mockEateries[5]),
-          ),
-          Positioned(
-            top: 410,
-            left: 185,
-            child: GestureDetector(
-              onTap: () => launchAcesMap(context),
-              child: Stack(
-                clipBehavior: Clip.none,
-                alignment: Alignment.center,
-                children: [
-                  Positioned(
-                    top: -38,
-                    left: 20,
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(10),
-                        boxShadow: [
-                          BoxShadow(color: Colors.black.withValues(alpha: 0.15), blurRadius: 6),
-                        ],
-                      ),
-                      child: const Text(
-                        'NEAR ACES SCHOOL',
-                        style: TextStyle(fontSize: 9, fontWeight: FontWeight.w900, color: Color(0xFF1E2D2A)),
-                      ),
-                    ),
-                  ),
-                  Column(
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.all(10),
-                        decoration: BoxDecoration(
-                          color: Colors.blue,
-                          shape: BoxShape.circle,
-                          border: Border.all(color: Colors.white, width: 3),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withValues(alpha: 0.3),
-                              blurRadius: 8,
-                              offset: const Offset(0, 4),
-                            ),
-                          ],
-                        ),
-                        child: const Icon(Icons.school, color: Colors.white, size: 22),
-                      ),
-                      const SizedBox(height: 4),
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(8),
-                          boxShadow: [
-                            BoxShadow(color: Colors.black.withValues(alpha: 0.15), blurRadius: 4),
-                          ],
-                        ),
-                        child: const Text(
-                          'ACES School',
-                          style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: Color(0xFF1E2D2A)),
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-          ),
-          GreenFoodPin(
-            label: 'Sisig & Rice',
-            top: 555,
-            left: 110,
-            onTap: () => Navigator.pushNamed(context, '/restaurant', arguments: mockEateries[0]),
-          ),
-          GreenFoodPin(
-            label: 'Halo-Halo',
-            top: 615,
-            left: 225,
-            onTap: () => Navigator.pushNamed(context, '/restaurant', arguments: mockEateries[4]),
           ),
           Positioned(
             bottom: 24,
