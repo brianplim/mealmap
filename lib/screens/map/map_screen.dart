@@ -11,48 +11,48 @@ class MapScreenContent extends StatelessWidget {
         children: [
           Positioned.fill(
             child: InteractiveViewer(
-              boundaryMargin: const EdgeInsets.all(300),
-              minScale: 0.5,
-              maxScale: 4.0,
+              boundaryMargin: const EdgeInsets.all(1200),
+              minScale: 0.3,
+              maxScale: 5.0,
               child: SizedBox(
-                width: 900,
-                height: 1100,
+                width: 1600,
+                height: 1800,
                 child: Stack(
                   children: [
                     Container(
                       color: const Color(0xFFD9E7DC),
                       child: Stack(
                         children: [
-                          Positioned(top: 50, left: 150, width: 250, height: 280, child: Container(decoration: BoxDecoration(color: const Color(0xFFCEE0D2), borderRadius: BorderRadius.circular(24)))),
-                          Positioned(top: 350, left: 330, width: 230, height: 260, child: Container(decoration: BoxDecoration(color: const Color(0xFFCEE0D2), borderRadius: BorderRadius.circular(24)))),
-                          Positioned(top: 620, left: 80, width: 240, height: 250, child: Container(decoration: BoxDecoration(color: const Color(0xFFCEE0D2), borderRadius: BorderRadius.circular(24)))),
-                          Positioned(top: 760, left: 290, width: 260, height: 240, child: Container(decoration: BoxDecoration(color: const Color(0xFFCEE0D2), borderRadius: BorderRadius.circular(24)))),
+                          Positioned(top: 150, left: 250, width: 350, height: 380, child: Container(decoration: BoxDecoration(color: const Color(0xFFCEE0D2), borderRadius: BorderRadius.circular(32)))),
+                          Positioned(top: 550, left: 630, width: 330, height: 360, child: Container(decoration: BoxDecoration(color: const Color(0xFFCEE0D2), borderRadius: BorderRadius.circular(32)))),
+                          Positioned(top: 920, left: 180, width: 340, height: 350, child: Container(decoration: BoxDecoration(color: const Color(0xFFCEE0D2), borderRadius: BorderRadius.circular(32)))),
+                          Positioned(top: 1160, left: 590, width: 360, height: 340, child: Container(decoration: BoxDecoration(color: const Color(0xFFCEE0D2), borderRadius: BorderRadius.circular(32)))),
 
                           Positioned(
-                            top: 270,
-                            left: -100,
-                            right: -100,
-                            height: 65,
+                            top: 400,
+                            left: -300,
+                            right: -300,
+                            height: 85,
                             child: Transform.rotate(
                               angle: -0.12,
                               child: Container(color: Colors.white),
                             ),
                           ),
                           Positioned(
-                            top: 450,
-                            left: -100,
-                            right: -100,
-                            height: 62,
+                            top: 750,
+                            left: -300,
+                            right: -300,
+                            height: 82,
                             child: Transform.rotate(
                               angle: 0.18,
                               child: Container(color: Colors.white),
                             ),
                           ),
                           Positioned(
-                            top: 620,
-                            left: -100,
-                            right: -100,
-                            height: 66,
+                            top: 1050,
+                            left: -300,
+                            right: -300,
+                            height: 86,
                             child: Transform.rotate(
                               angle: -0.05,
                               child: Container(color: Colors.white),
@@ -61,8 +61,8 @@ class MapScreenContent extends StatelessWidget {
                           Positioned(
                             top: 0,
                             bottom: 0,
-                            left: 210,
-                            width: 64,
+                            left: 450,
+                            width: 84,
                             child: Transform.rotate(
                               angle: 0.22,
                               child: Container(color: Colors.white),
@@ -71,8 +71,8 @@ class MapScreenContent extends StatelessWidget {
                           Positioned(
                             top: 0,
                             bottom: 0,
-                            right: 200,
-                            width: 68,
+                            right: 400,
+                            width: 88,
                             child: Transform.rotate(
                               angle: -0.25,
                               child: Container(color: Colors.white),
@@ -83,25 +83,25 @@ class MapScreenContent extends StatelessWidget {
                     ),
                     GreenFoodPin(
                       label: 'BBQ & Inihaw',
-                      top: 230,
-                      left: 195,
+                      top: 480,
+                      left: 520,
                       onTap: () => Navigator.pushNamed(context, '/restaurant', arguments: mockEateries[2]),
                     ),
                     GreenFoodPin(
                       label: 'Lutong Bahay',
-                      top: 215,
-                      left: 350,
+                      top: 460,
+                      left: 700,
                       onTap: () => Navigator.pushNamed(context, '/restaurant', arguments: mockEateries[1]),
                     ),
                     GreenFoodPin(
                       label: 'Coffee Shop',
-                      top: 350,
-                      left: 380,
+                      top: 650,
+                      left: 760,
                       onTap: () => Navigator.pushNamed(context, '/restaurant', arguments: mockEateries[5]),
                     ),
                     Positioned(
-                      top: 470,
-                      left: 300,
+                      top: 850,
+                      left: 630,
                       child: GestureDetector(
                         onTap: () => launchAcesMap(context),
                         child: Stack(
@@ -167,14 +167,14 @@ class MapScreenContent extends StatelessWidget {
                     ),
                     GreenFoodPin(
                       label: 'Sisig & Rice',
-                      top: 615,
-                      left: 190,
+                      top: 1050,
+                      left: 490,
                       onTap: () => Navigator.pushNamed(context, '/restaurant', arguments: mockEateries[0]),
                     ),
                     GreenFoodPin(
                       label: 'Halo-Halo',
-                      top: 675,
-                      left: 360,
+                      top: 1150,
+                      left: 720,
                       onTap: () => Navigator.pushNamed(context, '/restaurant', arguments: mockEateries[4]),
                     ),
                   ],
