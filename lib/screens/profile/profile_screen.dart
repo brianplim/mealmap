@@ -244,11 +244,7 @@ class _ProfileScreenContentState extends State<ProfileScreenContent> {
                   label: 'My Deals',
                   onTap: () => Navigator.pushNamed(context, '/deals'),
                 ),
-                ProfileMenuItem(
-                  icon: Icons.storefront,
-                  label: 'Eatery Vendor Portal (Post Deals)',
-                  onTap: () => Navigator.pushNamed(context, '/vendor'),
-                ),
+
                 ProfileMenuItem(
                   icon: Icons.notifications_none,
                   label: 'Notifications',
