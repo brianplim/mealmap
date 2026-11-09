@@ -11,7 +11,7 @@ class VendorPostDealScreen extends StatefulWidget {
 }
 
 class _VendorPostDealScreenState extends State<VendorPostDealScreen> {
-  final _eateryNameController = TextEditingController();
+  final _eateryNameController = TextEditingController(text: 'ACES Canteen Bites');
   final _dealTitleController = TextEditingController();
   final _priceController = TextEditingController();
   final _discountController = TextEditingController();
@@ -208,41 +208,123 @@ class _VendorPostDealScreenState extends State<VendorPostDealScreen> {
     );
   }
 
-  void _postDeal() {
-    if (_eateryNameController.text.trim().isEmpty || _dealTitleController.text.trim().isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please fill in eatery name and deal title')),
-      );
-      return;
-    }
+  void _showPostDealDialog(BuildContext context) {
+    _dealTitleController.clear();
+    _priceController.clear();
+    _discountController.clear();
 
-    final newEatery = Eatery(
-      id: 'vendor-${DateTime.now().millisecondsSinceEpoch}',
-      name: _eateryNameController.text.trim(),
-      cuisine: 'Local Special',
-      distance: 0.2,
-      rating: 5.0,
-      reviewsCount: 1,
-      imageUrl: _imageUrl,
-      description: _discountController.text.trim().isNotEmpty
-          ? _discountController.text.trim()
-          : 'Special daily offering near ACES Tagum College.',
-      hasStudentDiscount: true,
-      menu: [
-        MenuItem(
-          name: _dealTitleController.text.trim(),
-          price: _priceController.text.trim().isNotEmpty ? _priceController.text.trim() : '₱75',
-          imageUrl: _imageUrl,
-        ),
-      ],
+    showDialog(
+      context: context,
+      builder: (context) {
+        return StatefulBuilder(
+          builder: (context, setDialogState) {
+            return AlertDialog(
+              title: const Text('Post Daily Special & Discount'),
+              content: SingleChildScrollView(
+                child: SizedBox(
+                  width: 400,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      TextField(
+                        controller: _dealTitleController,
+                        decoration: const InputDecoration(labelText: 'Daily Special / Menu Item', hintText: 'e.g. Special Pork Adobo'),
+                      ),
+                      const SizedBox(height: 12),
+                      TextField(
+                        controller: _priceController,
+                        decoration: const InputDecoration(labelText: 'Price', hintText: 'e.g. ₱75'),
+                      ),
+                      const SizedBox(height: 12),
+                      TextField(
+                        controller: _discountController,
+                        decoration: const InputDecoration(labelText: 'Student Discount Description', hintText: 'e.g. 20% OFF with valid student ID'),
+                      ),
+                      const SizedBox(height: 16),
+                      const Text('Food Photo', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+                      const SizedBox(height: 8),
+                      GestureDetector(
+                        onTap: () {
+                          _showPresetImagePicker();
+                        },
+                        child: Container(
+                          height: 110,
+                          width: double.infinity,
+                          decoration: BoxDecoration(
+                            color: Colors.grey[200],
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(12),
+                            child: Stack(
+                              fit: StackFit.expand,
+                              children: [
+                                _imageUrl.startsWith('http')
+                                    ? Image.network(_imageUrl, fit: BoxFit.cover)
+                                    : Image.file(File(_imageUrl), fit: BoxFit.cover),
+                                Container(
+                                  color: Colors.black.withValues(alpha: 0.35),
+                                  child: const Center(
+                                    child: Text('Tap to Change Photo', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: const Text('Cancel'),
+                ),
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF0F7A5B), foregroundColor: Colors.white),
+                  onPressed: () {
+                    if (_dealTitleController.text.trim().isEmpty) {
+                      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Please enter deal title')));
+                      return;
+                    }
+
+                    final newEatery = Eatery(
+                      id: 'vendor-${DateTime.now().millisecondsSinceEpoch}',
+                      name: _eateryNameController.text.trim(),
+                      cuisine: 'Local Special',
+                      distance: 0.1,
+                      rating: 5.0,
+                      reviewsCount: 1,
+                      imageUrl: _imageUrl,
+                      description: _discountController.text.trim().isNotEmpty ? _discountController.text.trim() : 'Special student offer!',
+                      hasStudentDiscount: true,
+                      menu: [
+                        MenuItem(
+                          name: _dealTitleController.text.trim(),
+                          price: _priceController.text.trim().isNotEmpty ? _priceController.text.trim() : '₱75',
+                          imageUrl: _imageUrl,
+                        ),
+                      ],
+                    );
+
+                    mockEateries.insert(0, newEatery);
+                    Navigator.pop(context);
+                    setState(() {});
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Deal published successfully to student feed!')),
+                    );
+                  },
+                  child: const Text('Publish'),
+                ),
+              ],
+            );
+          },
+        );
+      },
     );
-
-    mockEateries.insert(0, newEatery);
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Deal posted successfully! Now live on student feeds and map.')),
-    );
-    Navigator.pop(context);
   }
 
   @override
@@ -265,7 +347,7 @@ class _VendorPostDealScreenState extends State<VendorPostDealScreen> {
                   ),
                   const SizedBox(width: 12),
                   Text(
-                    'Eatery Vendor Portal',
+                    'Vendor Dashboard',
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.w800,
@@ -308,140 +390,167 @@ class _VendorPostDealScreenState extends State<VendorPostDealScreen> {
               child: ListView(
                 padding: const EdgeInsets.all(20),
                 children: [
+                  // Dashboard Stats Banner
                   Container(
-                    padding: const EdgeInsets.all(16),
+                    padding: const EdgeInsets.all(20),
                     decoration: BoxDecoration(
-                      color: const Color(0xFFECF7EF),
-                      borderRadius: BorderRadius.circular(16),
-                      border: Border.all(color: const Color(0xFFB5E3C7)),
-                    ),
-                    child: Row(
-                      children: [
-                        const Icon(Icons.storefront, color: Color(0xFF0F7A5B), size: 32),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: const [
-                              Text(
-                                'Post Daily Special & Discount',
-                                style: TextStyle(
-                                  fontWeight: FontWeight.w800,
-                                  fontSize: 14,
-                                  color: Color(0xFF0F7A5B),
-                                ),
-                              ),
-                              SizedBox(height: 2),
-                              Text(
-                                'Your deal will instantly broadcast to all students near ACES Tagum College!',
-                                style: TextStyle(fontSize: 12, color: Color(0xFF3D554F)),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-                  TextField(
-                    controller: _eateryNameController,
-                    decoration: InputDecoration(
-                      labelText: 'Eatery / Business Name',
-                      hintText: 'e.g. ACES Canteen Bites',
-                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(14)),
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  TextField(
-                    controller: _dealTitleController,
-                    decoration: InputDecoration(
-                      labelText: 'Daily Special / Menu Item',
-                      hintText: 'e.g. Special Pork Adobo Meal',
-                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(14)),
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  TextField(
-                    controller: _priceController,
-                    decoration: InputDecoration(
-                      labelText: 'Price',
-                      hintText: 'e.g. ₱75',
-                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(14)),
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  TextField(
-                    controller: _discountController,
-                    decoration: InputDecoration(
-                      labelText: 'Student Discount Promo description',
-                      hintText: 'e.g. 20% OFF with valid student ID',
-                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(14)),
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  const Text('Food Photo', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 13)),
-                  const SizedBox(height: 8),
-                  GestureDetector(
-                    onTap: _showPresetImagePicker,
-                    child: Container(
-                      height: 130,
-                      width: double.infinity,
-                      decoration: BoxDecoration(
-                        color: Theme.of(context).cardColor,
-                        borderRadius: BorderRadius.circular(14),
-                        border: Border.all(color: const Color(0xFF0F7A5B), width: 1.5),
+                      gradient: const LinearGradient(
+                        colors: [Color(0xFF0F7A5B), Color(0xFF12A66B)],
                       ),
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(13),
-                        child: Stack(
-                          fit: StackFit.expand,
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
                           children: [
-                            _imageUrl.startsWith('http')
-                                ? Image.network(_imageUrl, fit: BoxFit.cover)
-                                : Image.file(File(_imageUrl), fit: BoxFit.cover),
-                            Container(
-                              color: Colors.black.withValues(alpha: 0.35),
-                              child: const Center(
-                                child: Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    Icon(Icons.camera_alt, color: Colors.white),
-                                    SizedBox(width: 8),
-                                    Text('Tap to Choose Food Photo', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-                                  ],
+                            const Icon(Icons.storefront, color: Colors.white, size: 28),
+                            const SizedBox(width: 10),
+                            Expanded(
+                              child: Text(
+                                _eateryNameController.text.trim(),
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.w900,
                                 ),
                               ),
                             ),
                           ],
                         ),
-                      ),
+                        const SizedBox(height: 16),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceAround,
+                          children: [
+                            _statBox('Active Deals', '${mockEateries.length}'),
+                            _statBox('Student Orders', '${globalOrders.length}'),
+                            _statBox('Views Today', '142'),
+                          ],
+                        ),
+                      ],
                     ),
                   ),
                   const SizedBox(height: 24),
-                  SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton(
-                      onPressed: _postDeal,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF0F7A5B),
-                        foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(16),
+                  // Quick Actions Grid
+                  const Text(
+                    'Quick Actions',
+                    style: TextStyle(fontWeight: FontWeight.w800, fontSize: 16, color: Color(0xFF1E2D2A)),
+                  ),
+                  const SizedBox(height: 12),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: ElevatedButton.icon(
+                          onPressed: () => _showPostDealDialog(context),
+                          icon: const Icon(Icons.add_circle_outline),
+                          label: const Text('Post Deal'),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: const Color(0xFF0F7A5B),
+                            foregroundColor: Colors.white,
+                            padding: const EdgeInsets.symmetric(vertical: 14),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                          ),
                         ),
                       ),
-                      child: const Text(
-                        'Publish Deal to Student Feed',
-                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: OutlinedButton.icon(
+                          onPressed: () => _showVendorOrdersDialog(context),
+                          icon: const Icon(Icons.receipt_long),
+                          label: const Text('View Orders'),
+                          style: OutlinedButton.styleFrom(
+                            foregroundColor: const Color(0xFF0F7A5B),
+                            side: const BorderSide(color: Color(0xFF0F7A5B)),
+                            padding: const EdgeInsets.symmetric(vertical: 14),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                          ),
+                        ),
                       ),
-                    ),
+                    ],
                   ),
+                  const SizedBox(height: 24),
+                  const Text(
+                    'Active Eatery Listings & Specials',
+                    style: TextStyle(fontWeight: FontWeight.w800, fontSize: 16, color: Color(0xFF1E2D2A)),
+                  ),
+                  const SizedBox(height: 12),
+                  ...mockEateries.map((eatery) => Container(
+                        margin: const EdgeInsets.only(bottom: 12),
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: Theme.of(context).cardColor,
+                          borderRadius: BorderRadius.circular(14),
+                          boxShadow: [
+                            BoxShadow(color: Colors.black.withValues(alpha: 0.04), blurRadius: 4, offset: const Offset(0, 2)),
+                          ],
+                        ),
+                        child: Row(
+                          children: [
+                            ClipRRect(
+                              borderRadius: BorderRadius.circular(10),
+                              child: Image.network(
+                                eatery.imageUrl,
+                                width: 50,
+                                height: 50,
+                                fit: BoxFit.cover,
+                                errorBuilder: (context, error, stackTrace) => placeholderImage(width: 50, height: 50),
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    eatery.name,
+                                    style: TextStyle(fontWeight: FontWeight.w800, fontSize: 14, color: Theme.of(context).colorScheme.onSurface),
+                                  ),
+                                  const SizedBox(height: 2),
+                                  Text(
+                                    eatery.description,
+                                    style: const TextStyle(fontSize: 11, color: Color(0xFF6E7D79)),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ],
+                              ),
+                            ),
+                            IconButton(
+                              icon: const Icon(Icons.delete_outline, color: Colors.red, size: 20),
+                              onPressed: () {
+                                setState(() {
+                                  mockEateries.removeWhere((item) => item.id == eatery.id);
+                                });
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(content: Text('Removed ${eatery.name}')),
+                                );
+                              },
+                            ),
+                          ],
+                        ),
+                      )),
                 ],
               ),
             ),
           ],
         ),
       ),
+    );
+  }
+
+  Widget _statBox(String label, String value) {
+    return Column(
+      children: [
+        Text(
+          value,
+          style: const TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.w900),
+        ),
+        const SizedBox(height: 2),
+        Text(
+          label,
+          style: const TextStyle(color: Colors.white70, fontSize: 11),
+        ),
+      ],
     );
   }
 }
