@@ -124,6 +124,7 @@ class _VendorCreateOrderTabState extends State<VendorCreateOrderTab> {
           ? _discountController.text.trim()
           : 'Special daily offering near ACES Tagum College.',
       hasStudentDiscount: _hasDiscount,
+      location: _selectedLatLng,
       menu: [
         MenuItem(
           name: _menuNameController.text.trim(),

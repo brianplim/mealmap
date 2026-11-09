@@ -3,8 +3,34 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import '../../models/app_models.dart';
 
-class MapScreenContent extends StatelessWidget {
+class MapScreenContent extends StatefulWidget {
   const MapScreenContent({super.key});
+
+  @override
+  State<MapScreenContent> createState() => _MapScreenContentState();
+}
+
+class _MapScreenContentState extends State<MapScreenContent> {
+  final MapController _mapController = MapController();
+  double _currentZoom = 18.5;
+
+  void _zoomIn() {
+    setState(() {
+      if (_currentZoom < 20.0) {
+        _currentZoom += 1.0;
+        _mapController.move(_mapController.camera.center, _currentZoom);
+      }
+    });
+  }
+
+  void _zoomOut() {
+    setState(() {
+      if (_currentZoom > 5.0) {
+        _currentZoom -= 1.0;
+        _mapController.move(_mapController.camera.center, _currentZoom);
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -16,11 +42,15 @@ class MapScreenContent extends StatelessWidget {
               valueListenable: eateryNotifier,
               builder: (context, eateries, child) {
                 return FlutterMap(
-                  options: const MapOptions(
-                    initialCenter: LatLng(7.4575, 125.7925),
-                    initialZoom: 18.5,
+                  mapController: _mapController,
+                  options: MapOptions(
+                    initialCenter: const LatLng(7.4575, 125.7925),
+                    initialZoom: _currentZoom,
                     minZoom: 5.0,
                     maxZoom: 20.0,
+                    onPositionChanged: (position, hasGesture) {
+                      _currentZoom = position.zoom;
+                    },
                   ),
                   children: [
                     TileLayer(
@@ -57,35 +87,15 @@ class MapScreenContent extends StatelessWidget {
                             ),
                           ),
                         ),
-                        ...globalVendorPins.map((pin) => Marker(
-                              point: pin.location,
+                        ...eateries.map((eatery) => Marker(
+                              point: eatery.location,
                               width: 80,
                               height: 80,
                               child: GestureDetector(
-                                onTap: () => Navigator.pushNamed(context, '/restaurant', arguments: pin.eatery),
+                                onTap: () => Navigator.pushNamed(context, '/restaurant', arguments: eatery),
                                 child: _eateryMarkerContent(),
                               ),
                             )),
-                        ...eateries.map((eatery) {
-                          final coords = [
-                            const LatLng(7.4568, 125.7925),
-                            const LatLng(7.4575, 125.7915),
-                            const LatLng(7.4582, 125.7928),
-                            const LatLng(7.4565, 125.7938),
-                            const LatLng(7.4572, 125.7930),
-                            const LatLng(7.4585, 125.7920),
-                          ];
-                          final idx = eateries.indexOf(eatery) % coords.length;
-                          return Marker(
-                            point: coords[idx],
-                            width: 80,
-                            height: 80,
-                            child: GestureDetector(
-                              onTap: () => Navigator.pushNamed(context, '/restaurant', arguments: eatery),
-                              child: _eateryMarkerContent(),
-                            ),
-                          );
-                        }),
                       ],
                     ),
                   ],
@@ -146,6 +156,27 @@ class MapScreenContent extends StatelessWidget {
                   ),
                 ],
               ),
+            ),
+          ),
+          Positioned(
+            right: 16,
+            top: 130,
+            child: Column(
+              children: [
+                FloatingActionButton.small(
+                  heroTag: 'zoomIn',
+                  backgroundColor: Theme.of(context).cardColor,
+                  onPressed: _zoomIn,
+                  child: Icon(Icons.add, color: Theme.of(context).colorScheme.onSurface),
+                ),
+                const SizedBox(height: 8),
+                FloatingActionButton.small(
+                  heroTag: 'zoomOut',
+                  backgroundColor: Theme.of(context).cardColor,
+                  onPressed: _zoomOut,
+                  child: Icon(Icons.remove, color: Theme.of(context).colorScheme.onSurface),
+                ),
+              ],
             ),
           ),
           Positioned(
@@ -228,14 +259,14 @@ class MapScreenContent extends StatelessWidget {
         Container(
           padding: const EdgeInsets.all(8),
           decoration: BoxDecoration(
-            color: const Color(0xFFE53935),
+            color: const Color(0xFF0F7A5B),
             shape: BoxShape.circle,
-            border: Border.all(color: Colors.white, width: 2.5),
+            border: Border.all(color: Colors.white, width: 2),
             boxShadow: [
-              BoxShadow(color: Colors.black.withValues(alpha: 0.3), blurRadius: 6, offset: const Offset(0, 3)),
+              BoxShadow(color: Colors.black.withValues(alpha: 0.2), blurRadius: 4, offset: const Offset(0, 2)),
             ],
           ),
-          child: const Icon(Icons.restaurant, color: Colors.white, size: 18),
+          child: const Icon(Icons.location_on, color: Colors.white, size: 20),
         ),
       ],
     );
