@@ -18,6 +18,7 @@ class _VendorCreateOrderTabState extends State<VendorCreateOrderTab> {
   final _priceController = TextEditingController();
   final _discountController = TextEditingController();
   bool _hasDiscount = true;
+  String _selectedCuisine = 'Filipino';
   String _imageUrl = 'https://images.unsplash.com/photo-1555939594-58d7cb561ad1?auto=format&fit=crop&w=400&q=80';
   LatLng _selectedLatLng = const LatLng(7.4578, 125.7921);
 
@@ -113,8 +114,8 @@ class _VendorCreateOrderTabState extends State<VendorCreateOrderTab> {
 
     final newEatery = Eatery(
       id: 'vendor-${DateTime.now().millisecondsSinceEpoch}',
-      name: _eateryNameController.text.trim(),
-      cuisine: 'Local Special',
+      name: _eateryNameController.text.trim().isNotEmpty ? _eateryNameController.text.trim() : 'ACES Canteen Bites',
+      cuisine: _selectedCuisine,
       distance: 0.1,
       rating: 5.0,
       reviewsCount: 1,
@@ -133,7 +134,6 @@ class _VendorCreateOrderTabState extends State<VendorCreateOrderTab> {
     );
 
     mockEateries.insert(0, newEatery);
-    eateryNotifier.value = List.from(mockEateries);
     globalVendorPins.add(
       CustomVendorPin(
         id: newEatery.id,
@@ -142,9 +142,10 @@ class _VendorCreateOrderTabState extends State<VendorCreateOrderTab> {
         eatery: newEatery,
       ),
     );
+    eateryNotifier.value = List.from(mockEateries);
 
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Menu item and map location published successfully!')),
+      const SnackBar(content: Text('Posted! Live on Student Homepage and Map.')),
     );
     _menuNameController.clear();
     _priceController.clear();
@@ -198,6 +199,22 @@ class _VendorCreateOrderTabState extends State<VendorCreateOrderTab> {
                     hintText: 'e.g. Special Pork Adobo Meal',
                     border: OutlineInputBorder(borderRadius: BorderRadius.circular(14)),
                   ),
+                ),
+                const SizedBox(height: 16),
+                DropdownButtonFormField<String>(
+                  initialValue: _selectedCuisine,
+                  decoration: InputDecoration(
+                    labelText: 'Cuisine Category',
+                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(14)),
+                  ),
+                  items: ['Filipino', 'Fast Food', 'Coffee', 'Asian', 'Mexican', 'Desserts'].map((c) {
+                    return DropdownMenuItem(value: c, child: Text(c));
+                  }).toList(),
+                  onChanged: (val) {
+                    if (val != null) {
+                      setState(() => _selectedCuisine = val);
+                    }
+                  },
                 ),
                 const SizedBox(height: 16),
                 TextField(
