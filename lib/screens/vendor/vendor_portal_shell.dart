@@ -3,6 +3,7 @@ import 'vendor_dashboard_tab.dart';
 import 'vendor_create_order_tab.dart';
 import 'vendor_received_order_tab.dart';
 import 'vendor_history_order_tab.dart';
+import 'vendor_profile_tab.dart';
 
 class VendorPortalShell extends StatefulWidget {
   const VendorPortalShell({super.key, this.initialTab = 0});
@@ -27,6 +28,7 @@ class _VendorPortalShellState extends State<VendorPortalShell> {
     VendorCreateOrderTab(),
     VendorReceivedOrderTab(),
     VendorHistoryOrderTab(),
+    VendorProfileTab(),
   ];
 
   @override
@@ -52,6 +54,7 @@ class _VendorPortalShellState extends State<VendorPortalShell> {
             BottomNavigationBarItem(icon: Icon(Icons.add_box_outlined), label: 'Create Order'),
             BottomNavigationBarItem(icon: Icon(Icons.notifications_active_outlined), label: 'Received Order'),
             BottomNavigationBarItem(icon: Icon(Icons.history), label: 'History'),
+            BottomNavigationBarItem(icon: Icon(Icons.person_outline), label: 'Profile'),
           ],
         ),
       ),
