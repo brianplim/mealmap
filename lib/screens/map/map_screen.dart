@@ -14,8 +14,8 @@ class MapScreenContent extends StatelessWidget {
           Positioned.fill(
             child: FlutterMap(
               options: const MapOptions(
-                initialCenter: LatLng(7.4478, 125.8090), // Pioneer Ave / ACES Tagum College
-                initialZoom: 18.0,
+                initialCenter: LatLng(7.457192, 125.792695),
+                initialZoom: 17.5,
                 minZoom: 5.0,
                 maxZoom: 20.0,
               ),
@@ -28,7 +28,7 @@ class MapScreenContent extends StatelessWidget {
                 MarkerLayer(
                   markers: [
                     Marker(
-                      point: const LatLng(7.4478, 125.8090),
+                      point: const LatLng(7.457192, 125.792695),
                       width: 120,
                       height: 90,
                       child: GestureDetector(
@@ -56,7 +56,7 @@ class MapScreenContent extends StatelessWidget {
                       ),
                     ),
                     Marker(
-                      point: const LatLng(7.4485, 125.8098),
+                      point: const LatLng(7.4578, 125.7932),
                       width: 110,
                       height: 85,
                       child: GestureDetector(
@@ -65,7 +65,7 @@ class MapScreenContent extends StatelessWidget {
                       ),
                     ),
                     Marker(
-                      point: const LatLng(7.4472, 125.8082),
+                      point: const LatLng(7.4565, 125.7918),
                       width: 110,
                       height: 85,
                       child: GestureDetector(
@@ -74,7 +74,7 @@ class MapScreenContent extends StatelessWidget {
                       ),
                     ),
                     Marker(
-                      point: const LatLng(7.4488, 125.8078),
+                      point: const LatLng(7.4580, 125.7915),
                       width: 110,
                       height: 85,
                       child: GestureDetector(
@@ -83,7 +83,7 @@ class MapScreenContent extends StatelessWidget {
                       ),
                     ),
                     Marker(
-                      point: const LatLng(7.4468, 125.8095),
+                      point: const LatLng(7.4562, 125.7935),
                       width: 110,
                       height: 85,
                       child: GestureDetector(
@@ -92,7 +92,7 @@ class MapScreenContent extends StatelessWidget {
                       ),
                     ),
                     Marker(
-                      point: const LatLng(7.4481, 125.8105),
+                      point: const LatLng(7.4575, 125.7940),
                       width: 110,
                       height: 85,
                       child: GestureDetector(
@@ -132,7 +132,7 @@ class MapScreenContent extends StatelessWidget {
                             ),
                           ),
                           const Text(
-                            'Pioneer Ave • ACES Tagum College',
+                            'Tagum City, Mindanao, Philippines',
                             style: TextStyle(
                               fontSize: 11,
                               color: Color(0xFF5A6A64),
@@ -205,7 +205,7 @@ class MapScreenContent extends StatelessWidget {
                           ),
                           const SizedBox(height: 2),
                           const Text(
-                            'Pioneer Ave • Tagum City',
+                            'ACES Tagum College • Tagum City',
                             style: TextStyle(fontSize: 12, color: Color(0xFF6E7D79)),
                           ),
                           const SizedBox(height: 4),
