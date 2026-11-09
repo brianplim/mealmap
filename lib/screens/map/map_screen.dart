@@ -15,9 +15,9 @@ class MapScreenContent extends StatelessWidget {
             child: FlutterMap(
               options: const MapOptions(
                 initialCenter: LatLng(7.4478, 125.8090),
-                initialZoom: 16.0,
+                initialZoom: 17.5,
                 minZoom: 5.0,
-                maxZoom: 18.0,
+                maxZoom: 20.0,
               ),
               children: [
                 TileLayer(
@@ -55,7 +55,7 @@ class MapScreenContent extends StatelessWidget {
                       ),
                     ),
                     Marker(
-                      point: const LatLng(7.4490, 125.8105),
+                      point: const LatLng(7.4482, 125.8095),
                       width: 110,
                       height: 85,
                       child: GestureDetector(
@@ -64,7 +64,7 @@ class MapScreenContent extends StatelessWidget {
                       ),
                     ),
                     Marker(
-                      point: const LatLng(7.4465, 125.8075),
+                      point: const LatLng(7.4474, 125.8082),
                       width: 110,
                       height: 85,
                       child: GestureDetector(
@@ -73,7 +73,7 @@ class MapScreenContent extends StatelessWidget {
                       ),
                     ),
                     Marker(
-                      point: const LatLng(7.4455, 125.8115),
+                      point: const LatLng(7.4483, 125.8080),
                       width: 110,
                       height: 85,
                       child: GestureDetector(
@@ -82,7 +82,7 @@ class MapScreenContent extends StatelessWidget {
                       ),
                     ),
                     Marker(
-                      point: const LatLng(7.4440, 125.8060),
+                      point: const LatLng(7.4472, 125.8100),
                       width: 110,
                       height: 85,
                       child: GestureDetector(
@@ -91,7 +91,7 @@ class MapScreenContent extends StatelessWidget {
                       ),
                     ),
                     Marker(
-                      point: const LatLng(7.4485, 125.8120),
+                      point: const LatLng(7.4480, 125.8102),
                       width: 110,
                       height: 85,
                       child: GestureDetector(
