@@ -3,34 +3,8 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import '../../models/app_models.dart';
 
-class MapScreenContent extends StatefulWidget {
+class MapScreenContent extends StatelessWidget {
   const MapScreenContent({super.key});
-
-  @override
-  State<MapScreenContent> createState() => _MapScreenContentState();
-}
-
-class _MapScreenContentState extends State<MapScreenContent> {
-  final MapController _mapController = MapController();
-  double _currentZoom = 18.5;
-
-  void _zoomIn() {
-    setState(() {
-      if (_currentZoom < 20.0) {
-        _currentZoom += 1.0;
-        _mapController.move(_mapController.camera.center, _currentZoom);
-      }
-    });
-  }
-
-  void _zoomOut() {
-    setState(() {
-      if (_currentZoom > 5.0) {
-        _currentZoom -= 1.0;
-        _mapController.move(_mapController.camera.center, _currentZoom);
-      }
-    });
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -39,15 +13,11 @@ class _MapScreenContentState extends State<MapScreenContent> {
         children: [
           Positioned.fill(
             child: FlutterMap(
-              mapController: _mapController,
-              options: MapOptions(
-                initialCenter: const LatLng(7.4575, 125.7925),
-                initialZoom: _currentZoom,
+              options: const MapOptions(
+                initialCenter: LatLng(7.4575, 125.7925),
+                initialZoom: 18.5,
                 minZoom: 5.0,
                 maxZoom: 20.0,
-                onPositionChanged: (position, hasGesture) {
-                  _currentZoom = position.zoom;
-                },
               ),
               children: [
                 TileLayer(
@@ -58,8 +28,8 @@ class _MapScreenContentState extends State<MapScreenContent> {
                   markers: [
                     Marker(
                       point: const LatLng(7.4578, 125.7921),
-                      width: 130,
-                      height: 90,
+                      width: 110,
+                      height: 85,
                       child: GestureDetector(
                         onTap: () => launchAcesMap(context),
                         child: Column(
@@ -86,47 +56,47 @@ class _MapScreenContentState extends State<MapScreenContent> {
                     ),
                     Marker(
                       point: const LatLng(7.4568, 125.7925),
-                      width: 110,
-                      height: 85,
+                      width: 80,
+                      height: 80,
                       child: GestureDetector(
                         onTap: () => Navigator.pushNamed(context, '/restaurant', arguments: mockEateries[0]),
-                        child: _eateryMarkerContent('Sisig & Rice'),
+                        child: _eateryMarkerContent(),
                       ),
                     ),
                     Marker(
                       point: const LatLng(7.4575, 125.7915),
-                      width: 110,
-                      height: 85,
+                      width: 80,
+                      height: 80,
                       child: GestureDetector(
                         onTap: () => Navigator.pushNamed(context, '/restaurant', arguments: mockEateries[1]),
-                        child: _eateryMarkerContent('Lutong Bahay'),
+                        child: _eateryMarkerContent(),
                       ),
                     ),
                     Marker(
                       point: const LatLng(7.4582, 125.7928),
-                      width: 110,
-                      height: 85,
+                      width: 80,
+                      height: 80,
                       child: GestureDetector(
                         onTap: () => Navigator.pushNamed(context, '/restaurant', arguments: mockEateries[2]),
-                        child: _eateryMarkerContent('BBQ & Inihaw'),
+                        child: _eateryMarkerContent(),
                       ),
                     ),
                     Marker(
                       point: const LatLng(7.4565, 125.7938),
-                      width: 110,
-                      height: 85,
+                      width: 80,
+                      height: 80,
                       child: GestureDetector(
                         onTap: () => Navigator.pushNamed(context, '/restaurant', arguments: mockEateries[4]),
-                        child: _eateryMarkerContent('Halo-Halo'),
+                        child: _eateryMarkerContent(),
                       ),
                     ),
                     Marker(
                       point: const LatLng(7.4572, 125.7930),
-                      width: 110,
-                      height: 85,
+                      width: 80,
+                      height: 80,
                       child: GestureDetector(
                         onTap: () => Navigator.pushNamed(context, '/restaurant', arguments: mockEateries[5]),
-                        child: _eateryMarkerContent('Coffee Shop'),
+                        child: _eateryMarkerContent(),
                       ),
                     ),
                   ],
@@ -187,27 +157,6 @@ class _MapScreenContentState extends State<MapScreenContent> {
                   ),
                 ],
               ),
-            ),
-          ),
-          Positioned(
-            right: 16,
-            top: 130,
-            child: Column(
-              children: [
-                FloatingActionButton.small(
-                  heroTag: 'zoomIn',
-                  backgroundColor: Theme.of(context).cardColor,
-                  onPressed: _zoomIn,
-                  child: Icon(Icons.add, color: Theme.of(context).colorScheme.onSurface),
-                ),
-                const SizedBox(height: 8),
-                FloatingActionButton.small(
-                  heroTag: 'zoomOut',
-                  backgroundColor: Theme.of(context).cardColor,
-                  onPressed: _zoomOut,
-                  child: Icon(Icons.remove, color: Theme.of(context).colorScheme.onSurface),
-                ),
-              ],
             ),
           ),
           Positioned(
@@ -283,21 +232,23 @@ class _MapScreenContentState extends State<MapScreenContent> {
     );
   }
 
-  Widget _eateryMarkerContent(String label) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-      decoration: BoxDecoration(
-        color: const Color(0xFF0F7A5B),
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: Colors.white, width: 2),
-        boxShadow: [
-          BoxShadow(color: Colors.black.withValues(alpha: 0.2), blurRadius: 4),
-        ],
-      ),
-      child: Text(
-        label,
-        style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w800, color: Colors.white),
-      ),
+  Widget _eateryMarkerContent() {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Container(
+          padding: const EdgeInsets.all(8),
+          decoration: BoxDecoration(
+            color: const Color(0xFFE53935),
+            shape: BoxShape.circle,
+            border: Border.all(color: Colors.white, width: 2.5),
+            boxShadow: [
+              BoxShadow(color: Colors.black.withValues(alpha: 0.3), blurRadius: 6, offset: const Offset(0, 3)),
+            ],
+          ),
+          child: const Icon(Icons.restaurant, color: Colors.white, size: 18),
+        ),
+      ],
     );
   }
 }
