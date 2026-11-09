@@ -61,7 +61,7 @@ class _HomeScreenContentState extends State<HomeScreenContent> {
               padding: const EdgeInsets.symmetric(horizontal: 16),
               children: [
                 GestureDetector(
-                  onTap: () => Navigator.pushNamed(context, '/filter'),
+                  onTap: () => Navigator.pushNamed(context, '/search'),
                   child: Container(
                     height: 44,
                     padding: const EdgeInsets.symmetric(horizontal: 12),
