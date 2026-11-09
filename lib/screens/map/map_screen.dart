@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_map/flutter_map.dart';
+import 'package:latlong2/latlong.dart';
 import '../../models/app_models.dart';
 
 class MapScreenContent extends StatelessWidget {
@@ -10,176 +12,96 @@ class MapScreenContent extends StatelessWidget {
       body: Stack(
         children: [
           Positioned.fill(
-            child: InteractiveViewer(
-              boundaryMargin: const EdgeInsets.all(1200),
-              minScale: 0.3,
-              maxScale: 5.0,
-              child: SizedBox(
-                width: 1600,
-                height: 1800,
-                child: Stack(
-                  children: [
-                    Container(
-                      color: const Color(0xFFD9E7DC),
-                      child: Stack(
-                        children: [
-                          Positioned(top: 150, left: 250, width: 350, height: 380, child: Container(decoration: BoxDecoration(color: const Color(0xFFCEE0D2), borderRadius: BorderRadius.circular(32)))),
-                          Positioned(top: 550, left: 630, width: 330, height: 360, child: Container(decoration: BoxDecoration(color: const Color(0xFFCEE0D2), borderRadius: BorderRadius.circular(32)))),
-                          Positioned(top: 920, left: 180, width: 340, height: 350, child: Container(decoration: BoxDecoration(color: const Color(0xFFCEE0D2), borderRadius: BorderRadius.circular(32)))),
-                          Positioned(top: 1160, left: 590, width: 360, height: 340, child: Container(decoration: BoxDecoration(color: const Color(0xFFCEE0D2), borderRadius: BorderRadius.circular(32)))),
-
-                          Positioned(
-                            top: 400,
-                            left: -300,
-                            right: -300,
-                            height: 85,
-                            child: Transform.rotate(
-                              angle: -0.12,
-                              child: Container(color: Colors.white),
-                            ),
-                          ),
-                          Positioned(
-                            top: 750,
-                            left: -300,
-                            right: -300,
-                            height: 82,
-                            child: Transform.rotate(
-                              angle: 0.18,
-                              child: Container(color: Colors.white),
-                            ),
-                          ),
-                          Positioned(
-                            top: 1050,
-                            left: -300,
-                            right: -300,
-                            height: 86,
-                            child: Transform.rotate(
-                              angle: -0.05,
-                              child: Container(color: Colors.white),
-                            ),
-                          ),
-                          Positioned(
-                            top: 0,
-                            bottom: 0,
-                            left: 450,
-                            width: 84,
-                            child: Transform.rotate(
-                              angle: 0.22,
-                              child: Container(color: Colors.white),
-                            ),
-                          ),
-                          Positioned(
-                            top: 0,
-                            bottom: 0,
-                            right: 400,
-                            width: 88,
-                            child: Transform.rotate(
-                              angle: -0.25,
-                              child: Container(color: Colors.white),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    GreenFoodPin(
-                      label: 'BBQ & Inihaw',
-                      top: 480,
-                      left: 520,
-                      onTap: () => Navigator.pushNamed(context, '/restaurant', arguments: mockEateries[2]),
-                    ),
-                    GreenFoodPin(
-                      label: 'Lutong Bahay',
-                      top: 460,
-                      left: 700,
-                      onTap: () => Navigator.pushNamed(context, '/restaurant', arguments: mockEateries[1]),
-                    ),
-                    GreenFoodPin(
-                      label: 'Coffee Shop',
-                      top: 650,
-                      left: 760,
-                      onTap: () => Navigator.pushNamed(context, '/restaurant', arguments: mockEateries[5]),
-                    ),
-                    Positioned(
-                      top: 850,
-                      left: 630,
+            child: FlutterMap(
+              options: const MapOptions(
+                initialCenter: LatLng(7.4478, 125.8090),
+                initialZoom: 16.0,
+                minZoom: 5.0,
+                maxZoom: 18.0,
+              ),
+              children: [
+                TileLayer(
+                  urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+                  userAgentPackageName: 'com.example.mealmap',
+                ),
+                MarkerLayer(
+                  markers: [
+                    Marker(
+                      point: const LatLng(7.4478, 125.8090),
+                      width: 110,
+                      height: 85,
                       child: GestureDetector(
                         onTap: () => launchAcesMap(context),
-                        child: Stack(
-                          clipBehavior: Clip.none,
-                          alignment: Alignment.center,
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
                           children: [
-                            Positioned(
-                              top: -38,
-                              left: 20,
-                              child: Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                                decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  borderRadius: BorderRadius.circular(10),
-                                  boxShadow: [
-                                    BoxShadow(color: Colors.black.withValues(alpha: 0.15), blurRadius: 6),
-                                  ],
-                                ),
-                                child: const Text(
-                                  'NEAR ACES SCHOOL',
-                                  style: TextStyle(fontSize: 9, fontWeight: FontWeight.w900, color: Color(0xFF1E2D2A)),
-                                ),
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(6),
+                                boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.2), blurRadius: 4)],
                               ),
+                              child: const Text('ACES SCHOOL', style: TextStyle(fontSize: 8, fontWeight: FontWeight.w900, color: Color(0xFF1E2D2A))),
                             ),
-                            Column(
-                              children: [
-                                Container(
-                                  padding: const EdgeInsets.all(10),
-                                  decoration: BoxDecoration(
-                                    color: Colors.blue,
-                                    shape: BoxShape.circle,
-                                    border: Border.all(color: Colors.white, width: 3),
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: Colors.black.withValues(alpha: 0.3),
-                                        blurRadius: 8,
-                                        offset: const Offset(0, 4),
-                                      ),
-                                    ],
-                                  ),
-                                  child: const Icon(Icons.school, color: Colors.white, size: 22),
-                                ),
-                                const SizedBox(height: 4),
-                                Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                                  decoration: BoxDecoration(
-                                    color: Colors.white,
-                                    borderRadius: BorderRadius.circular(8),
-                                    boxShadow: [
-                                      BoxShadow(color: Colors.black.withValues(alpha: 0.15), blurRadius: 4),
-                                    ],
-                                  ),
-                                  child: const Text(
-                                    'ACES School',
-                                    style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: Color(0xFF1E2D2A)),
-                                  ),
-                                ),
-                              ],
+                            const SizedBox(height: 2),
+                            Container(
+                              padding: const EdgeInsets.all(6),
+                              decoration: const BoxDecoration(color: Colors.blue, shape: BoxShape.circle),
+                              child: const Icon(Icons.school, color: Colors.white, size: 16),
                             ),
                           ],
                         ),
                       ),
                     ),
-                    GreenFoodPin(
-                      label: 'Sisig & Rice',
-                      top: 1050,
-                      left: 490,
-                      onTap: () => Navigator.pushNamed(context, '/restaurant', arguments: mockEateries[0]),
+                    Marker(
+                      point: const LatLng(7.4490, 125.8105),
+                      width: 110,
+                      height: 85,
+                      child: GestureDetector(
+                        onTap: () => Navigator.pushNamed(context, '/restaurant', arguments: mockEateries[0]),
+                        child: _eateryMarkerContent('Sisig & Rice'),
+                      ),
                     ),
-                    GreenFoodPin(
-                      label: 'Halo-Halo',
-                      top: 1150,
-                      left: 720,
-                      onTap: () => Navigator.pushNamed(context, '/restaurant', arguments: mockEateries[4]),
+                    Marker(
+                      point: const LatLng(7.4465, 125.8075),
+                      width: 110,
+                      height: 85,
+                      child: GestureDetector(
+                        onTap: () => Navigator.pushNamed(context, '/restaurant', arguments: mockEateries[1]),
+                        child: _eateryMarkerContent('Lutong Bahay'),
+                      ),
+                    ),
+                    Marker(
+                      point: const LatLng(7.4455, 125.8115),
+                      width: 110,
+                      height: 85,
+                      child: GestureDetector(
+                        onTap: () => Navigator.pushNamed(context, '/restaurant', arguments: mockEateries[2]),
+                        child: _eateryMarkerContent('BBQ & Inihaw'),
+                      ),
+                    ),
+                    Marker(
+                      point: const LatLng(7.4440, 125.8060),
+                      width: 110,
+                      height: 85,
+                      child: GestureDetector(
+                        onTap: () => Navigator.pushNamed(context, '/restaurant', arguments: mockEateries[4]),
+                        child: _eateryMarkerContent('Halo-Halo'),
+                      ),
+                    ),
+                    Marker(
+                      point: const LatLng(7.4485, 125.8120),
+                      width: 110,
+                      height: 85,
+                      child: GestureDetector(
+                        onTap: () => Navigator.pushNamed(context, '/restaurant', arguments: mockEateries[5]),
+                        child: _eateryMarkerContent('Coffee Shop'),
+                      ),
                     ),
                   ],
                 ),
-              ),
+              ],
             ),
           ),
           SafeArea(
@@ -190,25 +112,25 @@ class MapScreenContent extends StatelessWidget {
                   Row(
                     children: [
                       CircleAvatar(
-                        backgroundColor: Colors.white,
+                        backgroundColor: Theme.of(context).cardColor,
                         child: IconButton(
-                          icon: const Icon(Icons.arrow_back, color: Color(0xFF1E2D2A)),
+                          icon: Icon(Icons.arrow_back, color: Theme.of(context).colorScheme.onSurface),
                           onPressed: () => Navigator.pop(context),
                         ),
                       ),
                       const SizedBox(width: 12),
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
-                        children: const [
+                        children: [
                           Text(
                             'Food Map',
                             style: TextStyle(
                               fontSize: 20,
                               fontWeight: FontWeight.w800,
-                              color: Color(0xFF1E2D2A),
+                              color: Theme.of(context).colorScheme.onSurface,
                             ),
                           ),
-                          Text(
+                          const Text(
                             'Tagum City, Mindanao, Philippines',
                             style: TextStyle(
                               fontSize: 11,
@@ -220,14 +142,14 @@ class MapScreenContent extends StatelessWidget {
                       const Spacer(),
                       Container(
                         decoration: BoxDecoration(
-                          color: Colors.white,
+                          color: Theme.of(context).cardColor,
                           borderRadius: BorderRadius.circular(12),
                           boxShadow: [
                             BoxShadow(color: Colors.black.withValues(alpha: 0.1), blurRadius: 4),
                           ],
                         ),
                         child: IconButton(
-                          icon: const Icon(Icons.tune, color: Color(0xFF1E2D2A), size: 20),
+                          icon: Icon(Icons.tune, color: Theme.of(context).colorScheme.onSurface, size: 20),
                           onPressed: () => Navigator.pushNamed(context, '/filter'),
                         ),
                       ),
@@ -246,7 +168,7 @@ class MapScreenContent extends StatelessWidget {
               child: Container(
                 padding: const EdgeInsets.all(14),
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: Theme.of(context).cardColor,
                   borderRadius: BorderRadius.circular(18),
                   boxShadow: [
                     BoxShadow(
@@ -272,12 +194,12 @@ class MapScreenContent extends StatelessWidget {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Text(
+                          Text(
                             'Filipino Food Nearby',
                             style: TextStyle(
                               fontWeight: FontWeight.w800,
                               fontSize: 15,
-                              color: Color(0xFF1E2D2A),
+                              color: Theme.of(context).colorScheme.onSurface,
                             ),
                           ),
                           const SizedBox(height: 2),
@@ -299,7 +221,7 @@ class MapScreenContent extends StatelessWidget {
                         ],
                       ),
                     ),
-                    const Icon(Icons.chevron_right, color: Color(0xFF1E2D2A), size: 22),
+                    Icon(Icons.chevron_right, color: Theme.of(context).colorScheme.onSurface, size: 22),
                   ],
                 ),
               ),
@@ -309,65 +231,39 @@ class MapScreenContent extends StatelessWidget {
       ),
     );
   }
-}
 
-class GreenFoodPin extends StatelessWidget {
-  const GreenFoodPin({
-    super.key,
-    required this.label,
-    required this.top,
-    required this.left,
-    required this.onTap,
-  });
-
-  final String label;
-  final double top;
-  final double left;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return Positioned(
-      top: top,
-      left: left,
-      child: GestureDetector(
-        onTap: onTap,
-        child: Column(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                color: const Color(0xFF0F7A5B),
-                shape: BoxShape.circle,
-                border: Border.all(color: Colors.white, width: 2),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.2),
-                    blurRadius: 6,
-                    offset: const Offset(0, 3),
-                  ),
-                ],
-              ),
-              child: const Icon(Icons.restaurant, color: Colors.white, size: 16),
-            ),
-            const SizedBox(height: 4),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(8),
-                boxShadow: [
-                  BoxShadow(color: Colors.black.withValues(alpha: 0.15), blurRadius: 4),
-                ],
-              ),
-              child: Text(
-                label,
-                style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w800, color: Color(0xFF1E2D2A)),
-              ),
-            ),
-          ],
+  Widget _eateryMarkerContent(String label) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Container(
+          padding: const EdgeInsets.all(6),
+          decoration: BoxDecoration(
+            color: const Color(0xFF0F7A5B),
+            shape: BoxShape.circle,
+            border: Border.all(color: Colors.white, width: 2),
+            boxShadow: [
+              BoxShadow(color: Colors.black.withValues(alpha: 0.2), blurRadius: 4),
+            ],
+          ),
+          child: const Icon(Icons.restaurant, color: Colors.white, size: 14),
         ),
-      ),
+        const SizedBox(height: 2),
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(6),
+            boxShadow: [
+              BoxShadow(color: Colors.black.withValues(alpha: 0.15), blurRadius: 2),
+            ],
+          ),
+          child: Text(
+            label,
+            style: const TextStyle(fontSize: 9, fontWeight: FontWeight.bold, color: Color(0xFF1E2D2A)),
+          ),
+        ),
+      ],
     );
   }
 }
