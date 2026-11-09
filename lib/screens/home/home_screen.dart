@@ -16,7 +16,7 @@ class _HomeScreenContentState extends State<HomeScreenContent> {
     return SafeArea(
       child: Column(
         children: [
-
+          statusBar(time: '9:41', color: Theme.of(context).colorScheme.onSurface),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             child: Row(
@@ -60,27 +60,41 @@ class _HomeScreenContentState extends State<HomeScreenContent> {
             child: ListView(
               padding: const EdgeInsets.symmetric(horizontal: 16),
               children: [
-                GestureDetector(
-                  onTap: () => Navigator.pushNamed(context, '/search'),
-                  child: Container(
-                    height: 44,
-                    padding: const EdgeInsets.symmetric(horizontal: 12),
-                    decoration: BoxDecoration(
-                      color: Theme.of(context).cardColor,
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Row(
-                      children: [
-                        const Icon(Icons.search, size: 18, color: Color(0xFF7A8A85)),
-                        const SizedBox(width: 8),
-                        Text(
-                          'Search food near ACES Tagum College...',
-                          style: TextStyle(fontSize: 12, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6)),
+                Container(
+                  height: 44,
+                  padding: const EdgeInsets.symmetric(horizontal: 12),
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).cardColor,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: GestureDetector(
+                          onTap: () => Navigator.pushNamed(context, '/search'),
+                          child: Row(
+                            children: [
+                              const Icon(Icons.search, size: 18, color: Color(0xFF7A8A85)),
+                              const SizedBox(width: 8),
+                              Expanded(
+                                child: Text(
+                                  'Search food near ACES Tagum College...',
+                                  style: TextStyle(fontSize: 12, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6)),
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
-                        const Spacer(),
-                        const Icon(Icons.tune, size: 16, color: Color(0xFF7A8A85)),
-                      ],
-                    ),
+                      ),
+                      GestureDetector(
+                        onTap: () => Navigator.pushNamed(context, '/filter'),
+                        child: const Padding(
+                          padding: EdgeInsets.all(8.0),
+                          child: Icon(Icons.tune, size: 18, color: Color(0xFF0F7A5B)),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
                 const SizedBox(height: 16),
@@ -362,31 +376,18 @@ class CategoryItem extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: onTap,
-      child: Column(
-        children: [
-          Container(
-            width: 56,
-            height: 56,
-            decoration: BoxDecoration(
-              color: active ? const Color(0xFF0F7A5B) : Theme.of(context).cardColor,
-              shape: BoxShape.circle,
-            ),
-            child: Icon(
-              icon,
-              size: 24,
-              color: active ? Colors.white : const Color(0xFF0F7A5B),
-            ),
-          ),
-          const SizedBox(height: 6),
-          Text(
-            label,
-            style: TextStyle(
-              fontSize: 12,
-              fontWeight: active ? FontWeight.w700 : FontWeight.w500,
-              color: Theme.of(context).colorScheme.onSurface,
-            ),
-          ),
-        ],
+      child: Container(
+        width: 56,
+        height: 56,
+        decoration: BoxDecoration(
+          color: active ? const Color(0xFF0F7A5B) : Theme.of(context).cardColor,
+          shape: BoxShape.circle,
+        ),
+        child: Icon(
+          icon,
+          size: 24,
+          color: active ? Colors.white : const Color(0xFF0F7A5B),
+        ),
       ),
     );
   }
