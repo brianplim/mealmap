@@ -14,22 +14,23 @@ class MapScreenContent extends StatelessWidget {
           Positioned.fill(
             child: FlutterMap(
               options: const MapOptions(
-                initialCenter: LatLng(7.4478, 125.8090),
-                initialZoom: 17.5,
+                initialCenter: LatLng(7.4478, 125.8090), // Pioneer Ave / ACES Tagum College
+                initialZoom: 18.0,
                 minZoom: 5.0,
                 maxZoom: 20.0,
               ),
               children: [
                 TileLayer(
-                  urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+                  urlTemplate: 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png',
+                  subdomains: const ['a', 'b', 'c', 'd'],
                   userAgentPackageName: 'com.example.mealmap',
                 ),
                 MarkerLayer(
                   markers: [
                     Marker(
                       point: const LatLng(7.4478, 125.8090),
-                      width: 110,
-                      height: 85,
+                      width: 120,
+                      height: 90,
                       child: GestureDetector(
                         onTap: () => launchAcesMap(context),
                         child: Column(
@@ -42,12 +43,12 @@ class MapScreenContent extends StatelessWidget {
                                 borderRadius: BorderRadius.circular(6),
                                 boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.2), blurRadius: 4)],
                               ),
-                              child: const Text('ACES SCHOOL', style: TextStyle(fontSize: 8, fontWeight: FontWeight.w900, color: Color(0xFF1E2D2A))),
+                              child: const Text('ACES Tagum College', style: TextStyle(fontSize: 8, fontWeight: FontWeight.w900, color: Color(0xFF1E2D2A))),
                             ),
                             const SizedBox(height: 2),
                             Container(
                               padding: const EdgeInsets.all(6),
-                              decoration: const BoxDecoration(color: Colors.blue, shape: BoxShape.circle),
+                              decoration: const BoxDecoration(color: Colors.red, shape: BoxShape.circle),
                               child: const Icon(Icons.school, color: Colors.white, size: 16),
                             ),
                           ],
@@ -55,7 +56,7 @@ class MapScreenContent extends StatelessWidget {
                       ),
                     ),
                     Marker(
-                      point: const LatLng(7.4482, 125.8095),
+                      point: const LatLng(7.4485, 125.8098),
                       width: 110,
                       height: 85,
                       child: GestureDetector(
@@ -64,7 +65,7 @@ class MapScreenContent extends StatelessWidget {
                       ),
                     ),
                     Marker(
-                      point: const LatLng(7.4474, 125.8082),
+                      point: const LatLng(7.4472, 125.8082),
                       width: 110,
                       height: 85,
                       child: GestureDetector(
@@ -73,7 +74,7 @@ class MapScreenContent extends StatelessWidget {
                       ),
                     ),
                     Marker(
-                      point: const LatLng(7.4483, 125.8080),
+                      point: const LatLng(7.4488, 125.8078),
                       width: 110,
                       height: 85,
                       child: GestureDetector(
@@ -82,7 +83,7 @@ class MapScreenContent extends StatelessWidget {
                       ),
                     ),
                     Marker(
-                      point: const LatLng(7.4472, 125.8100),
+                      point: const LatLng(7.4468, 125.8095),
                       width: 110,
                       height: 85,
                       child: GestureDetector(
@@ -91,7 +92,7 @@ class MapScreenContent extends StatelessWidget {
                       ),
                     ),
                     Marker(
-                      point: const LatLng(7.4480, 125.8102),
+                      point: const LatLng(7.4481, 125.8105),
                       width: 110,
                       height: 85,
                       child: GestureDetector(
@@ -131,7 +132,7 @@ class MapScreenContent extends StatelessWidget {
                             ),
                           ),
                           const Text(
-                            'Tagum City, Mindanao, Philippines',
+                            'Pioneer Ave • ACES Tagum College',
                             style: TextStyle(
                               fontSize: 11,
                               color: Color(0xFF5A6A64),
@@ -195,7 +196,7 @@ class MapScreenContent extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'Filipino Food Nearby',
+                            'Cuisine & Student Deals',
                             style: TextStyle(
                               fontWeight: FontWeight.w800,
                               fontSize: 15,
@@ -204,7 +205,7 @@ class MapScreenContent extends StatelessWidget {
                           ),
                           const SizedBox(height: 2),
                           const Text(
-                            'Near ACES School • Tagum City',
+                            'Pioneer Ave • Tagum City',
                             style: TextStyle(fontSize: 12, color: Color(0xFF6E7D79)),
                           ),
                           const SizedBox(height: 4),
@@ -213,7 +214,7 @@ class MapScreenContent extends StatelessWidget {
                               Icon(Icons.star, size: 12, color: Colors.amber),
                               SizedBox(width: 4),
                               Text(
-                                'Sample food spots',
+                                'Explore food spots',
                                 style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: Color(0xFF0F7A5B)),
                               ),
                             ],
@@ -233,37 +234,20 @@ class MapScreenContent extends StatelessWidget {
   }
 
   Widget _eateryMarkerContent(String label) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Container(
-          padding: const EdgeInsets.all(6),
-          decoration: BoxDecoration(
-            color: const Color(0xFF0F7A5B),
-            shape: BoxShape.circle,
-            border: Border.all(color: Colors.white, width: 2),
-            boxShadow: [
-              BoxShadow(color: Colors.black.withValues(alpha: 0.2), blurRadius: 4),
-            ],
-          ),
-          child: const Icon(Icons.restaurant, color: Colors.white, size: 14),
-        ),
-        const SizedBox(height: 2),
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(6),
-            boxShadow: [
-              BoxShadow(color: Colors.black.withValues(alpha: 0.15), blurRadius: 2),
-            ],
-          ),
-          child: Text(
-            label,
-            style: const TextStyle(fontSize: 9, fontWeight: FontWeight.bold, color: Color(0xFF1E2D2A)),
-          ),
-        ),
-      ],
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      decoration: BoxDecoration(
+        color: const Color(0xFF0F7A5B),
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: Colors.white, width: 2),
+        boxShadow: [
+          BoxShadow(color: Colors.black.withValues(alpha: 0.2), blurRadius: 4),
+        ],
+      ),
+      child: Text(
+        label,
+        style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w800, color: Colors.white),
+      ),
     );
   }
 }
