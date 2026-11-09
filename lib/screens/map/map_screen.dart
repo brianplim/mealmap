@@ -14,8 +14,8 @@ class MapScreenContent extends StatelessWidget {
           Positioned.fill(
             child: FlutterMap(
               options: const MapOptions(
-                initialCenter: LatLng(7.457192, 125.792695),
-                initialZoom: 17.5,
+                initialCenter: LatLng(7.4575, 125.7925),
+                initialZoom: 18.5,
                 minZoom: 5.0,
                 maxZoom: 20.0,
               ),
@@ -28,8 +28,8 @@ class MapScreenContent extends StatelessWidget {
                 MarkerLayer(
                   markers: [
                     Marker(
-                      point: const LatLng(7.457192, 125.792695),
-                      width: 120,
+                      point: const LatLng(7.4578, 125.7921),
+                      width: 130,
                       height: 90,
                       child: GestureDetector(
                         onTap: () => launchAcesMap(context),
@@ -43,7 +43,7 @@ class MapScreenContent extends StatelessWidget {
                                 borderRadius: BorderRadius.circular(6),
                                 boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.2), blurRadius: 4)],
                               ),
-                              child: const Text('ACES Tagum College', style: TextStyle(fontSize: 8, fontWeight: FontWeight.w900, color: Color(0xFF1E2D2A))),
+                              child: const Text('Aces Tagum College', style: TextStyle(fontSize: 8, fontWeight: FontWeight.w900, color: Color(0xFF1E2D2A))),
                             ),
                             const SizedBox(height: 2),
                             Container(
@@ -56,7 +56,7 @@ class MapScreenContent extends StatelessWidget {
                       ),
                     ),
                     Marker(
-                      point: const LatLng(7.4578, 125.7932),
+                      point: const LatLng(7.4568, 125.7925),
                       width: 110,
                       height: 85,
                       child: GestureDetector(
@@ -65,7 +65,7 @@ class MapScreenContent extends StatelessWidget {
                       ),
                     ),
                     Marker(
-                      point: const LatLng(7.4565, 125.7918),
+                      point: const LatLng(7.4575, 125.7915),
                       width: 110,
                       height: 85,
                       child: GestureDetector(
@@ -74,7 +74,7 @@ class MapScreenContent extends StatelessWidget {
                       ),
                     ),
                     Marker(
-                      point: const LatLng(7.4580, 125.7915),
+                      point: const LatLng(7.4582, 125.7928),
                       width: 110,
                       height: 85,
                       child: GestureDetector(
@@ -83,7 +83,7 @@ class MapScreenContent extends StatelessWidget {
                       ),
                     ),
                     Marker(
-                      point: const LatLng(7.4562, 125.7935),
+                      point: const LatLng(7.4565, 125.7938),
                       width: 110,
                       height: 85,
                       child: GestureDetector(
@@ -92,7 +92,7 @@ class MapScreenContent extends StatelessWidget {
                       ),
                     ),
                     Marker(
-                      point: const LatLng(7.4575, 125.7940),
+                      point: const LatLng(7.4572, 125.7930),
                       width: 110,
                       height: 85,
                       child: GestureDetector(
@@ -132,7 +132,7 @@ class MapScreenContent extends StatelessWidget {
                             ),
                           ),
                           const Text(
-                            'Tagum City, Mindanao, Philippines',
+                            'Pioneer Avenue • Aces Tagum College',
                             style: TextStyle(
                               fontSize: 11,
                               color: Color(0xFF5A6A64),
@@ -205,7 +205,7 @@ class MapScreenContent extends StatelessWidget {
                           ),
                           const SizedBox(height: 2),
                           const Text(
-                            'ACES Tagum College • Tagum City',
+                            'Pioneer Avenue • Tagum City',
                             style: TextStyle(fontSize: 12, color: Color(0xFF6E7D79)),
                           ),
                           const SizedBox(height: 4),
