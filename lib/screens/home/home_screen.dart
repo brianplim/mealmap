@@ -241,113 +241,123 @@ class _HomeScreenContentState extends State<HomeScreenContent> {
                   ],
                 ),
                 const SizedBox(height: 8),
-                ...mockEateries
-                    .where((e) => _selectedCategory == 'All' || e.cuisine == _selectedCategory || (_selectedCategory == 'Fast Food' && e.cuisine == 'Mexican'))
-                    .map((eatery) => Padding(
-                          padding: const EdgeInsets.only(bottom: 12),
-                          child: InkWell(
-                            onTap: () => Navigator.pushNamed(
-                              context,
-                              '/restaurant',
-                              arguments: eatery,
-                            ),
-                            borderRadius: BorderRadius.circular(16),
-                            child: Container(
-                              decoration: BoxDecoration(
-                                color: Theme.of(context).cardColor,
-                                borderRadius: BorderRadius.circular(16),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.black.withValues(alpha: 0.05),
-                                    blurRadius: 8,
-                                    offset: const Offset(0, 2),
+                ValueListenableBuilder<List<Eatery>>(
+                  valueListenable: eateryNotifier,
+                  builder: (context, eateries, child) {
+                    final filteredEateries = eateries
+                        .where((e) => _selectedCategory == 'All' || e.cuisine == _selectedCategory || (_selectedCategory == 'Fast Food' && e.cuisine == 'Mexican'))
+                        .toList();
+                    return Column(
+                      children: filteredEateries
+                          .map((eatery) => Padding(
+                                padding: const EdgeInsets.only(bottom: 12),
+                                child: InkWell(
+                                  onTap: () => Navigator.pushNamed(
+                                    context,
+                                    '/restaurant',
+                                    arguments: eatery,
                                   ),
-                                ],
-                              ),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  ClipRRect(
-                                    borderRadius: const BorderRadius.vertical(
-                                      top: Radius.circular(16),
+                                  borderRadius: BorderRadius.circular(16),
+                                  child: Container(
+                                    decoration: BoxDecoration(
+                                      color: Theme.of(context).cardColor,
+                                      borderRadius: BorderRadius.circular(16),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Colors.black.withValues(alpha: 0.05),
+                                          blurRadius: 8,
+                                          offset: const Offset(0, 2),
+                                        ),
+                                      ],
                                     ),
-                                    child: Image.network(
-                                      eatery.imageUrl,
-                                      height: 140,
-                                      width: double.infinity,
-                                      fit: BoxFit.cover,
-                                      errorBuilder: (context, error, stackTrace) =>
-                                          placeholderImage(width: double.infinity, height: 140),
-                                    ),
-                                  ),
-                                  Padding(
-                                    padding: const EdgeInsets.all(12),
-                                    child: Row(
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
                                       children: [
-                                        Column(
-                                          crossAxisAlignment: CrossAxisAlignment.start,
-                                          children: [
-                                            Text(
-                                              eatery.name,
-                                              style: TextStyle(
-                                                fontWeight: FontWeight.w800,
-                                                fontSize: 15,
-                                                color: Theme.of(context).colorScheme.onSurface,
+                                        ClipRRect(
+                                          borderRadius: const BorderRadius.vertical(
+                                            top: Radius.circular(16),
+                                          ),
+                                          child: Image.network(
+                                            eatery.imageUrl,
+                                            height: 140,
+                                            width: double.infinity,
+                                            fit: BoxFit.cover,
+                                            errorBuilder: (context, error, stackTrace) =>
+                                                placeholderImage(width: double.infinity, height: 140),
+                                          ),
+                                        ),
+                                        Padding(
+                                          padding: const EdgeInsets.all(12),
+                                          child: Row(
+                                            children: [
+                                              Column(
+                                                crossAxisAlignment: CrossAxisAlignment.start,
+                                                children: [
+                                                  Text(
+                                                    eatery.name,
+                                                    style: TextStyle(
+                                                      fontWeight: FontWeight.w800,
+                                                      fontSize: 15,
+                                                      color: Theme.of(context).colorScheme.onSurface,
+                                                    ),
+                                                  ),
+                                                  const SizedBox(height: 4),
+                                                  Text(
+                                                    '${eatery.distance} km from ACES College • ${eatery.cuisine}',
+                                                    style: const TextStyle(
+                                                      fontSize: 12,
+                                                      color: Color(0xFF6E7D79),
+                                                    ),
+                                                  ),
+                                                  const SizedBox(height: 6),
+                                                  Row(
+                                                    children: [
+                                                      const Icon(Icons.star, size: 14, color: Colors.amber),
+                                                      const SizedBox(width: 4),
+                                                      Text(
+                                                        eatery.rating.toString(),
+                                                        style: TextStyle(
+                                                          fontSize: 12,
+                                                          fontWeight: FontWeight.w700,
+                                                          color: Theme.of(context).colorScheme.onSurface,
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ],
                                               ),
-                                            ),
-                                            const SizedBox(height: 4),
-                                            Text(
-                                              '${eatery.distance} km from ACES College • ${eatery.cuisine}',
-                                              style: const TextStyle(
-                                                fontSize: 12,
-                                                color: Color(0xFF6E7D79),
-                                              ),
-                                            ),
-                                            const SizedBox(height: 6),
-                                            Row(
-                                              children: [
-                                                const Icon(Icons.star, size: 14, color: Colors.amber),
-                                                const SizedBox(width: 4),
-                                                Text(
-                                                  eatery.rating.toString(),
-                                                  style: TextStyle(
-                                                    fontSize: 12,
-                                                    fontWeight: FontWeight.w700,
-                                                    color: Theme.of(context).colorScheme.onSurface,
+                                              const Spacer(),
+                                              if (eatery.hasStudentDiscount)
+                                                Container(
+                                                  padding: const EdgeInsets.symmetric(
+                                                    horizontal: 10,
+                                                    vertical: 6,
+                                                  ),
+                                                  decoration: BoxDecoration(
+                                                    color: const Color(0xFFECF7EF),
+                                                    borderRadius: BorderRadius.circular(10),
+                                                  ),
+                                                  child: const Text(
+                                                    'Student Discount',
+                                                    style: TextStyle(
+                                                      fontSize: 11,
+                                                      fontWeight: FontWeight.w700,
+                                                      color: Color(0xFF0F7A5B),
+                                                    ),
                                                   ),
                                                 ),
-                                              ],
-                                            ),
-                                          ],
-                                        ),
-                                        const Spacer(),
-                                        if (eatery.hasStudentDiscount)
-                                          Container(
-                                            padding: const EdgeInsets.symmetric(
-                                              horizontal: 10,
-                                              vertical: 6,
-                                            ),
-                                            decoration: BoxDecoration(
-                                              color: const Color(0xFFECF7EF),
-                                              borderRadius: BorderRadius.circular(10),
-                                            ),
-                                            child: const Text(
-                                              'Student Discount',
-                                              style: TextStyle(
-                                                fontSize: 11,
-                                                fontWeight: FontWeight.w700,
-                                                color: Color(0xFF0F7A5B),
-                                              ),
-                                            ),
+                                            ],
                                           ),
+                                        ),
                                       ],
                                     ),
                                   ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        )),
+                                ),
+                              ))
+                          .toList(),
+                    );
+                  },
+                ),
                 const SizedBox(height: 16),
               ],
             ),

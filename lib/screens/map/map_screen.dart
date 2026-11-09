@@ -12,105 +12,85 @@ class MapScreenContent extends StatelessWidget {
       body: Stack(
         children: [
           Positioned.fill(
-            child: FlutterMap(
-              options: const MapOptions(
-                initialCenter: LatLng(7.4575, 125.7925),
-                initialZoom: 18.5,
-                minZoom: 5.0,
-                maxZoom: 20.0,
-              ),
-              children: [
-                TileLayer(
-                  urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-                  userAgentPackageName: 'com.example.mealmap',
-                ),
-                MarkerLayer(
-                  markers: [
-                    Marker(
-                      point: const LatLng(7.4578, 125.7921),
-                      width: 130,
-                      height: 90,
-                      child: GestureDetector(
-                        onTap: () => launchAcesMap(context),
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(6),
-                                boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.2), blurRadius: 4)],
-                              ),
-                              child: const Text('Aces Tagum College', style: TextStyle(fontSize: 8, fontWeight: FontWeight.w900, color: Color(0xFF1E2D2A))),
-                            ),
-                            const SizedBox(height: 2),
-                            Container(
-                              padding: const EdgeInsets.all(6),
-                              decoration: const BoxDecoration(color: Colors.red, shape: BoxShape.circle),
-                              child: const Icon(Icons.school, color: Colors.white, size: 16),
-                            ),
-                          ],
-                        ),
-                      ),
+            child: ValueListenableBuilder<List<Eatery>>(
+              valueListenable: eateryNotifier,
+              builder: (context, eateries, child) {
+                return FlutterMap(
+                  options: const MapOptions(
+                    initialCenter: LatLng(7.4575, 125.7925),
+                    initialZoom: 18.5,
+                    minZoom: 5.0,
+                    maxZoom: 20.0,
+                  ),
+                  children: [
+                    TileLayer(
+                      urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+                      userAgentPackageName: 'com.example.mealmap',
                     ),
-                    ...globalVendorPins.map((pin) => Marker(
-                          point: pin.location,
-                          width: 80,
-                          height: 80,
+                    MarkerLayer(
+                      markers: [
+                        Marker(
+                          point: const LatLng(7.4578, 125.7921),
+                          width: 130,
+                          height: 90,
                           child: GestureDetector(
-                            onTap: () => Navigator.pushNamed(context, '/restaurant', arguments: pin.eatery),
-                            child: _eateryMarkerContent(),
+                            onTap: () => launchAcesMap(context),
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.circular(6),
+                                    boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.2), blurRadius: 4)],
+                                  ),
+                                  child: const Text('Aces Tagum College', style: TextStyle(fontSize: 8, fontWeight: FontWeight.w900, color: Color(0xFF1E2D2A))),
+                                ),
+                                const SizedBox(height: 2),
+                                Container(
+                                  padding: const EdgeInsets.all(6),
+                                  decoration: const BoxDecoration(color: Colors.red, shape: BoxShape.circle),
+                                  child: const Icon(Icons.school, color: Colors.white, size: 16),
+                                ),
+                              ],
+                            ),
                           ),
-                        )),
-                    Marker(
-                      point: const LatLng(7.4568, 125.7925),
-                      width: 80,
-                      height: 80,
-                      child: GestureDetector(
-                        onTap: () => Navigator.pushNamed(context, '/restaurant', arguments: mockEateries[0]),
-                        child: _eateryMarkerContent(),
-                      ),
-                    ),
-                    Marker(
-                      point: const LatLng(7.4575, 125.7915),
-                      width: 80,
-                      height: 80,
-                      child: GestureDetector(
-                        onTap: () => Navigator.pushNamed(context, '/restaurant', arguments: mockEateries[1]),
-                        child: _eateryMarkerContent(),
-                      ),
-                    ),
-                    Marker(
-                      point: const LatLng(7.4582, 125.7928),
-                      width: 80,
-                      height: 80,
-                      child: GestureDetector(
-                        onTap: () => Navigator.pushNamed(context, '/restaurant', arguments: mockEateries[2]),
-                        child: _eateryMarkerContent(),
-                      ),
-                    ),
-                    Marker(
-                      point: const LatLng(7.4565, 125.7938),
-                      width: 80,
-                      height: 80,
-                      child: GestureDetector(
-                        onTap: () => Navigator.pushNamed(context, '/restaurant', arguments: mockEateries[4]),
-                        child: _eateryMarkerContent(),
-                      ),
-                    ),
-                    Marker(
-                      point: const LatLng(7.4572, 125.7930),
-                      width: 80,
-                      height: 80,
-                      child: GestureDetector(
-                        onTap: () => Navigator.pushNamed(context, '/restaurant', arguments: mockEateries[5]),
-                        child: _eateryMarkerContent(),
-                      ),
+                        ),
+                        ...globalVendorPins.map((pin) => Marker(
+                              point: pin.location,
+                              width: 80,
+                              height: 80,
+                              child: GestureDetector(
+                                onTap: () => Navigator.pushNamed(context, '/restaurant', arguments: pin.eatery),
+                                child: _eateryMarkerContent(),
+                              ),
+                            )),
+                        ...eateries.map((eatery) {
+                          final coords = [
+                            const LatLng(7.4568, 125.7925),
+                            const LatLng(7.4575, 125.7915),
+                            const LatLng(7.4582, 125.7928),
+                            const LatLng(7.4565, 125.7938),
+                            const LatLng(7.4572, 125.7930),
+                            const LatLng(7.4585, 125.7920),
+                          ];
+                          final idx = eateries.indexOf(eatery) % coords.length;
+                          return Marker(
+                            point: coords[idx],
+                            width: 80,
+                            height: 80,
+                            child: GestureDetector(
+                              onTap: () => Navigator.pushNamed(context, '/restaurant', arguments: eatery),
+                              child: _eateryMarkerContent(),
+                            ),
+                          );
+                        }),
+                      ],
                     ),
                   ],
-                ),
-              ],
+                );
+              },
             ),
           ),
           SafeArea(

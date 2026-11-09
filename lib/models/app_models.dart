@@ -3,6 +3,7 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:latlong2/latlong.dart';
 
 final ValueNotifier<ThemeMode> themeNotifier = ValueNotifier(ThemeMode.light);
+final ValueNotifier<List<Eatery>> eateryNotifier = ValueNotifier(mockEateries);
 
 class Eatery {
   final String id;

@@ -133,6 +133,7 @@ class _VendorCreateOrderTabState extends State<VendorCreateOrderTab> {
     );
 
     mockEateries.insert(0, newEatery);
+    eateryNotifier.value = List.from(mockEateries);
     globalVendorPins.add(
       CustomVendorPin(
         id: newEatery.id,
