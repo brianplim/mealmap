@@ -16,7 +16,7 @@ class _DailyDealsScreenContentState extends State<DailyDealsScreenContent> {
     return SafeArea(
       child: Column(
         children: [
-
+          statusBar(time: '9:41', color: Theme.of(context).colorScheme.onSurface),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             child: Row(
@@ -69,44 +69,29 @@ class _DailyDealsScreenContentState extends State<DailyDealsScreenContent> {
           ),
           const SizedBox(height: 12),
           Expanded(
-            child: ListView(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              children: [
-                DealItemCard(
-                  title: 'Taco Haven Tagum',
-                  cuisine: 'Mexican • 0.3 km near ACES',
-                  dealText: '20% off on all meals with student ID',
-                  badge: '20% OFF',
-                  image: 'https://images.unsplash.com/photo-1613514785940-daed07799d9b?auto=format&fit=crop&w=300&q=80',
-                  onTap: () => Navigator.pushNamed(context, '/restaurant', arguments: mockEateries[0]),
-                ),
-                DealItemCard(
-                  title: 'ACES Canteen Bites',
-                  cuisine: 'Filipino • 0.1 km near ACES Tagum College',
-                  dealText: 'Pancit + Drink for only ₱50',
-                  badge: 'P50',
-                  badgeColor: Colors.deepOrange,
-                  image: 'https://images.unsplash.com/photo-1555939594-58d7cb561ad1?auto=format&fit=crop&w=300&q=80',
-                  onTap: () => Navigator.pushNamed(context, '/restaurant', arguments: mockEateries[1]),
-                ),
-                DealItemCard(
-                  title: 'Tagum Inihaw Express',
-                  cuisine: 'Filipino • 0.4 km',
-                  dealText: 'Buy 2 BBQ Skewers Get 1 Free',
-                  badge: 'Special',
-                  badgeColor: const Color(0xFF0F7A5B),
-                  image: 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=300&q=80',
-                  onTap: () => Navigator.pushNamed(context, '/restaurant', arguments: mockEateries[2]),
-                ),
-                DealItemCard(
-                  title: 'Mindanao Halal Grill',
-                  cuisine: 'Asian • 0.6 km',
-                  dealText: '15% off student lunch special',
-                  badge: '15% OFF',
-                  image: 'https://images.unsplash.com/photo-1565299585323-38d6b0865b47?auto=format&fit=crop&w=300&q=80',
-                  onTap: () => Navigator.pushNamed(context, '/restaurant', arguments: mockEateries[3]),
-                ),
-              ],
+            child: ValueListenableBuilder<List<Eatery>>(
+              valueListenable: eateryNotifier,
+              builder: (context, eateries, child) {
+                final dealEateries = eateries.where((e) => e.hasStudentDiscount).toList();
+                return ListView.builder(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  itemCount: dealEateries.length,
+                  itemBuilder: (context, index) {
+                    final eatery = dealEateries[index];
+                    final firstMenuItem = eatery.menu.isNotEmpty ? eatery.menu.first.name : 'Special Meal';
+                    final firstPrice = eatery.menu.isNotEmpty ? eatery.menu.first.price : '';
+
+                    return DealItemCard(
+                      title: eatery.name,
+                      cuisine: '${eatery.cuisine} • ${eatery.distance} km near ACES',
+                      dealText: '$firstMenuItem - $firstPrice (${eatery.description})',
+                      badge: 'STUDENT DEAL',
+                      image: eatery.imageUrl,
+                      onTap: () => Navigator.pushNamed(context, '/restaurant', arguments: eatery),
+                    );
+                  },
+                );
+              },
             ),
           ),
         ],

@@ -20,7 +20,7 @@ class _SearchScreenState extends State<SearchScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final results = mockEateries.where((e) {
+    final results = eateryNotifier.value.where((e) {
       final q = _query.toLowerCase();
       final matchesName = e.name.toLowerCase().contains(q);
       final matchesCuisine = e.cuisine.toLowerCase().contains(q);
