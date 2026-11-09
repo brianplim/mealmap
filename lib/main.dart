@@ -10,7 +10,7 @@ import 'screens/filter/deals_filter_screen.dart';
 import 'screens/notifications/notifications_screen.dart';
 import 'screens/orders/orders_screen.dart';
 import 'screens/settings/settings_screen.dart';
-import 'screens/vendor/vendor_post_deal_screen.dart';
+import 'screens/vendor/vendor_portal_shell.dart';
 import 'screens/vendor/vendor_auth_screen.dart';
 import 'screens/search/search_screen.dart';
 
@@ -81,7 +81,7 @@ class MealMapApp extends StatelessWidget {
             '/notifications': (context) => const NotificationsScreen(),
             '/orders': (context) => const OrdersScreen(),
             '/settings': (context) => const SettingsScreen(),
-            '/vendor': (context) => const VendorPostDealScreen(),
+            '/vendor': (context) => const VendorPortalShell(),
             '/vendor-auth': (context) => const VendorAuthScreen(),
             '/search': (context) => const SearchScreen(),
           },
