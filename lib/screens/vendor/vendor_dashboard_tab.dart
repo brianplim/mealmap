@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../models/app_models.dart';
+import '../../services/firestore_service.dart';
 
 class VendorDashboardTab extends StatefulWidget {
   const VendorDashboardTab({super.key});
@@ -159,6 +160,7 @@ class _VendorDashboardTabState extends State<VendorDashboardTab> {
                                   mockEateries.removeWhere((item) => item.id == eatery.id);
                                   globalVendorPins.removeWhere((pin) => pin.id == eatery.id);
                                   eateryNotifier.value = List.from(mockEateries);
+                                  FirestoreService.deleteEatery(eatery.id);
                                   ScaffoldMessenger.of(context).showSnackBar(
                                     SnackBar(content: Text('Removed ${eatery.name} from student feed')),
                                   );
