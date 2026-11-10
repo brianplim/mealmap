@@ -83,4 +83,29 @@ class FirestoreService {
     }
     return null;
   }
+
+  static Future<void> saveUserProfile(String uid, String name, String handle, String avatarUrl) async {
+    try {
+      await _db.collection('users').doc(uid).set({
+        'name': name,
+        'handle': handle,
+        'avatarUrl': avatarUrl,
+        'updatedAt': FieldValue.serverTimestamp(),
+      }, SetOptions(merge: true));
+    } catch (e) {
+      debugPrint('Firestore saveUserProfile error: $e');
+    }
+  }
+
+  static Future<Map<String, dynamic>?> getUserProfile(String uid) async {
+    try {
+      final doc = await _db.collection('users').doc(uid).get();
+      if (doc.exists) {
+        return doc.data();
+      }
+    } catch (e) {
+      debugPrint('Firestore getUserProfile error: $e');
+    }
+    return null;
+  }
 }

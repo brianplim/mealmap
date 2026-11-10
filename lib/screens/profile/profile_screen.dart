@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 import '../../models/app_models.dart';
+import '../../services/firestore_service.dart';
 
 class ProfileScreenContent extends StatefulWidget {
   const ProfileScreenContent({super.key});
@@ -15,6 +17,29 @@ class _ProfileScreenContentState extends State<ProfileScreenContent> {
   String _handle = '@tagum_student23';
   String? _imagePath;
   bool _isNetworkImage = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadProfile();
+  }
+
+  Future<void> _loadProfile() async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      final data = await FirestoreService.getUserProfile(user.uid);
+      if (data != null && mounted) {
+        setState(() {
+          _name = data['name'] ?? _name;
+          _handle = data['handle'] ?? _handle;
+          _imagePath = data['avatarUrl'] ?? _imagePath;
+          if (_imagePath != null && _imagePath!.startsWith('http')) {
+            _isNetworkImage = true;
+          }
+        });
+      }
+    }
+  }
 
   void _showEditProfileDialog() {
     final nameController = TextEditingController(text: _name);
@@ -114,7 +139,7 @@ class _ProfileScreenContentState extends State<ProfileScreenContent> {
                   child: const Text('Cancel'),
                 ),
                 ElevatedButton(
-                  onPressed: () {
+                  onPressed: () async {
                     setState(() {
                       _name = nameController.text.trim();
                       _handle = handleController.text.trim();
@@ -122,10 +147,21 @@ class _ProfileScreenContentState extends State<ProfileScreenContent> {
                         _imagePath = tempImagePath;
                       }
                     });
-                    Navigator.pop(context);
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Profile updated successfully!')),
-                    );
+                    final user = FirebaseAuth.instance.currentUser;
+                    if (user != null) {
+                      await FirestoreService.saveUserProfile(
+                        user.uid,
+                        _name,
+                        _handle,
+                        _imagePath ?? '',
+                      );
+                    }
+                    if (context.mounted) {
+                      Navigator.pop(context);
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('Profile saved to Cloud Firestore!')),
+                      );
+                    }
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFF0F7A5B),
