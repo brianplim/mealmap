@@ -213,7 +213,7 @@ class _ProfileScreenContentState extends State<ProfileScreenContent> {
                   children: [
                     ProfileStat(count: '${globalFavoriteIds.length}', label: 'Favorites'),
                     const ProfileStat(count: '6', label: 'Deals Viewed'),
-                    const ProfileStat(count: '2', label: 'Notifications'),
+                    ProfileStat(count: '${globalNotifications.length}', label: 'Notifications'),
                   ],
                 ),
               ],
@@ -235,8 +235,11 @@ class _ProfileScreenContentState extends State<ProfileScreenContent> {
                 ProfileMenuItem(
                   icon: Icons.notifications_none,
                   label: 'Notifications',
-                  badge: '3',
-                  onTap: () => Navigator.pushNamed(context, '/notifications'),
+                  badge: globalNotifications.isNotEmpty ? '${globalNotifications.length}' : null,
+                  onTap: () async {
+                    await Navigator.pushNamed(context, '/notifications');
+                    setState(() {});
+                  },
                 ),
                 ProfileMenuItem(
                   icon: Icons.settings_outlined,
