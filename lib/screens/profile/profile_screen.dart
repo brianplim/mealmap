@@ -240,7 +240,7 @@ class _ProfileScreenContentState extends State<ProfileScreenContent> {
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
                     ProfileStat(count: '${globalFavoriteIds.length}', label: 'Favorites'),
-                    ProfileStat(count: '${eateryNotifier.value.where((e) => e.hasStudentDiscount).length}', label: 'Deals Viewed'),
+                    const ProfileStat(count: '0', label: 'Deals Viewed'),
                     ProfileStat(count: '${globalNotifications.length}', label: 'Notifications'),
                   ],
                 ),
