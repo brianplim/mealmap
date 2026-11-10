@@ -48,9 +48,6 @@ class _MapScreenContentState extends State<MapScreenContent> {
                     initialZoom: _currentZoom,
                     minZoom: 5.0,
                     maxZoom: 20.0,
-                    onPositionChanged: (position, hasGesture) {
-                      _currentZoom = position.zoom;
-                    },
                   ),
                   children: [
                     TileLayer(
@@ -89,11 +86,11 @@ class _MapScreenContentState extends State<MapScreenContent> {
                         ),
                         ...eateries.where((e) => e.showOnMap).map((eatery) => Marker(
                               point: eatery.location,
-                              width: 110,
-                              height: 85,
+                              width: 80,
+                              height: 80,
                               child: GestureDetector(
                                 onTap: () => Navigator.pushNamed(context, '/restaurant', arguments: eatery),
-                                child: _eateryMarkerContent(eatery.name),
+                                child: _eateryMarkerContent(),
                               ),
                             )),
                       ],
@@ -252,36 +249,21 @@ class _MapScreenContentState extends State<MapScreenContent> {
     );
   }
 
-  Widget _eateryMarkerContent(String name) {
+  Widget _eateryMarkerContent() {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
         Container(
-          padding: const EdgeInsets.all(6),
+          padding: const EdgeInsets.all(8),
           decoration: BoxDecoration(
-            color: const Color(0xFF0F7A5B),
+            color: const Color(0xFFE53935),
             shape: BoxShape.circle,
-            border: Border.all(color: Colors.white, width: 2),
+            border: Border.all(color: Colors.white, width: 2.5),
             boxShadow: [
-              BoxShadow(color: Colors.black.withValues(alpha: 0.2), blurRadius: 4, offset: const Offset(0, 2)),
+              BoxShadow(color: Colors.black.withValues(alpha: 0.3), blurRadius: 6, offset: const Offset(0, 3)),
             ],
           ),
-          child: const Icon(Icons.location_on, color: Colors.white, size: 16),
-        ),
-        const SizedBox(height: 2),
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(6),
-            boxShadow: [
-              BoxShadow(color: Colors.black.withValues(alpha: 0.15), blurRadius: 2),
-            ],
-          ),
-          child: Text(
-            name,
-            style: const TextStyle(fontSize: 9, fontWeight: FontWeight.bold, color: Color(0xFF1E2D2A)),
-          ),
+          child: const Icon(Icons.restaurant, color: Colors.white, size: 18),
         ),
       ],
     );
