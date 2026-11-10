@@ -247,6 +247,18 @@ class _HomeScreenContentState extends State<HomeScreenContent> {
                     final filteredEateries = eateries
                         .where((e) => _selectedCategory == 'All' || e.cuisine == _selectedCategory || (_selectedCategory == 'Fast Food' && e.cuisine == 'Mexican'))
                         .toList();
+                    if (filteredEateries.isEmpty) {
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 40),
+                        child: Center(
+                          child: Text(
+                            'No eateries posted yet.\nNew food spots & vendor deals will appear here!',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6)),
+                          ),
+                        ),
+                      );
+                    }
                     return Column(
                       children: filteredEateries
                           .map((eatery) => Padding(
