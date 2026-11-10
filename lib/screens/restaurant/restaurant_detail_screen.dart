@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../models/app_models.dart';
+import '../../services/firestore_service.dart';
 
 class RestaurantDetailScreen extends StatefulWidget {
   const RestaurantDetailScreen({super.key});
@@ -96,6 +97,7 @@ class _RestaurantDetailScreenState extends State<RestaurantDetailScreen> {
                       timestamp: 'Just now',
                     );
                     globalOrders.insert(0, newOrder);
+                    FirestoreService.uploadOrder(newOrder);
                     Navigator.pop(context);
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(content: Text('Order placed successfully! Check Deliveries/Orders status.')),

@@ -4,6 +4,7 @@ import 'package:latlong2/latlong.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 import '../../models/app_models.dart';
+import '../../services/firestore_service.dart';
 
 class VendorCreateOrderTab extends StatefulWidget {
   const VendorCreateOrderTab({super.key});
@@ -135,6 +136,7 @@ class _VendorCreateOrderTabState extends State<VendorCreateOrderTab> {
     );
 
     mockEateries.insert(0, newEatery);
+    FirestoreService.uploadEatery(newEatery, _selectedLatLng);
     globalVendorPins.add(
       CustomVendorPin(
         id: newEatery.id,
