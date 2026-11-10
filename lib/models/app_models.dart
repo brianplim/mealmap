@@ -18,6 +18,7 @@ class Eatery {
   final bool hasStudentDiscount;
   final List<MenuItem> menu;
   final LatLng location;
+  final String? vendorEmail;
 
   const Eatery({
     required this.id,
@@ -31,6 +32,7 @@ class Eatery {
     required this.hasStudentDiscount,
     required this.menu,
     this.location = const LatLng(7.4578, 125.7921),
+    this.vendorEmail,
   });
 }
 
@@ -54,6 +56,7 @@ class FoodOrder {
   final String fulfillmentType;
   String status;
   final String timestamp;
+  final String? vendorEmail;
 
   FoodOrder({
     required this.id,
@@ -63,6 +66,7 @@ class FoodOrder {
     required this.fulfillmentType,
     required this.status,
     required this.timestamp,
+    this.vendorEmail,
   });
 }
 
@@ -91,6 +95,7 @@ final List<FoodOrder> globalOrders = [
     fulfillmentType: 'Delivery',
     status: 'Out for Delivery near ACES College',
     timestamp: '10 mins ago',
+    vendorEmail: 'taco@aces.edu.ph',
   ),
   FoodOrder(
     id: 'ORD-002',
@@ -100,6 +105,7 @@ final List<FoodOrder> globalOrders = [
     fulfillmentType: 'Pickup',
     status: 'Food Taken / Picked Up',
     timestamp: '1 hour ago',
+    vendorEmail: 'aces@aces.edu.ph',
   ),
 ];
 
@@ -117,6 +123,7 @@ final List<Eatery> mockEateries = [
     description: 'Popular Tex-Mex spot near ACES Tagum College. Fresh ingredients, bold flavors, and student-friendly prices!',
     hasStudentDiscount: true,
     location: const LatLng(7.4568, 125.7925),
+    vendorEmail: 'taco@aces.edu.ph',
     menu: [
       MenuItem(name: 'Campus Tacos', price: '₱65', imageUrl: 'https://images.unsplash.com/photo-1613514785940-daed07799d9b?auto=format&fit=crop&w=300&q=80'),
       MenuItem(name: 'Mindanao Burrito', price: '₱95', imageUrl: 'https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=300&q=80'),
@@ -134,6 +141,7 @@ final List<Eatery> mockEateries = [
     description: 'Located right inside/near ACES Tagum College. Serving affordable homemade Filipino comfort food and student meals.',
     hasStudentDiscount: true,
     location: const LatLng(7.4575, 125.7915),
+    vendorEmail: 'aces@aces.edu.ph',
     menu: [
       MenuItem(name: 'Pancit + Drink', price: '₱50', imageUrl: 'https://images.unsplash.com/photo-1555939594-58d7cb561ad1?auto=format&fit=crop&w=300&q=80'),
       MenuItem(name: 'Chicken Adobo Meal', price: '₱75', imageUrl: 'https://images.unsplash.com/photo-1626503378942-8874a9cf2996?auto=format&fit=crop&w=300&q=80'),
@@ -150,6 +158,7 @@ final List<Eatery> mockEateries = [
     description: 'Best grilled pork barbecue and native chicken near ACES Tagum College.',
     hasStudentDiscount: true,
     location: const LatLng(7.4582, 125.7928),
+    vendorEmail: 'inihaw@aces.edu.ph',
     menu: [
       MenuItem(name: 'Pork BBQ Skewers (3pcs)', price: '₱60', imageUrl: 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=300&q=80'),
     ],
@@ -165,6 +174,7 @@ final List<Eatery> mockEateries = [
     description: 'Authentic Halal dishes, flavorful satay, and refreshing fruit shakes near ACES Tagum College.',
     hasStudentDiscount: true,
     location: const LatLng(7.4585, 125.7920),
+    vendorEmail: 'halal@aces.edu.ph',
     menu: [
       MenuItem(name: 'Beef Satay Rice', price: '₱90', imageUrl: 'https://images.unsplash.com/photo-1565299585323-38d6b0865b47?auto=format&fit=crop&w=300&q=80'),
     ],
@@ -180,6 +190,7 @@ final List<Eatery> mockEateries = [
     description: 'Special creamy shaved ice halo-halo with leche flan, ube ice cream, and sweet tropical fruits near ACES Tagum College.',
     hasStudentDiscount: true,
     location: const LatLng(7.4565, 125.7938),
+    vendorEmail: 'halohalo@aces.edu.ph',
     menu: [
       MenuItem(name: 'Special Student Halo-Halo', price: '₱75', imageUrl: 'https://images.unsplash.com/photo-1563805042-7684c019e1cb?auto=format&fit=crop&w=300&q=80'),
       MenuItem(name: 'Mais Con Yelo', price: '₱55', imageUrl: 'https://images.unsplash.com/photo-1570197788417-0e82375c9371?auto=format&fit=crop&w=300&q=80'),
@@ -196,6 +207,7 @@ final List<Eatery> mockEateries = [
     description: 'Cozy study cafe near ACES Tagum College serving iced lattes, local barako coffee, and pastries.',
     hasStudentDiscount: true,
     location: const LatLng(7.4572, 125.7930),
+    vendorEmail: 'coffee@aces.edu.ph',
     menu: [
       MenuItem(name: 'Iced Caramel Macchiato', price: '₱90', imageUrl: 'https://images.unsplash.com/photo-1461023058943-07fcbe16d735?auto=format&fit=crop&w=300&q=80'),
       MenuItem(name: 'Student Barako Brew', price: '₱50', imageUrl: 'https://images.unsplash.com/photo-1509042239860-f550ce710b93?auto=format&fit=crop&w=300&q=80'),

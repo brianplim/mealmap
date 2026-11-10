@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:image_picker/image_picker.dart';
@@ -112,6 +113,7 @@ class _VendorCreateOrderTabState extends State<VendorCreateOrderTab> {
 
     final rawPrice = _priceController.text.trim().replaceAll('₱', '');
     final formattedPrice = '₱$rawPrice';
+    final userEmail = FirebaseAuth.instance.currentUser?.email;
 
     final newEatery = Eatery(
       id: 'vendor-${DateTime.now().millisecondsSinceEpoch}',
@@ -126,6 +128,7 @@ class _VendorCreateOrderTabState extends State<VendorCreateOrderTab> {
           : 'Special daily offering near ACES Tagum College.',
       hasStudentDiscount: _hasDiscount,
       location: _selectedLatLng,
+      vendorEmail: userEmail,
       menu: [
         MenuItem(
           name: _menuNameController.text.trim(),

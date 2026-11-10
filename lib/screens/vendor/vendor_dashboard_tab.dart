@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import '../../models/app_models.dart';
 import '../../services/firestore_service.dart';
 
@@ -12,6 +13,8 @@ class VendorDashboardTab extends StatefulWidget {
 class _VendorDashboardTabState extends State<VendorDashboardTab> {
   @override
   Widget build(BuildContext context) {
+    final currentUserEmail = FirebaseAuth.instance.currentUser?.email;
+
     return SafeArea(
       child: Column(
         children: [
@@ -48,6 +51,14 @@ class _VendorDashboardTabState extends State<VendorDashboardTab> {
             child: ValueListenableBuilder<List<Eatery>>(
               valueListenable: eateryNotifier,
               builder: (context, eateries, child) {
+                final vendorEateries = currentUserEmail != null
+                    ? eateries.where((e) => e.vendorEmail == currentUserEmail).toList()
+                    : <Eatery>[];
+
+                final vendorOrders = currentUserEmail != null
+                    ? globalOrders.where((o) => o.vendorEmail == currentUserEmail).toList()
+                    : <FoodOrder>[];
+
                 return ListView(
                   padding: const EdgeInsets.all(16),
                   children: [
@@ -87,9 +98,9 @@ class _VendorDashboardTabState extends State<VendorDashboardTab> {
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceAround,
                             children: [
-                              _statBox('Active Posts', '${eateries.length}'),
-                              _statBox('Orders', '${globalOrders.length}'),
-                              _statBox('Sold Today', '24'),
+                              _statBox('Active Posts', '${vendorEateries.length}'),
+                              _statBox('Orders', '${vendorOrders.length}'),
+                              _statBox('Sold Today', '${vendorOrders.where((o) => o.status.contains('Received') || o.status.contains('Taken')).length}'),
                             ],
                           ),
                         ],
@@ -101,74 +112,86 @@ class _VendorDashboardTabState extends State<VendorDashboardTab> {
                       style: TextStyle(fontWeight: FontWeight.w800, fontSize: 16, color: Color(0xFF1E2D2A)),
                     ),
                     const SizedBox(height: 12),
-                    ...eateries.map((eatery) => Container(
-                          margin: const EdgeInsets.only(bottom: 12),
-                          padding: const EdgeInsets.all(12),
-                          decoration: BoxDecoration(
-                            color: Theme.of(context).cardColor,
-                            borderRadius: BorderRadius.circular(14),
-                            boxShadow: [
-                              BoxShadow(color: Colors.black.withValues(alpha: 0.04), blurRadius: 4, offset: const Offset(0, 2)),
-                            ],
+                    if (vendorEateries.isEmpty)
+                      Center(
+                        child: Padding(
+                          padding: const EdgeInsets.only(top: 40),
+                          child: Text(
+                            'No active posts yet.\nUse "Create Order" tab to post your first menu item!',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7)),
                           ),
-                          child: Row(
-                            children: [
-                              ClipRRect(
-                                borderRadius: BorderRadius.circular(10),
-                                child: Image.network(
-                                  eatery.imageUrl,
-                                  width: 55,
-                                  height: 55,
-                                  fit: BoxFit.cover,
-                                  errorBuilder: (context, error, stackTrace) => placeholderImage(width: 55, height: 55),
+                        ),
+                      )
+                    else
+                      ...vendorEateries.map((eatery) => Container(
+                            margin: const EdgeInsets.only(bottom: 12),
+                            padding: const EdgeInsets.all(12),
+                            decoration: BoxDecoration(
+                              color: Theme.of(context).cardColor,
+                              borderRadius: BorderRadius.circular(14),
+                              boxShadow: [
+                                BoxShadow(color: Colors.black.withValues(alpha: 0.04), blurRadius: 4, offset: const Offset(0, 2)),
+                              ],
+                            ),
+                            child: Row(
+                              children: [
+                                ClipRRect(
+                                  borderRadius: BorderRadius.circular(10),
+                                  child: Image.network(
+                                    eatery.imageUrl,
+                                    width: 55,
+                                    height: 55,
+                                    fit: BoxFit.cover,
+                                    errorBuilder: (context, error, stackTrace) => placeholderImage(width: 55, height: 55),
+                                  ),
                                 ),
-                              ),
-                              const SizedBox(width: 12),
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      eatery.name,
-                                      style: TextStyle(fontWeight: FontWeight.w800, fontSize: 14, color: Theme.of(context).colorScheme.onSurface),
-                                    ),
-                                    const SizedBox(height: 2),
-                                    Text(
-                                      eatery.description,
-                                      style: const TextStyle(fontSize: 11, color: Color(0xFF6E7D79)),
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
-                                    ),
-                                    const SizedBox(height: 4),
-                                    Container(
-                                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                                      decoration: BoxDecoration(
-                                        color: const Color(0xFFECF7EF),
-                                        borderRadius: BorderRadius.circular(6),
+                                const SizedBox(width: 12),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        eatery.name,
+                                        style: TextStyle(fontWeight: FontWeight.w800, fontSize: 14, color: Theme.of(context).colorScheme.onSurface),
                                       ),
-                                      child: Text(
-                                        eatery.hasStudentDiscount ? 'Student Discount Active' : 'Regular',
-                                        style: const TextStyle(fontSize: 9, fontWeight: FontWeight.bold, color: Color(0xFF0F7A5B)),
+                                      const SizedBox(height: 2),
+                                      Text(
+                                        eatery.description,
+                                        style: const TextStyle(fontSize: 11, color: Color(0xFF6E7D79)),
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
                                       ),
-                                    ),
-                                  ],
+                                      const SizedBox(height: 4),
+                                      Container(
+                                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                        decoration: BoxDecoration(
+                                          color: const Color(0xFFECF7EF),
+                                          borderRadius: BorderRadius.circular(6),
+                                        ),
+                                        child: Text(
+                                          eatery.hasStudentDiscount ? 'Student Discount Active' : 'Regular',
+                                          style: const TextStyle(fontSize: 9, fontWeight: FontWeight.bold, color: Color(0xFF0F7A5B)),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
                                 ),
-                              ),
-                              IconButton(
-                                icon: const Icon(Icons.delete_outline, color: Colors.red, size: 20),
-                                onPressed: () {
-                                  mockEateries.removeWhere((item) => item.id == eatery.id);
-                                  globalVendorPins.removeWhere((pin) => pin.id == eatery.id);
-                                  eateryNotifier.value = List.from(mockEateries);
-                                  FirestoreService.deleteEatery(eatery.id);
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(content: Text('Removed ${eatery.name} from student feed')),
-                                  );
-                                },
-                              ),
-                            ],
-                          ),
-                        )),
+                                IconButton(
+                                  icon: const Icon(Icons.delete_outline, color: Colors.red, size: 20),
+                                  onPressed: () {
+                                    mockEateries.removeWhere((item) => item.id == eatery.id);
+                                    globalVendorPins.removeWhere((pin) => pin.id == eatery.id);
+                                    eateryNotifier.value = List.from(mockEateries);
+                                    FirestoreService.deleteEatery(eatery.id);
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(content: Text('Removed ${eatery.name} from student feed')),
+                                    );
+                                  },
+                                ),
+                              ],
+                            ),
+                          )),
                   ],
                 );
               },
