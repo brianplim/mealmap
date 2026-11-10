@@ -19,132 +19,125 @@ class _ProfileScreenContentState extends State<ProfileScreenContent> {
   void _showEditProfileDialog() {
     final nameController = TextEditingController(text: _name);
     final handleController = TextEditingController(text: _handle);
-    final urlController = TextEditingController();
+    String? tempImagePath = _imagePath;
 
     showDialog(
       context: context,
       builder: (context) {
-        return AlertDialog(
-          title: const Text('Edit Profile'),
-          content: SingleChildScrollView(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                TextField(
-                  controller: nameController,
-                  decoration: const InputDecoration(labelText: 'Display Name'),
-                ),
-                const SizedBox(height: 12),
-                TextField(
-                  controller: handleController,
-                  decoration: const InputDecoration(labelText: 'Username / Handle'),
-                ),
-                const SizedBox(height: 12),
-                TextField(
-                  controller: urlController,
-                  decoration: const InputDecoration(
-                    labelText: 'Or Profile Image URL',
-                    hintText: 'https://example.com/photo.jpg',
-                  ),
-                ),
-                const SizedBox(height: 16),
-                ElevatedButton.icon(
-                  onPressed: () async {
-                    try {
-                      final picker = ImagePicker();
-                      final pickedFile = await picker.pickImage(source: ImageSource.gallery);
-                      if (pickedFile != null) {
-                        setState(() {
-                          _imagePath = pickedFile.path;
-                          _isNetworkImage = false;
-                        });
-                        if (context.mounted) {
-                          Navigator.pop(context);
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text('Profile picture updated from gallery!')),
-                          );
+        return StatefulBuilder(
+          builder: (context, setDialogState) {
+            return AlertDialog(
+              title: const Text('Edit Profile'),
+              content: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    TextField(
+                      controller: nameController,
+                      decoration: const InputDecoration(labelText: 'Display Name'),
+                    ),
+                    const SizedBox(height: 12),
+                    TextField(
+                      controller: handleController,
+                      decoration: const InputDecoration(labelText: 'Username / Handle'),
+                    ),
+                    const SizedBox(height: 16),
+                    ElevatedButton.icon(
+                      onPressed: () async {
+                        try {
+                          final picker = ImagePicker();
+                          final pickedFile = await picker.pickImage(source: ImageSource.gallery);
+                          if (pickedFile != null) {
+                            setDialogState(() {
+                              tempImagePath = pickedFile.path;
+                              _isNetworkImage = false;
+                            });
+                          }
+                        } catch (e) {
+                          if (context.mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text('Gallery picker note: (${e.toString()})')),
+                            );
+                          }
                         }
-                      }
-                    } catch (e) {
-                      if (context.mounted) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text('Gallery picker note: Use Image URL below (${e.toString()})')),
+                      },
+                      icon: const Icon(Icons.photo_library),
+                      label: const Text('Upload from Gallery'),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF0F7A5B),
+                        foregroundColor: Colors.white,
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    const Text(
+                      'Or choose a preset avatar:',
+                      style: TextStyle(fontSize: 12, color: Colors.grey, fontWeight: FontWeight.bold),
+                    ),
+                    const SizedBox(height: 10),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80',
+                        'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=200&q=80',
+                        'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=200&q=80',
+                      ].map((url) {
+                        final isSelected = tempImagePath == url;
+                        return GestureDetector(
+                          onTap: () {
+                            setDialogState(() {
+                              tempImagePath = url;
+                              _isNetworkImage = true;
+                            });
+                          },
+                          child: Container(
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              border: Border.all(
+                                color: isSelected ? const Color(0xFF0F7A5B) : Colors.transparent,
+                                width: 3,
+                              ),
+                            ),
+                            child: CircleAvatar(
+                              radius: 24,
+                              backgroundImage: NetworkImage(url),
+                            ),
+                          ),
                         );
+                      }).toList(),
+                    ),
+                  ],
+                ),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: const Text('Cancel'),
+                ),
+                ElevatedButton(
+                  onPressed: () {
+                    setState(() {
+                      _name = nameController.text.trim();
+                      _handle = handleController.text.trim();
+                      if (tempImagePath != null) {
+                        _imagePath = tempImagePath;
                       }
-                    }
+                    });
+                    Navigator.pop(context);
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Profile updated successfully!')),
+                    );
                   },
-                  icon: const Icon(Icons.photo_library),
-                  label: const Text('Upload from Gallery'),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFF0F7A5B),
                     foregroundColor: Colors.white,
                   ),
-                ),
-                const SizedBox(height: 10),
-                const Text(
-                  'Or choose a preset avatar:',
-                  style: TextStyle(fontSize: 12, color: Colors.grey),
-                ),
-                const SizedBox(height: 8),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    _presetAvatarButton('https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80', '1'),
-                    _presetAvatarButton('https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=200&q=80', '2'),
-                    _presetAvatarButton('https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=200&q=80', '3'),
-                  ],
+                  child: const Text('Save'),
                 ),
               ],
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text('Cancel'),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                setState(() {
-                  _name = nameController.text.trim();
-                  _handle = handleController.text.trim();
-                  if (urlController.text.trim().isNotEmpty) {
-                    _imagePath = urlController.text.trim();
-                    _isNetworkImage = true;
-                  }
-                });
-                Navigator.pop(context);
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Profile updated successfully!')),
-                );
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF0F7A5B),
-                foregroundColor: Colors.white,
-              ),
-              child: const Text('Save'),
-            ),
-          ],
+            );
+          },
         );
       },
-    );
-  }
-
-  Widget _presetAvatarButton(String url, String label) {
-    return GestureDetector(
-      onTap: () {
-        setState(() {
-          _imagePath = url;
-          _isNetworkImage = true;
-        });
-        Navigator.pop(context);
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Preset avatar selected!')),
-        );
-      },
-      child: CircleAvatar(
-        radius: 20,
-        backgroundImage: NetworkImage(url),
-      ),
     );
   }
 
@@ -153,9 +146,8 @@ class _ProfileScreenContentState extends State<ProfileScreenContent> {
     return SafeArea(
       child: Column(
         children: [
-
           Container(
-            margin: const EdgeInsets.symmetric(horizontal: 16),
+            margin: const EdgeInsets.all(16),
             padding: const EdgeInsets.symmetric(vertical: 20),
             decoration: BoxDecoration(
               color: const Color(0xFF0F7A5B),
@@ -219,7 +211,6 @@ class _ProfileScreenContentState extends State<ProfileScreenContent> {
               ],
             ),
           ),
-          const SizedBox(height: 12),
           Expanded(
             child: ListView(
               padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -230,8 +221,6 @@ class _ProfileScreenContentState extends State<ProfileScreenContent> {
                   badge: '${globalOrders.where((o) => !o.status.contains('Taken') && !o.status.contains('Delivered')).length}',
                   onTap: () => Navigator.pushNamed(context, '/orders'),
                 ),
-
-
                 ProfileMenuItem(
                   icon: Icons.notifications_none,
                   label: 'Notifications',
@@ -334,18 +323,13 @@ class ProfileMenuItem extends StatelessWidget {
               Icon(icon, size: 20, color: iconColor),
               const SizedBox(width: 12),
               Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      label,
-                      style: TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w700,
-                        color: textColor == const Color(0xFF1E2D2A) ? Theme.of(context).colorScheme.onSurface : textColor,
-                      ),
-                    ),
-                  ],
+                child: Text(
+                  label,
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w700,
+                    color: textColor == const Color(0xFF1E2D2A) ? Theme.of(context).colorScheme.onSurface : textColor,
+                  ),
                 ),
               ),
               if (badge != null && badge != '0') ...[
