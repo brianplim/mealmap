@@ -86,28 +86,7 @@ class CustomVendorPin {
 
 final List<CustomVendorPin> globalVendorPins = [];
 
-final List<FoodOrder> globalOrders = [
-  FoodOrder(
-    id: 'ORD-001',
-    eateryName: 'Taco Haven Tagum',
-    itemName: 'Campus Tacos (2x)',
-    price: '₱130',
-    fulfillmentType: 'Delivery',
-    status: 'Out for Delivery near ACES College',
-    timestamp: '10 mins ago',
-    vendorEmail: 'taco@aces.edu.ph',
-  ),
-  FoodOrder(
-    id: 'ORD-002',
-    eateryName: 'ACES Canteen Bites',
-    itemName: 'Pancit + Drink',
-    price: '₱50',
-    fulfillmentType: 'Pickup',
-    status: 'Food Taken / Picked Up',
-    timestamp: '1 hour ago',
-    vendorEmail: 'aces@aces.edu.ph',
-  ),
-];
+final List<FoodOrder> globalOrders = [];
 
 final List<String> globalFavoriteIds = ['1', '2', '3', '4', '5', '6'];
 
