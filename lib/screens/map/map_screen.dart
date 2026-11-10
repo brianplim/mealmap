@@ -87,7 +87,7 @@ class _MapScreenContentState extends State<MapScreenContent> {
                             ),
                           ),
                         ),
-                        ...eateries.map((eatery) => Marker(
+                        ...eateries.where((e) => e.showOnMap).map((eatery) => Marker(
                               point: eatery.location,
                               width: 110,
                               height: 85,
