@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 import '../../models/app_models.dart';
+import '../../services/firestore_service.dart';
 
 class VendorProfileTab extends StatefulWidget {
   const VendorProfileTab({super.key});
@@ -15,6 +17,29 @@ class _VendorProfileTabState extends State<VendorProfileTab> {
   String _handle = '@aces_canteen_tagum';
   String? _imagePath;
   bool _isNetworkImage = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadProfile();
+  }
+
+  Future<void> _loadProfile() async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      final data = await FirestoreService.getVendorProfile(user.uid);
+      if (data != null && mounted) {
+        setState(() {
+          _businessName = data['businessName'] ?? _businessName;
+          _handle = data['handle'] ?? _handle;
+          _imagePath = data['logoUrl'] ?? _imagePath;
+          if (_imagePath != null && _imagePath!.startsWith('http')) {
+            _isNetworkImage = true;
+          }
+        });
+      }
+    }
+  }
 
   void _showEditProfileDialog() {
     final nameController = TextEditingController(text: _businessName);
@@ -89,7 +114,7 @@ class _VendorProfileTabState extends State<VendorProfileTab> {
               child: const Text('Cancel'),
             ),
             ElevatedButton(
-              onPressed: () {
+              onPressed: () async {
                 setState(() {
                   _businessName = nameController.text.trim();
                   _handle = handleController.text.trim();
@@ -98,10 +123,21 @@ class _VendorProfileTabState extends State<VendorProfileTab> {
                     _isNetworkImage = true;
                   }
                 });
-                Navigator.pop(context);
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Business profile updated successfully!')),
-                );
+                final user = FirebaseAuth.instance.currentUser;
+                if (user != null) {
+                  await FirestoreService.saveVendorProfile(
+                    user.uid,
+                    _businessName,
+                    _handle,
+                    _imagePath ?? '',
+                  );
+                }
+                if (context.mounted) {
+                  Navigator.pop(context);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Business profile saved to Cloud Firestore!')),
+                  );
+                }
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFF0F7A5B),

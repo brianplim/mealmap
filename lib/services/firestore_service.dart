@@ -58,4 +58,29 @@ class FirestoreService {
       debugPrint('Firestore updateOrderStatus error: $e');
     }
   }
+
+  static Future<void> saveVendorProfile(String uid, String businessName, String handle, String logoUrl) async {
+    try {
+      await _db.collection('vendors').doc(uid).set({
+        'businessName': businessName,
+        'handle': handle,
+        'logoUrl': logoUrl,
+        'updatedAt': FieldValue.serverTimestamp(),
+      }, SetOptions(merge: true));
+    } catch (e) {
+      debugPrint('Firestore saveVendorProfile error: $e');
+    }
+  }
+
+  static Future<Map<String, dynamic>?> getVendorProfile(String uid) async {
+    try {
+      final doc = await _db.collection('vendors').doc(uid).get();
+      if (doc.exists) {
+        return doc.data();
+      }
+    } catch (e) {
+      debugPrint('Firestore getVendorProfile error: $e');
+    }
+    return null;
+  }
 }
