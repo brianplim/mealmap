@@ -37,6 +37,7 @@ class _VendorProfileTabState extends State<VendorProfileTab> {
             _isNetworkImage = true;
           }
         });
+        businessNameNotifier.value = '$_businessName & Deals';
       }
     }
   }
@@ -123,6 +124,7 @@ class _VendorProfileTabState extends State<VendorProfileTab> {
                     _isNetworkImage = true;
                   }
                 });
+                businessNameNotifier.value = '$_businessName & Deals';
                 final user = FirebaseAuth.instance.currentUser;
                 if (user != null) {
                   await FirestoreService.saveVendorProfile(
@@ -291,17 +293,15 @@ class _VendorProfileTabState extends State<VendorProfileTab> {
     Color iconColor = const Color(0xFF0F7A5B),
     required VoidCallback onTap,
   }) {
-    return Container(
+    return Card(
       margin: const EdgeInsets.only(bottom: 12),
+      elevation: 0,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: InkWell(
         onTap: onTap,
         borderRadius: BorderRadius.circular(12),
-        child: Container(
+        child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-          decoration: BoxDecoration(
-            color: Theme.of(context).cardColor,
-            borderRadius: BorderRadius.circular(12),
-          ),
           child: Row(
             children: [
               Icon(icon, size: 20, color: iconColor),

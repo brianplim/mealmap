@@ -62,15 +62,22 @@ class _VendorDashboardTabState extends State<VendorDashboardTab> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Row(
-                            children: const [
-                              Icon(Icons.storefront, color: Colors.white, size: 28),
-                              SizedBox(width: 10),
-                              Text(
-                                'ACES Canteen Bites & Deals',
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.w900,
+                            children: [
+                              const Icon(Icons.storefront, color: Colors.white, size: 28),
+                              const SizedBox(width: 10),
+                              Expanded(
+                                child: ValueListenableBuilder<String>(
+                                  valueListenable: businessNameNotifier,
+                                  builder: (context, name, child) {
+                                    return Text(
+                                      name,
+                                      style: const TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.w900,
+                                      ),
+                                    );
+                                  },
                                 ),
                               ),
                             ],
