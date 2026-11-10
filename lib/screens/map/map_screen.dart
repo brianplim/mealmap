@@ -89,11 +89,11 @@ class _MapScreenContentState extends State<MapScreenContent> {
                         ),
                         ...eateries.map((eatery) => Marker(
                               point: eatery.location,
-                              width: 80,
-                              height: 80,
+                              width: 110,
+                              height: 85,
                               child: GestureDetector(
                                 onTap: () => Navigator.pushNamed(context, '/restaurant', arguments: eatery),
-                                child: _eateryMarkerContent(),
+                                child: _eateryMarkerContent(eatery.name),
                               ),
                             )),
                       ],
@@ -252,12 +252,12 @@ class _MapScreenContentState extends State<MapScreenContent> {
     );
   }
 
-  Widget _eateryMarkerContent() {
+  Widget _eateryMarkerContent(String name) {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
         Container(
-          padding: const EdgeInsets.all(8),
+          padding: const EdgeInsets.all(6),
           decoration: BoxDecoration(
             color: const Color(0xFF0F7A5B),
             shape: BoxShape.circle,
@@ -266,7 +266,22 @@ class _MapScreenContentState extends State<MapScreenContent> {
               BoxShadow(color: Colors.black.withValues(alpha: 0.2), blurRadius: 4, offset: const Offset(0, 2)),
             ],
           ),
-          child: const Icon(Icons.location_on, color: Colors.white, size: 20),
+          child: const Icon(Icons.location_on, color: Colors.white, size: 16),
+        ),
+        const SizedBox(height: 2),
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(6),
+            boxShadow: [
+              BoxShadow(color: Colors.black.withValues(alpha: 0.15), blurRadius: 2),
+            ],
+          ),
+          child: Text(
+            name,
+            style: const TextStyle(fontSize: 9, fontWeight: FontWeight.bold, color: Color(0xFF1E2D2A)),
+          ),
         ),
       ],
     );
