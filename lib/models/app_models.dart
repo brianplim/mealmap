@@ -92,6 +92,24 @@ final List<String> globalFavoriteIds = [];
 
 final List<Eatery> mockEateries = [];
 
+class AppNotification {
+  final String id;
+  final String title;
+  final String detail;
+  final String time;
+  final Eatery eatery;
+
+  const AppNotification({
+    required this.id,
+    required this.title,
+    required this.detail,
+    required this.time,
+    required this.eatery,
+  });
+}
+
+final List<AppNotification> globalNotifications = [];
+
 Widget statusBar({String time = '9:41', Color color = const Color(0xFF1E1E1E)}) {
   return Padding(
     padding: const EdgeInsets.only(left: 16, right: 16, top: 10, bottom: 6),

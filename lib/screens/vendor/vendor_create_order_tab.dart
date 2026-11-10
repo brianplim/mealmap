@@ -148,6 +148,16 @@ class _VendorCreateOrderTabState extends State<VendorCreateOrderTab> {
         eatery: newEatery,
       ),
     );
+    globalNotifications.insert(
+      0,
+      AppNotification(
+        id: newEatery.id,
+        title: 'New Deal: ${newEatery.name}!',
+        detail: '${newEatery.menu.first.name} - ${newEatery.menu.first.price} (${newEatery.description})',
+        time: 'Just now',
+        eatery: newEatery,
+      ),
+    );
     eateryNotifier.value = List.from(mockEateries);
 
     ScaffoldMessenger.of(context).showSnackBar(
