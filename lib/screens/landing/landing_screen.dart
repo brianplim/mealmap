@@ -6,43 +6,65 @@ class WelcomeScreen extends StatelessWidget {
 
   void _showVendorLoginDialog(BuildContext context) {
     final passwordController = TextEditingController();
+    bool obscurePassword = true;
+
     showDialog(
       context: context,
       builder: (context) {
-        return AlertDialog(
-          title: const Text('Eatery Vendor Access'),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const Text('Enter vendor password to proceed:', style: TextStyle(fontSize: 13, color: Colors.grey)),
-              const SizedBox(height: 12),
-              TextField(
-                controller: passwordController,
-                obscureText: true,
-                decoration: const InputDecoration(labelText: 'Password', hintText: 'e.g. aces2026'),
+        return StatefulBuilder(
+          builder: (context, setDialogState) {
+            return AlertDialog(
+              title: const Text('Eatery Vendor Access'),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Text(
+                    'Enter vendor password to proceed:',
+                    style: TextStyle(fontSize: 13, color: Colors.grey),
+                  ),
+                  const SizedBox(height: 12),
+                  TextField(
+                    controller: passwordController,
+                    obscureText: obscurePassword,
+                    decoration: InputDecoration(
+                      labelText: 'Password',
+                      hintText: 'Contact the MealMap for More Info.',
+                      suffixIcon: IconButton(
+                        icon: Icon(
+                          obscurePassword ? Icons.visibility_off : Icons.visibility,
+                          color: const Color(0xFF0F7A5B),
+                        ),
+                        onPressed: () => setDialogState(() => obscurePassword = !obscurePassword),
+                      ),
+                    ),
+                  ),
+                ],
               ),
-            ],
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text('Cancel'),
-            ),
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF0F7A5B), foregroundColor: Colors.white),
-              onPressed: () {
-                if (passwordController.text.trim() == 'aces2026') {
-                  Navigator.pop(context);
-                  Navigator.pushNamed(context, '/vendor-auth');
-                } else {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Incorrect vendor password')),
-                  );
-                }
-              },
-              child: const Text('Continue'),
-            ),
-          ],
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: const Text('Cancel'),
+                ),
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF0F7A5B),
+                    foregroundColor: Colors.white,
+                  ),
+                  onPressed: () {
+                    if (passwordController.text.trim() == 'Aces@2026') {
+                      Navigator.pop(context);
+                      Navigator.pushNamed(context, '/vendor-auth');
+                    } else {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('Incorrect vendor password')),
+                      );
+                    }
+                  },
+                  child: const Text('Continue'),
+                ),
+              ],
+            );
+          },
         );
       },
     );
@@ -86,7 +108,8 @@ class WelcomeScreen extends StatelessWidget {
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 13,
-                    color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.8),
+                    color: Theme.of(context).colorScheme.onSurface
+                        .withValues(alpha: 0.8),
                     height: 1.5,
                   ),
                 ),
@@ -94,7 +117,8 @@ class WelcomeScreen extends StatelessWidget {
                 SizedBox(
                   width: double.infinity,
                   child: ElevatedButton(
-                    onPressed: () => Navigator.pushNamed(context, '/auth', arguments: true),
+                    onPressed: () =>
+                        Navigator.pushNamed(context, '/auth', arguments: true),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFF0A8E6A),
                       foregroundColor: Colors.white,
@@ -106,13 +130,17 @@ class WelcomeScreen extends StatelessWidget {
                     ),
                     child: const Text(
                       'Login',
-                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w700,
+                      ),
                     ),
                   ),
                 ),
                 const SizedBox(height: 12),
                 TextButton(
-                  onPressed: () => Navigator.pushNamed(context, '/auth', arguments: false),
+                  onPressed: () =>
+                      Navigator.pushNamed(context, '/auth', arguments: false),
                   child: Text(
                     'Register',
                     style: TextStyle(
@@ -125,7 +153,11 @@ class WelcomeScreen extends StatelessWidget {
                 const SizedBox(height: 8),
                 TextButton.icon(
                   onPressed: () => _showVendorLoginDialog(context),
-                  icon: const Icon(Icons.storefront, size: 16, color: Color(0xFF0F7A5B)),
+                  icon: const Icon(
+                    Icons.storefront,
+                    size: 16,
+                    color: Color(0xFF0F7A5B),
+                  ),
                   label: const Text(
                     'Eatery Vendor Access',
                     style: TextStyle(
