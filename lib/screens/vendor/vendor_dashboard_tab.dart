@@ -183,75 +183,81 @@ class _VendorDashboardTabState extends State<VendorDashboardTab> {
                         ),
                       )
                     else
-                      ...vendorEateries.map((eatery) => InkWell(
-                            onTap: () => _showEateryDetailDialog(context, eatery),
-                            borderRadius: BorderRadius.circular(14),
-                            child: Container(
-                              margin: const EdgeInsets.only(bottom: 12),
-                              padding: const EdgeInsets.all(12),
-                              decoration: BoxDecoration(
-                                color: Theme.of(context).cardColor,
+                      ...vendorEateries.map((eatery) => Container(
+                            margin: const EdgeInsets.only(bottom: 12),
+                            decoration: BoxDecoration(
+                              color: Theme.of(context).cardColor,
+                              borderRadius: BorderRadius.circular(14),
+                              boxShadow: [
+                                BoxShadow(color: Colors.black.withValues(alpha: 0.04), blurRadius: 4, offset: const Offset(0, 2)),
+                              ],
+                            ),
+                            child: Material(
+                              color: Colors.transparent,
+                              borderRadius: BorderRadius.circular(14),
+                              child: InkWell(
+                                onTap: () => _showEateryDetailDialog(context, eatery),
                                 borderRadius: BorderRadius.circular(14),
-                                boxShadow: [
-                                  BoxShadow(color: Colors.black.withValues(alpha: 0.04), blurRadius: 4, offset: const Offset(0, 2)),
-                                ],
-                              ),
-                              child: Row(
-                                children: [
-                                  ClipRRect(
-                                    borderRadius: BorderRadius.circular(10),
-                                    child: Image.network(
-                                      eatery.imageUrl,
-                                      width: 55,
-                                      height: 55,
-                                      fit: BoxFit.cover,
-                                      errorBuilder: (context, error, stackTrace) => placeholderImage(width: 55, height: 55),
-                                    ),
-                                  ),
-                                  const SizedBox(width: 12),
-                                  Expanded(
-                                    child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          eatery.name,
-                                          style: TextStyle(fontWeight: FontWeight.w800, fontSize: 14, color: Theme.of(context).colorScheme.onSurface),
+                                child: Padding(
+                                  padding: const EdgeInsets.all(12),
+                                  child: Row(
+                                    children: [
+                                      ClipRRect(
+                                        borderRadius: BorderRadius.circular(10),
+                                        child: Image.network(
+                                          eatery.imageUrl,
+                                          width: 55,
+                                          height: 55,
+                                          fit: BoxFit.cover,
+                                          errorBuilder: (context, error, stackTrace) => placeholderImage(width: 55, height: 55),
                                         ),
-                                        const SizedBox(height: 2),
-                                        Text(
-                                          eatery.description,
-                                          style: const TextStyle(fontSize: 11, color: Color(0xFF6E7D79)),
-                                          maxLines: 1,
-                                          overflow: TextOverflow.ellipsis,
+                                      ),
+                                      const SizedBox(width: 12),
+                                      Expanded(
+                                        child: Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              eatery.name,
+                                              style: TextStyle(fontWeight: FontWeight.w800, fontSize: 14, color: Theme.of(context).colorScheme.onSurface),
+                                            ),
+                                            const SizedBox(height: 2),
+                                            Text(
+                                              eatery.description,
+                                              style: const TextStyle(fontSize: 11, color: Color(0xFF6E7D79)),
+                                              maxLines: 1,
+                                              overflow: TextOverflow.ellipsis,
+                                            ),
+                                            const SizedBox(height: 4),
+                                            Container(
+                                              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                              decoration: BoxDecoration(
+                                                color: const Color(0xFFECF7EF),
+                                                borderRadius: BorderRadius.circular(6),
+                                              ),
+                                              child: Text(
+                                                eatery.hasStudentDiscount ? 'Student Discount Active' : 'Regular',
+                                                style: const TextStyle(fontSize: 9, fontWeight: FontWeight.bold, color: Color(0xFF0F7A5B)),
+                                              ),
+                                            ),
+                                          ],
                                         ),
-                                        const SizedBox(height: 4),
-                                        Container(
-                                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                                          decoration: BoxDecoration(
-                                            color: const Color(0xFFECF7EF),
-                                            borderRadius: BorderRadius.circular(6),
-                                          ),
-                                          child: Text(
-                                            eatery.hasStudentDiscount ? 'Student Discount Active' : 'Regular',
-                                            style: const TextStyle(fontSize: 9, fontWeight: FontWeight.bold, color: Color(0xFF0F7A5B)),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
+                                      ),
+                                      IconButton(
+                                        icon: const Icon(Icons.delete_outline, color: Colors.red, size: 20),
+                                        onPressed: () {
+                                          mockEateries.removeWhere((item) => item.id == eatery.id);
+                                          globalVendorPins.removeWhere((pin) => pin.id == eatery.id);
+                                          eateryNotifier.value = List.from(mockEateries);
+                                          FirestoreService.deleteEatery(eatery.id);
+                                          ScaffoldMessenger.of(context).showSnackBar(
+                                            SnackBar(content: Text('Removed ${eatery.name} from student feed')),
+                                          );
+                                        },
+                                      ),
+                                    ],
                                   ),
-                                  IconButton(
-                                    icon: const Icon(Icons.delete_outline, color: Colors.red, size: 20),
-                                    onPressed: () {
-                                      mockEateries.removeWhere((item) => item.id == eatery.id);
-                                      globalVendorPins.removeWhere((pin) => pin.id == eatery.id);
-                                      eateryNotifier.value = List.from(mockEateries);
-                                      FirestoreService.deleteEatery(eatery.id);
-                                      ScaffoldMessenger.of(context).showSnackBar(
-                                        SnackBar(content: Text('Removed ${eatery.name} from student feed')),
-                                      );
-                                    },
-                                  ),
-                                ],
+                                ),
                               ),
                             ),
                           )),
