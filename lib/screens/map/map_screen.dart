@@ -86,8 +86,8 @@ class _MapScreenContentState extends State<MapScreenContent> {
                         ),
                         ...eateries.where((e) => e.showOnMap).map((eatery) => Marker(
                               point: eatery.location,
-                              width: 120,
-                              height: 90,
+                              width: 110,
+                              height: 85,
                               child: GestureDetector(
                                 onTap: () => Navigator.pushNamed(context, '/restaurant', arguments: eatery),
                                 child: _eateryMarkerContent(eatery.name),
@@ -253,19 +253,15 @@ class _MapScreenContentState extends State<MapScreenContent> {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Container(
-          padding: const EdgeInsets.all(8),
-          decoration: BoxDecoration(
-            color: const Color(0xFFE53935),
-            shape: BoxShape.circle,
-            border: Border.all(color: Colors.white, width: 2.5),
-            boxShadow: [
-              BoxShadow(color: Colors.black.withValues(alpha: 0.3), blurRadius: 6, offset: const Offset(0, 3)),
-            ],
-          ),
-          child: const Icon(Icons.restaurant, color: Colors.white, size: 18),
+        const Icon(
+          Icons.location_on,
+          color: Color(0xFFE53935),
+          size: 38,
+          shadows: [
+            Shadow(color: Colors.black45, blurRadius: 4, offset: Offset(0, 2)),
+          ],
         ),
-        const SizedBox(height: 3),
+        const SizedBox(height: 1),
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
           decoration: BoxDecoration(
