@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../models/app_models.dart';
+import '../../services/firestore_service.dart';
 
 class HomeScreenContent extends StatefulWidget {
   const HomeScreenContent({super.key});
@@ -10,6 +11,21 @@ class HomeScreenContent extends StatefulWidget {
 
 class _HomeScreenContentState extends State<HomeScreenContent> {
   String _selectedCategory = 'All';
+
+  @override
+  void initState() {
+    super.initState();
+    _loadEateries();
+  }
+
+  Future<void> _loadEateries() async {
+    final fetched = await FirestoreService.getEateries();
+    if (fetched.isNotEmpty && mounted) {
+      mockEateries.clear();
+      mockEateries.addAll(fetched);
+      eateryNotifier.value = List.from(mockEateries);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {

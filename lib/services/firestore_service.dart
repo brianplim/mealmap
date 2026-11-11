@@ -20,10 +20,48 @@ class FirestoreService {
         'hasStudentDiscount': eatery.hasStudentDiscount,
         'lat': location.latitude,
         'lng': location.longitude,
+        'vendorEmail': eatery.vendorEmail,
         'menu': eatery.menu.map((m) => {'name': m.name, 'price': m.price, 'imageUrl': m.imageUrl}).toList(),
       });
     } catch (e) {
       debugPrint('Firestore uploadEatery error: $e');
+    }
+  }
+
+  static Future<List<Eatery>> getEateries() async {
+    try {
+      final snapshot = await _db.collection('eateries').get();
+      List<Eatery> eateries = [];
+      for (var doc in snapshot.docs) {
+        final data = doc.data();
+        final lat = data['lat'] ?? 7.4578;
+        final lng = data['lng'] ?? 125.7921;
+        final menuList = (data['menu'] as List<dynamic>? ?? []).map((m) => MenuItem(
+          name: m['name'] ?? '',
+          price: m['price'] ?? '',
+          imageUrl: m['imageUrl'] ?? '',
+        )).toList();
+
+        eateries.add(Eatery(
+          id: data['id'] ?? doc.id,
+          name: data['name'] ?? '',
+          cuisine: data['cuisine'] ?? 'Filipino',
+          distance: (data['distance'] ?? 0.1).toDouble(),
+          rating: (data['rating'] ?? 5.0).toDouble(),
+          reviewsCount: data['reviewsCount'] ?? 1,
+          imageUrl: data['imageUrl'] ?? '',
+          description: data['description'] ?? '',
+          hasStudentDiscount: data['hasStudentDiscount'] ?? true,
+          location: LatLng(lat, lng),
+          vendorEmail: data['vendorEmail'],
+          showOnMap: true,
+          menu: menuList,
+        ));
+      }
+      return eateries;
+    } catch (e) {
+      debugPrint('Firestore getEateries error: $e');
+      return [];
     }
   }
 
