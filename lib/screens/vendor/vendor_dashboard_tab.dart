@@ -111,12 +111,12 @@ class _VendorDashboardTabState extends State<VendorDashboardTab> {
               valueListenable: eateryNotifier,
               builder: (context, eateries, child) {
                 final vendorEateries = currentUserEmail != null
-                    ? eateries.where((e) => e.vendorEmail == currentUserEmail).toList()
-                    : <Eatery>[];
+                    ? eateries.where((e) => e.vendorEmail == currentUserEmail || e.vendorEmail == null || e.vendorEmail == '').toList()
+                    : eateries;
 
                 final vendorOrders = currentUserEmail != null
-                    ? globalOrders.where((o) => o.vendorEmail == currentUserEmail).toList()
-                    : <FoodOrder>[];
+                    ? globalOrders.where((o) => o.vendorEmail == currentUserEmail || o.vendorEmail == null || o.vendorEmail == '').toList()
+                    : globalOrders;
 
                 return ListView(
                   padding: const EdgeInsets.all(16),
