@@ -21,6 +21,25 @@ class _VendorCreateOrderTabState extends State<VendorCreateOrderTab> {
   bool _hasDiscount = true;
   String _selectedCuisine = 'Filipino';
   String _imageUrl = 'https://images.unsplash.com/photo-1555939594-58d7cb561ad1?auto=format&fit=crop&w=400&q=80';
+  LatLng _businessLocation = const LatLng(7.4578, 125.7921);
+
+  @override
+  void initState() {
+    super.initState();
+    _loadVendorLocation();
+  }
+
+  Future<void> _loadVendorLocation() async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      final data = await FirestoreService.getVendorProfile(user.uid);
+      if (data != null && data['lat'] != null && data['lng'] != null && mounted) {
+        setState(() {
+          _businessLocation = LatLng(data['lat'], data['lng']);
+        });
+      }
+    }
+  }
 
   @override
   void dispose() {
@@ -125,7 +144,7 @@ class _VendorCreateOrderTabState extends State<VendorCreateOrderTab> {
           ? _discountController.text.trim()
           : 'Special daily offering near ACES Tagum College.',
       hasStudentDiscount: _hasDiscount,
-      location: const LatLng(7.4578, 125.7921),
+      location: _businessLocation, // Uses vendor's pinpointed profile location
       vendorEmail: userEmail,
       showOnMap: true,
       menu: [
@@ -150,7 +169,7 @@ class _VendorCreateOrderTabState extends State<VendorCreateOrderTab> {
     eateryNotifier.value = List.from(mockEateries);
 
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Posted! Live on Student Homepage and Map.')),
+      const SnackBar(content: Text('Posted! Live on Student Homepage and Map at your profile location.')),
     );
     _menuNameController.clear();
     _priceController.clear();
@@ -307,7 +326,7 @@ class _VendorCreateOrderTabState extends State<VendorCreateOrderTab> {
                       ),
                     ),
                     child: const Text(
-                      'Publish Menu & Deal',
+                      'Publish Menu & Location to Student Map',
                       style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
                     ),
                   ),

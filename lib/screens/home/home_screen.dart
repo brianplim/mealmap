@@ -244,9 +244,12 @@ class _HomeScreenContentState extends State<HomeScreenContent> {
                 ValueListenableBuilder<List<Eatery>>(
                   valueListenable: eateryNotifier,
                   builder: (context, eateries, child) {
-                    final filteredEateries = eateries
-                        .where((e) => _selectedCategory == 'All' || e.cuisine == _selectedCategory || (_selectedCategory == 'Fast Food' && e.cuisine == 'Mexican'))
-                        .toList();
+                    final filteredEateries = eateries.where((e) {
+                      if (_selectedCategory == 'All') return true;
+                      if (e.cuisine.toLowerCase().trim() == _selectedCategory.toLowerCase().trim()) return true;
+                      if (_selectedCategory == 'Fast Food' && (e.cuisine.toLowerCase().contains('fast') || e.cuisine.toLowerCase().contains('mexican'))) return true;
+                      return false;
+                    }).toList();
                     if (filteredEateries.isEmpty) {
                       return Padding(
                         padding: const EdgeInsets.symmetric(vertical: 40),
