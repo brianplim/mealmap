@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter_map/flutter_map.dart';
+import 'package:latlong2/latlong.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 import '../../models/app_models.dart';
@@ -17,6 +19,8 @@ class _VendorProfileTabState extends State<VendorProfileTab> {
   String _handle = '@aces_canteen_tagum';
   String? _imagePath;
   bool _isNetworkImage = false;
+  LatLng _businessLocation = const LatLng(7.4578, 125.7921);
+  bool _showMapLocation = true;
 
   @override
   void initState() {
@@ -33,6 +37,9 @@ class _VendorProfileTabState extends State<VendorProfileTab> {
           _businessName = data['businessName'] ?? _businessName;
           _handle = data['handle'] ?? _handle;
           _imagePath = data['logoUrl'] ?? _imagePath;
+          if (data['lat'] != null && data['lng'] != null) {
+            _businessLocation = LatLng(data['lat'], data['lng']);
+          }
           if (_imagePath != null && _imagePath!.startsWith('http')) {
             _isNetworkImage = true;
           }
@@ -45,109 +52,151 @@ class _VendorProfileTabState extends State<VendorProfileTab> {
   void _showEditProfileDialog() {
     final nameController = TextEditingController(text: _businessName);
     final handleController = TextEditingController(text: _handle);
-    final urlController = TextEditingController();
+    LatLng tempLocation = _businessLocation;
+    bool tempShowMap = _showMapLocation;
 
     showDialog(
       context: context,
       builder: (context) {
-        return AlertDialog(
-          title: const Text('Edit Business Profile'),
-          content: SingleChildScrollView(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                TextField(
-                  controller: nameController,
-                  decoration: const InputDecoration(labelText: 'Business / Company Name'),
-                ),
-                const SizedBox(height: 12),
-                TextField(
-                  controller: handleController,
-                  decoration: const InputDecoration(labelText: 'Business Handle'),
-                ),
-                const SizedBox(height: 12),
-                TextField(
-                  controller: urlController,
-                  decoration: const InputDecoration(
-                    labelText: 'Or Logo Image URL',
-                    hintText: 'https://example.com/logo.jpg',
+        return StatefulBuilder(
+          builder: (context, setDialogState) {
+            return AlertDialog(
+              title: const Text('Edit Business Profile & Location'),
+              content: SingleChildScrollView(
+                child: SizedBox(
+                  width: 320,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      TextField(
+                        controller: nameController,
+                        decoration: const InputDecoration(labelText: 'Business / Company Name'),
+                      ),
+                      const SizedBox(height: 12),
+                      TextField(
+                        controller: handleController,
+                        decoration: const InputDecoration(labelText: 'Business Handle'),
+                      ),
+                      const SizedBox(height: 16),
+                      ElevatedButton.icon(
+                        onPressed: () async {
+                          try {
+                            final picker = ImagePicker();
+                            final pickedFile = await picker.pickImage(source: ImageSource.gallery);
+                            if (pickedFile != null) {
+                              setDialogState(() {
+                                _imagePath = pickedFile.path;
+                                _isNetworkImage = false;
+                              });
+                            }
+                          } catch (e) {
+                            // ignore
+                          }
+                        },
+                        icon: const Icon(Icons.photo_library),
+                        label: const Text('Upload Logo from Gallery'),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFF0F7A5B),
+                          foregroundColor: Colors.white,
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      Row(
+                        children: [
+                          Checkbox(
+                            value: tempShowMap,
+                            activeColor: const Color(0xFF0F7A5B),
+                            onChanged: (val) => setDialogState(() => tempShowMap = val ?? true),
+                          ),
+                          const Text('Pinpoint Location on Map', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 13)),
+                        ],
+                      ),
+                      if (tempShowMap) ...[
+                        const SizedBox(height: 4),
+                        const Text('Tap anywhere on the map to set your business location:', style: TextStyle(fontSize: 11, color: Colors.grey)),
+                        const SizedBox(height: 8),
+                        SizedBox(
+                          height: 160,
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(12),
+                            child: FlutterMap(
+                              options: MapOptions(
+                                initialCenter: tempLocation,
+                                initialZoom: 17.0,
+                                onTap: (tapPosition, latLng) {
+                                  setDialogState(() {
+                                    tempLocation = latLng;
+                                  });
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(content: Text('Business location pinpointed!')),
+                                  );
+                                },
+                              ),
+                              children: [
+                                TileLayer(
+                                  urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+                                  userAgentPackageName: 'com.example.mealmap',
+                                ),
+                                MarkerLayer(
+                                  markers: [
+                                    Marker(
+                                      point: tempLocation,
+                                      width: 40,
+                                      height: 40,
+                                      child: const Icon(Icons.location_on, color: Colors.red, size: 36),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
+                    ],
                   ),
                 ),
-                const SizedBox(height: 16),
-                ElevatedButton.icon(
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: const Text('Cancel'),
+                ),
+                ElevatedButton(
                   onPressed: () async {
-                    try {
-                      final picker = ImagePicker();
-                      final pickedFile = await picker.pickImage(source: ImageSource.gallery);
-                      if (pickedFile != null) {
-                        setState(() {
-                          _imagePath = pickedFile.path;
-                          _isNetworkImage = false;
-                        });
-                        if (context.mounted) {
-                          Navigator.pop(context);
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text('Business logo updated from gallery!')),
-                          );
-                        }
-                      }
-                    } catch (e) {
-                      if (context.mounted) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text('Gallery picker note: Use Image URL below (${e.toString()})')),
-                        );
-                      }
+                    setState(() {
+                      _businessName = nameController.text.trim();
+                      _handle = handleController.text.trim();
+                      _businessLocation = tempLocation;
+                      _showMapLocation = tempShowMap;
+                    });
+                    businessNameNotifier.value = '$_businessName & Deals';
+                    final user = FirebaseAuth.instance.currentUser;
+                    if (user != null) {
+                      await FirestoreService.saveVendorProfile(
+                        user.uid,
+                        _businessName,
+                        _handle,
+                        _imagePath ?? '',
+                        _businessLocation,
+                      );
+                    }
+                    if (context.mounted) {
+                      Navigator.pop(context);
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('Business profile & map location saved!')),
+                      );
                     }
                   },
-                  icon: const Icon(Icons.photo_library),
-                  label: const Text('Upload Logo from Gallery'),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFF0F7A5B),
                     foregroundColor: Colors.white,
                   ),
+                  child: const Text('Save'),
                 ),
               ],
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text('Cancel'),
-            ),
-            ElevatedButton(
-              onPressed: () async {
-                setState(() {
-                  _businessName = nameController.text.trim();
-                  _handle = handleController.text.trim();
-                  if (urlController.text.trim().isNotEmpty) {
-                    _imagePath = urlController.text.trim();
-                    _isNetworkImage = true;
-                  }
-                });
-                businessNameNotifier.value = '$_businessName & Deals';
-                final user = FirebaseAuth.instance.currentUser;
-                if (user != null) {
-                  await FirestoreService.saveVendorProfile(
-                    user.uid,
-                    _businessName,
-                    _handle,
-                    _imagePath ?? '',
-                  );
-                }
-                if (context.mounted) {
-                  Navigator.pop(context);
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Business profile saved to Cloud Firestore!')),
-                  );
-                }
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF0F7A5B),
-                foregroundColor: Colors.white,
-              ),
-              child: const Text('Save'),
-            ),
-          ],
+            );
+          },
         );
       },
     );
@@ -229,7 +278,7 @@ class _VendorProfileTabState extends State<VendorProfileTab> {
               children: [
                 _menuItem(
                   icon: Icons.storefront,
-                  label: 'Business Settings',
+                  label: 'Business Settings & Map Location',
                   onTap: _showEditProfileDialog,
                 ),
                 _menuItem(

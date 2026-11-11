@@ -59,12 +59,14 @@ class FirestoreService {
     }
   }
 
-  static Future<void> saveVendorProfile(String uid, String businessName, String handle, String logoUrl) async {
+  static Future<void> saveVendorProfile(String uid, String businessName, String handle, String logoUrl, LatLng location) async {
     try {
       await _db.collection('vendors').doc(uid).set({
         'businessName': businessName,
         'handle': handle,
         'logoUrl': logoUrl,
+        'lat': location.latitude,
+        'lng': location.longitude,
         'updatedAt': FieldValue.serverTimestamp(),
       }, SetOptions(merge: true));
     } catch (e) {

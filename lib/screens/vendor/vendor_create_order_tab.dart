@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
@@ -20,10 +19,8 @@ class _VendorCreateOrderTabState extends State<VendorCreateOrderTab> {
   final _priceController = TextEditingController();
   final _discountController = TextEditingController();
   bool _hasDiscount = true;
-  bool _showMapLocation = true;
   String _selectedCuisine = 'Filipino';
   String _imageUrl = 'https://images.unsplash.com/photo-1555939594-58d7cb561ad1?auto=format&fit=crop&w=400&q=80';
-  LatLng _selectedLatLng = const LatLng(7.4578, 125.7921);
 
   @override
   void dispose() {
@@ -128,9 +125,9 @@ class _VendorCreateOrderTabState extends State<VendorCreateOrderTab> {
           ? _discountController.text.trim()
           : 'Special daily offering near ACES Tagum College.',
       hasStudentDiscount: _hasDiscount,
-      location: _selectedLatLng,
+      location: const LatLng(7.4578, 125.7921),
       vendorEmail: userEmail,
-      showOnMap: _showMapLocation,
+      showOnMap: true,
       menu: [
         MenuItem(
           name: _menuNameController.text.trim(),
@@ -142,16 +139,14 @@ class _VendorCreateOrderTabState extends State<VendorCreateOrderTab> {
 
     mockEateries.insert(0, newEatery);
     FirestoreService.uploadEatery(newEatery, newEatery.location);
-    if (_showMapLocation) {
-      globalVendorPins.add(
-        CustomVendorPin(
-          id: newEatery.id,
-          label: _menuNameController.text.trim(),
-          location: _selectedLatLng,
-          eatery: newEatery,
-        ),
-      );
-    }
+    globalVendorPins.add(
+      CustomVendorPin(
+        id: newEatery.id,
+        label: _menuNameController.text.trim(),
+        location: newEatery.location,
+        eatery: newEatery,
+      ),
+    );
     eateryNotifier.value = List.from(mockEateries);
 
     ScaffoldMessenger.of(context).showSnackBar(
@@ -260,58 +255,6 @@ class _VendorCreateOrderTabState extends State<VendorCreateOrderTab> {
                   ),
                 ],
                 const SizedBox(height: 20),
-                Row(
-                  children: [
-                    Checkbox(
-                      value: _showMapLocation,
-                      activeColor: const Color(0xFF0F7A5B),
-                      onChanged: (val) => setState(() => _showMapLocation = val ?? true),
-                    ),
-                    const Text('Pinpoint Location on Map', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 13)),
-                  ],
-                ),
-                if (_showMapLocation) ...[
-                  const SizedBox(height: 4),
-                  const Text('Tap anywhere on the mini map below to set your business location:', style: TextStyle(fontSize: 11, color: Colors.grey)),
-                  const SizedBox(height: 8),
-                  SizedBox(
-                    height: 180,
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(14),
-                      child: FlutterMap(
-                        options: MapOptions(
-                          initialCenter: _selectedLatLng,
-                          initialZoom: 17.0,
-                          onTap: (tapPosition, latLng) {
-                            setState(() {
-                              _selectedLatLng = latLng;
-                            });
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(content: Text('Location pinpointed on map!')),
-                            );
-                          },
-                        ),
-                        children: [
-                          TileLayer(
-                            urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-                            userAgentPackageName: 'com.example.mealmap',
-                          ),
-                          MarkerLayer(
-                            markers: [
-                              Marker(
-                                point: _selectedLatLng,
-                                width: 40,
-                                height: 40,
-                                child: const Icon(Icons.location_on, color: Colors.red, size: 36),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ],
-                const SizedBox(height: 20),
                 const Text('Food Photo', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 13)),
                 const SizedBox(height: 8),
                 GestureDetector(
@@ -364,7 +307,7 @@ class _VendorCreateOrderTabState extends State<VendorCreateOrderTab> {
                       ),
                     ),
                     child: const Text(
-                      'Publish Menu & Location to Student Map',
+                      'Publish Menu & Deal',
                       style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
                     ),
                   ),
