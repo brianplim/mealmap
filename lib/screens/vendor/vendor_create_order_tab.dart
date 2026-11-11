@@ -19,6 +19,7 @@ class _VendorCreateOrderTabState extends State<VendorCreateOrderTab> {
   final _priceController = TextEditingController();
   final _discountController = TextEditingController();
   bool _hasDiscount = true;
+  bool _showOnMap = false; // Default false so it doesn't automatically pinpoint on student map
   String _selectedCuisine = 'Filipino';
   String _imageUrl = 'https://images.unsplash.com/photo-1555939594-58d7cb561ad1?auto=format&fit=crop&w=400&q=80';
   LatLng _businessLocation = const LatLng(7.4578, 125.7921);
@@ -144,9 +145,9 @@ class _VendorCreateOrderTabState extends State<VendorCreateOrderTab> {
           ? _discountController.text.trim()
           : 'Special daily offering near ACES Tagum College.',
       hasStudentDiscount: _hasDiscount,
-      location: _businessLocation, // Uses vendor's pinpointed profile location
+      location: _businessLocation,
       vendorEmail: userEmail,
-      showOnMap: true,
+      showOnMap: _showOnMap,
       menu: [
         MenuItem(
           name: _menuNameController.text.trim(),
@@ -158,18 +159,20 @@ class _VendorCreateOrderTabState extends State<VendorCreateOrderTab> {
 
     mockEateries.insert(0, newEatery);
     FirestoreService.uploadEatery(newEatery, newEatery.location);
-    globalVendorPins.add(
-      CustomVendorPin(
-        id: newEatery.id,
-        label: _menuNameController.text.trim(),
-        location: newEatery.location,
-        eatery: newEatery,
-      ),
-    );
+    if (_showOnMap) {
+      globalVendorPins.add(
+        CustomVendorPin(
+          id: newEatery.id,
+          label: _menuNameController.text.trim(),
+          location: _businessLocation,
+          eatery: newEatery,
+        ),
+      );
+    }
     eateryNotifier.value = List.from(mockEateries);
 
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Posted! Live on Student Homepage and Map at your profile location.')),
+      SnackBar(content: Text(_showOnMap ? 'Posted to Student Feed and Map!' : 'Posted to Student Feed!')),
     );
     _menuNameController.clear();
     _priceController.clear();
@@ -273,6 +276,17 @@ class _VendorCreateOrderTabState extends State<VendorCreateOrderTab> {
                     ),
                   ),
                 ],
+                const SizedBox(height: 16),
+                Row(
+                  children: [
+                    Checkbox(
+                      value: _showOnMap,
+                      activeColor: const Color(0xFF0F7A5B),
+                      onChanged: (val) => setState(() => _showOnMap = val ?? false),
+                    ),
+                    const Text('Pinpoint this post on the Student Map', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 13)),
+                  ],
+                ),
                 const SizedBox(height: 20),
                 const Text('Food Photo', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 13)),
                 const SizedBox(height: 8),
@@ -326,7 +340,7 @@ class _VendorCreateOrderTabState extends State<VendorCreateOrderTab> {
                       ),
                     ),
                     child: const Text(
-                      'Publish Menu & Location to Student Map',
+                      'Publish Menu & Deal',
                       style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
                     ),
                   ),
