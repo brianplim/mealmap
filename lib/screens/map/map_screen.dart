@@ -86,11 +86,11 @@ class _MapScreenContentState extends State<MapScreenContent> {
                         ),
                         ...eateries.where((e) => e.showOnMap).map((eatery) => Marker(
                               point: eatery.location,
-                              width: 80,
-                              height: 80,
+                              width: 120,
+                              height: 90,
                               child: GestureDetector(
                                 onTap: () => Navigator.pushNamed(context, '/restaurant', arguments: eatery),
-                                child: _eateryMarkerContent(),
+                                child: _eateryMarkerContent(eatery.name),
                               ),
                             )),
                       ],
@@ -249,7 +249,7 @@ class _MapScreenContentState extends State<MapScreenContent> {
     );
   }
 
-  Widget _eateryMarkerContent() {
+  Widget _eateryMarkerContent(String name) {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -264,6 +264,21 @@ class _MapScreenContentState extends State<MapScreenContent> {
             ],
           ),
           child: const Icon(Icons.restaurant, color: Colors.white, size: 18),
+        ),
+        const SizedBox(height: 3),
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(6),
+            boxShadow: [
+              BoxShadow(color: Colors.black.withValues(alpha: 0.2), blurRadius: 3),
+            ],
+          ),
+          child: Text(
+            name,
+            style: const TextStyle(fontSize: 9, fontWeight: FontWeight.bold, color: Color(0xFF1E2D2A)),
+          ),
         ),
       ],
     );
