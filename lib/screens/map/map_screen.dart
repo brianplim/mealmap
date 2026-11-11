@@ -253,12 +253,35 @@ class _MapScreenContentState extends State<MapScreenContent> {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        const Icon(
-          Icons.location_on,
-          color: Color(0xFFE53935),
-          size: 38,
-          shadows: [
-            Shadow(color: Colors.black45, blurRadius: 4, offset: Offset(0, 2)),
+        Stack(
+          alignment: Alignment.center,
+          children: [
+            const Icon(
+              Icons.location_on,
+              color: Color(0xFFD81B60),
+              size: 46,
+              shadows: [
+                Shadow(color: Colors.black45, blurRadius: 4, offset: Offset(0, 2)),
+              ],
+            ),
+            Positioned(
+              top: 6,
+              child: Container(
+                width: 20,
+                height: 20,
+                decoration: const BoxDecoration(
+                  color: Colors.white,
+                  shape: BoxShape.circle,
+                ),
+                child: const Center(
+                  child: Icon(
+                    Icons.restaurant_menu,
+                    color: Color(0xFFD81B60),
+                    size: 12,
+                  ),
+                ),
+              ),
+            ),
           ],
         ),
         const SizedBox(height: 1),
