@@ -4,6 +4,7 @@ import 'vendor_create_order_tab.dart';
 import 'vendor_received_order_tab.dart';
 import 'vendor_history_order_tab.dart';
 import 'vendor_profile_tab.dart';
+import '../../models/app_models.dart';
 
 class VendorPortalShell extends StatefulWidget {
   const VendorPortalShell({super.key, this.initialTab = 0});
@@ -15,12 +16,23 @@ class VendorPortalShell extends StatefulWidget {
 }
 
 class _VendorPortalShellState extends State<VendorPortalShell> {
-  late int _currentIndex;
-
   @override
   void initState() {
     super.initState();
-    _currentIndex = widget.initialTab;
+    vendorTabNotifier.value = widget.initialTab;
+    vendorTabNotifier.addListener(_onTabChanged);
+  }
+
+  @override
+  void dispose() {
+    vendorTabNotifier.removeListener(_onTabChanged);
+    super.dispose();
+  }
+
+  void _onTabChanged() {
+    if (mounted) {
+      setState(() {});
+    }
   }
 
   final List<Widget> _tabs = const [
@@ -34,15 +46,15 @@ class _VendorPortalShellState extends State<VendorPortalShell> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: _tabs[_currentIndex],
+      body: _tabs[vendorTabNotifier.value],
       bottomNavigationBar: Container(
         decoration: BoxDecoration(
           color: Theme.of(context).cardColor,
           border: Border(top: BorderSide(color: Theme.of(context).dividerColor, width: 1)),
         ),
         child: BottomNavigationBar(
-          currentIndex: _currentIndex,
-          onTap: (index) => setState(() => _currentIndex = index),
+          currentIndex: vendorTabNotifier.value,
+          onTap: (index) => vendorTabNotifier.value = index,
           type: BottomNavigationBarType.fixed,
           backgroundColor: Theme.of(context).cardColor,
           selectedItemColor: const Color(0xFF0F7A5B),

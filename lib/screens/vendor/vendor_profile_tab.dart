@@ -281,13 +281,18 @@ class _VendorProfileTabState extends State<VendorProfileTab> {
                   label: 'Business Settings & Map Location',
                   onTap: _showEditProfileDialog,
                 ),
-                _menuItem(
-                  icon: Icons.notifications_none,
-                  label: 'Vendor Notifications',
-                  badge: '${globalOrders.length}',
-                  onTap: () {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('All vendor notifications checked')),
+                ValueListenableBuilder<bool>(
+                  valueListenable: vendorNotifReadNotifier,
+                  builder: (context, isRead, child) {
+                    final unreadCount = isRead ? 0 : globalOrders.length;
+                    return _menuItem(
+                      icon: Icons.notifications_none,
+                      label: 'Vendor Notifications',
+                      badge: unreadCount > 0 ? '$unreadCount' : null,
+                      onTap: () {
+                        vendorNotifReadNotifier.value = true;
+                        vendorTabNotifier.value = 2; // Navigate to Received Order tab
+                      },
                     );
                   },
                 ),

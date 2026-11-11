@@ -97,6 +97,7 @@ class _RestaurantDetailScreenState extends State<RestaurantDetailScreen> {
                       timestamp: 'Just now',
                     );
                     globalOrders.insert(0, newOrder);
+                    vendorNotifReadNotifier.value = false;
                     FirestoreService.uploadOrder(newOrder);
                     Navigator.pop(context);
                     ScaffoldMessenger.of(context).showSnackBar(

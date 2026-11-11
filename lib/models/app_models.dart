@@ -5,6 +5,8 @@ import 'package:latlong2/latlong.dart';
 final ValueNotifier<ThemeMode> themeNotifier = ValueNotifier(ThemeMode.light);
 final ValueNotifier<List<Eatery>> eateryNotifier = ValueNotifier(mockEateries);
 final ValueNotifier<String> businessNameNotifier = ValueNotifier('ACES Canteen Bites & Deals');
+final ValueNotifier<int> vendorTabNotifier = ValueNotifier(0);
+final ValueNotifier<bool> vendorNotifReadNotifier = ValueNotifier(false);
 
 class Eatery {
   final String id;
