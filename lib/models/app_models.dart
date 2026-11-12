@@ -7,6 +7,7 @@ final ValueNotifier<List<Eatery>> eateryNotifier = ValueNotifier(mockEateries);
 final ValueNotifier<String> businessNameNotifier = ValueNotifier('ACES Canteen Bites & Deals');
 final ValueNotifier<int> vendorTabNotifier = ValueNotifier(0);
 final ValueNotifier<bool> vendorNotifReadNotifier = ValueNotifier(false);
+final ValueNotifier<bool> locationSharingNotifier = ValueNotifier(true);
 
 class Eatery {
   final String id;

@@ -54,46 +54,52 @@ class _MapScreenContentState extends State<MapScreenContent> {
                       urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
                       userAgentPackageName: 'com.example.mealmap',
                     ),
-                    MarkerLayer(
-                      markers: [
-                        Marker(
-                          point: const LatLng(7.4578, 125.7921),
-                          width: 130,
-                          height: 90,
-                          child: GestureDetector(
-                            onTap: () => launchAcesMap(context),
-                            child: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                                  decoration: BoxDecoration(
-                                    color: Colors.white,
-                                    borderRadius: BorderRadius.circular(6),
-                                    boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.2), blurRadius: 4)],
-                                  ),
-                                  child: const Text('Aces Tagum College', style: TextStyle(fontSize: 8, fontWeight: FontWeight.w900, color: Color(0xFF1E2D2A))),
-                                ),
-                                const SizedBox(height: 2),
-                                Container(
-                                  padding: const EdgeInsets.all(6),
-                                  decoration: const BoxDecoration(color: Colors.red, shape: BoxShape.circle),
-                                  child: const Icon(Icons.school, color: Colors.white, size: 16),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                        ...eateries.where((e) => e.showOnMap).map((eatery) => Marker(
-                              point: eatery.location,
-                              width: 110,
-                              height: 85,
+                    ValueListenableBuilder<bool>(
+                      valueListenable: locationSharingNotifier,
+                      builder: (context, sharingEnabled, child) {
+                        return MarkerLayer(
+                          markers: [
+                            Marker(
+                              point: const LatLng(7.4578, 125.7921),
+                              width: 130,
+                              height: 90,
                               child: GestureDetector(
-                                onTap: () => Navigator.pushNamed(context, '/restaurant', arguments: eatery),
-                                child: _eateryMarkerContent(eatery.name),
+                                onTap: () => launchAcesMap(context),
+                                child: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Container(
+                                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                      decoration: BoxDecoration(
+                                        color: Colors.white,
+                                        borderRadius: BorderRadius.circular(6),
+                                        boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.2), blurRadius: 4)],
+                                      ),
+                                      child: const Text('Aces Tagum College', style: TextStyle(fontSize: 8, fontWeight: FontWeight.w900, color: Color(0xFF1E2D2A))),
+                                    ),
+                                    const SizedBox(height: 2),
+                                    Container(
+                                      padding: const EdgeInsets.all(6),
+                                      decoration: const BoxDecoration(color: Colors.red, shape: BoxShape.circle),
+                                      child: const Icon(Icons.school, color: Colors.white, size: 16),
+                                    ),
+                                  ],
+                                ),
                               ),
-                            )),
-                      ],
+                            ),
+                            if (sharingEnabled)
+                              ...eateries.where((e) => e.showOnMap).map((eatery) => Marker(
+                                    point: eatery.location,
+                                    width: 110,
+                                    height: 85,
+                                    child: GestureDetector(
+                                      onTap: () => Navigator.pushNamed(context, '/restaurant', arguments: eatery),
+                                      child: _eateryMarkerContent(eatery.name),
+                                    ),
+                                  )),
+                          ],
+                        );
+                      },
                     ),
                   ],
                 );

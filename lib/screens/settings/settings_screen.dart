@@ -34,9 +34,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     try {
       final user = FirebaseAuth.instance.currentUser;
       if (user != null) {
-        // Delete user profile document from Firestore database
         await FirebaseFirestore.instance.collection('users').doc(user.uid).delete();
-        // Delete user from Firebase Auth
         await user.delete();
       }
       if (mounted) {
@@ -50,7 +48,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Error deleting account: ${e.toString()}')),
         );
-        // Fallback navigation if re-auth required
         Navigator.pushNamedAndRemoveUntil(context, '/', (route) => false);
       }
     }
@@ -125,6 +122,22 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             });
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(content: Text(_darkMode ? 'Dark mode enabled!' : 'Light mode enabled!')),
+                            );
+                          },
+                        ),
+                        const Divider(height: 1),
+                        SwitchListTile(
+                          title: Text('Location Sharing', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 14, color: Theme.of(context).colorScheme.onSurface)),
+                          subtitle: const Text('Find food spots near ACES Tagum College', style: TextStyle(fontSize: 12, color: Colors.grey)),
+                          value: locationSharingNotifier.value,
+                          activeTrackColor: const Color(0xFF0F7A5B),
+                          activeThumbColor: Colors.white,
+                          onChanged: (val) {
+                            setState(() {
+                              locationSharingNotifier.value = val;
+                            });
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text(val ? 'Location sharing enabled on map!' : 'Location sharing disabled on map!')),
                             );
                           },
                         ),
