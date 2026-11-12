@@ -306,7 +306,18 @@ class _VendorProfileTabState extends State<VendorProfileTab> {
                   label: 'Log Out Vendor',
                   textColor: Colors.red,
                   iconColor: Colors.red,
-                  onTap: () => Navigator.pushReplacementNamed(context, '/'),
+                  onTap: () async {
+                    final ok = await showConfirmDialog(
+                      context: context,
+                      title: 'Log Out Vendor',
+                      message: 'Are you sure you want to log out of your vendor account?',
+                      confirmText: 'Log Out',
+                      confirmColor: Colors.red,
+                    );
+                    if (ok && context.mounted) {
+                      Navigator.pushReplacementNamed(context, '/');
+                    }
+                  },
                 ),
               ],
             ),

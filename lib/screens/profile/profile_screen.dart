@@ -281,7 +281,18 @@ class _ProfileScreenContentState extends State<ProfileScreenContent> {
                   label: 'Log Out',
                   textColor: Colors.red,
                   iconColor: Colors.red,
-                  onTap: () => Navigator.pushNamedAndRemoveUntil(context, '/', (route) => false),
+                  onTap: () async {
+                    final ok = await showConfirmDialog(
+                      context: context,
+                      title: 'Log Out',
+                      message: 'Are you sure you want to log out?',
+                      confirmText: 'Log Out',
+                      confirmColor: Colors.red,
+                    );
+                    if (ok && context.mounted) {
+                      Navigator.pushNamedAndRemoveUntil(context, '/', (route) => false);
+                    }
+                  },
                 ),
               ],
             ),

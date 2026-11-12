@@ -222,3 +222,33 @@ class AppLogo extends StatelessWidget {
     );
   }
 }
+
+Future<bool> showConfirmDialog({
+  required BuildContext context,
+  required String title,
+  required String message,
+  required String confirmText,
+  Color confirmColor = const Color(0xFF0F7A5B),
+}) async {
+  final result = await showDialog<bool>(
+    context: context,
+    builder: (context) {
+      return AlertDialog(
+        title: Text(title),
+        content: Text(message),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Cancel'),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(backgroundColor: confirmColor, foregroundColor: Colors.white),
+            onPressed: () => Navigator.pop(context, true),
+            child: Text(confirmText),
+          ),
+        ],
+      );
+    },
+  );
+  return result ?? false;
+}

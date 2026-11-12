@@ -134,24 +134,32 @@ class _RestaurantDetailScreenState extends State<RestaurantDetailScreen> {
                   child: const Text('Cancel'),
                 ),
                 ElevatedButton(
-                  onPressed: () {
-                    final newOrder = FoodOrder(
-                      id: 'ORD-${DateTime.now().millisecondsSinceEpoch.toString().substring(8)}',
-                      eateryName: eatery.name,
-                      itemName: '${item.name} (x$quantity)',
-                      price: formattedTotal,
-                      fulfillmentType: fulfillment,
-                      status: fulfillment == 'Delivery' ? 'Out for Delivery' : 'Ready for Pickup',
-                      timestamp: 'Just now',
-                      vendorEmail: eatery.vendorEmail,
+                  onPressed: () async {
+                    final ok = await showConfirmDialog(
+                      context: context,
+                      title: 'Confirm Order',
+                      message: 'Place order for ${item.name} (x$quantity) totaling $formattedTotal via $fulfillment?',
+                      confirmText: 'Confirm',
                     );
-                    globalOrders.insert(0, newOrder);
-                    vendorNotifReadNotifier.value = false;
-                    FirestoreService.uploadOrder(newOrder);
-                    Navigator.pop(context);
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('Order placed successfully! Total: $formattedTotal')),
-                    );
+                    if (ok && context.mounted) {
+                      final newOrder = FoodOrder(
+                        id: 'ORD-${DateTime.now().millisecondsSinceEpoch.toString().substring(8)}',
+                        eateryName: eatery.name,
+                        itemName: '${item.name} (x$quantity)',
+                        price: formattedTotal,
+                        fulfillmentType: fulfillment,
+                        status: fulfillment == 'Delivery' ? 'Out for Delivery' : 'Ready for Pickup',
+                        timestamp: 'Just now',
+                        vendorEmail: eatery.vendorEmail,
+                      );
+                      globalOrders.insert(0, newOrder);
+                      vendorNotifReadNotifier.value = false;
+                      FirestoreService.uploadOrder(newOrder);
+                      Navigator.pop(context);
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text('Order placed successfully! Total: $formattedTotal')),
+                      );
+                    }
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFF0F7A5B),
