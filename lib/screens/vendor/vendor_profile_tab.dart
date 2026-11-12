@@ -277,8 +277,8 @@ class _VendorProfileTabState extends State<VendorProfileTab> {
               padding: const EdgeInsets.symmetric(horizontal: 16),
               children: [
                 _menuItem(
-                  icon: Icons.storefront,
-                  label: 'Business Settings & Map Location',
+                  icon: Icons.settings_outlined,
+                  label: 'Settings',
                   onTap: _showEditProfileDialog,
                 ),
                 ValueListenableBuilder<bool>(
