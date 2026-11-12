@@ -45,14 +45,6 @@ class _VendorHistoryOrderTabState extends State<VendorHistoryOrderTab> {
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             child: Row(
               children: [
-                CircleAvatar(
-                  backgroundColor: Theme.of(context).cardColor,
-                  child: IconButton(
-                    icon: Icon(Icons.arrow_back, color: Theme.of(context).colorScheme.onSurface),
-                    onPressed: () => Navigator.pushReplacementNamed(context, '/'),
-                  ),
-                ),
-                const SizedBox(width: 12),
                 Expanded(
                   child: Text(
                     'Order History & Analytics',

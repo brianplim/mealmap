@@ -81,27 +81,13 @@ class _VendorDashboardTabState extends State<VendorDashboardTab> {
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             child: Row(
               children: [
-                CircleAvatar(
-                  backgroundColor: Theme.of(context).cardColor,
-                  child: IconButton(
-                    icon: Icon(Icons.arrow_back, color: Theme.of(context).colorScheme.onSurface),
-                    onPressed: () => Navigator.pushReplacementNamed(context, '/'),
-                  ),
-                ),
-                const SizedBox(width: 12),
                 Text(
                   'Vendor Dashboard',
                   style: TextStyle(
-                    fontSize: 20,
+                    fontSize: 22,
                     fontWeight: FontWeight.w800,
                     color: Theme.of(context).colorScheme.onSurface,
                   ),
-                ),
-                const Spacer(),
-                IconButton(
-                  icon: const Icon(Icons.logout, color: Colors.red),
-                  tooltip: 'Exit Portal',
-                  onPressed: () => Navigator.pushReplacementNamed(context, '/'),
                 ),
               ],
             ),

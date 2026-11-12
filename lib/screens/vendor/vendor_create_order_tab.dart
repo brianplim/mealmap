@@ -206,18 +206,10 @@ class _VendorCreateOrderTabState extends State<VendorCreateOrderTab> {
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             child: Row(
               children: [
-                CircleAvatar(
-                  backgroundColor: Theme.of(context).cardColor,
-                  child: IconButton(
-                    icon: Icon(Icons.arrow_back, color: Theme.of(context).colorScheme.onSurface),
-                    onPressed: () => Navigator.pushReplacementNamed(context, '/'),
-                  ),
-                ),
-                const SizedBox(width: 12),
                 Text(
                   'Create Order / Post Menu',
                   style: TextStyle(
-                    fontSize: 20,
+                    fontSize: 22,
                     fontWeight: FontWeight.w800,
                     color: Theme.of(context).colorScheme.onSurface,
                   ),
