@@ -12,11 +12,28 @@ class SearchScreen extends StatefulWidget {
 class _SearchScreenState extends State<SearchScreen> {
   final _searchController = TextEditingController();
   String _query = '';
+  Map<String, String>? _appliedFilters;
 
   @override
   void dispose() {
     _searchController.dispose();
     super.dispose();
+  }
+
+  Future<void> _openFilters() async {
+    final result = await Navigator.pushNamed(context, '/filter');
+    if (result != null && result is Map<String, String>) {
+      setState(() {
+        _appliedFilters = result;
+      });
+    }
+  }
+
+  bool get _hasActiveFilters {
+    if (_appliedFilters == null) return false;
+    return (_appliedFilters!['cuisine'] != 'All') ||
+        (_appliedFilters!['price'] != 'All') ||
+        (_appliedFilters!['distance'] != 'All');
   }
 
   @override
@@ -26,7 +43,26 @@ class _SearchScreenState extends State<SearchScreen> {
       final matchesName = e.name.toLowerCase().contains(q);
       final matchesCuisine = e.cuisine.toLowerCase().contains(q);
       final matchesMenu = e.menu.any((m) => m.name.toLowerCase().contains(q));
-      return matchesName || matchesCuisine || matchesMenu;
+      final matchesQuery = matchesName || matchesCuisine || matchesMenu;
+
+      if (!matchesQuery) return false;
+
+      if (_appliedFilters != null) {
+        final cuisineFilter = _appliedFilters!['cuisine'];
+        if (cuisineFilter != null && cuisineFilter != 'All') {
+          if (!e.cuisine.toLowerCase().contains(cuisineFilter.toLowerCase())) {
+            return false;
+          }
+        }
+
+        final distanceFilter = _appliedFilters!['distance'];
+        if (distanceFilter != null && distanceFilter != 'All') {
+          if (distanceFilter == 'Within 500m' && e.distance > 0.5) return false;
+          if (distanceFilter == '1 km' && e.distance > 1.0) return false;
+        }
+      }
+
+      return true;
     }).toList();
 
     return Scaffold(
@@ -55,7 +91,8 @@ class _SearchScreenState extends State<SearchScreen> {
                       autofocus: true,
                       onChanged: (val) => setState(() => _query = val),
                       decoration: InputDecoration(
-                        hintText: 'Search eateries, coffee, halo-halo...',
+                        hintText:
+                            'Search Eateries,Fast Food,Desserts,Drinks...',
                         prefixIcon: const Icon(
                           Icons.search,
                           color: Color(0xFF0F7A5B),
@@ -72,13 +109,14 @@ class _SearchScreenState extends State<SearchScreen> {
                                 },
                               ),
                             IconButton(
-                              icon: const Icon(
+                              icon: Icon(
                                 Icons.tune,
-                                color: Color(0xFF0F7A5B),
+                                color: _hasActiveFilters
+                                    ? Colors.orange
+                                    : const Color(0xFF0F7A5B),
                                 size: 20,
                               ),
-                              onPressed: () =>
-                                  Navigator.pushNamed(context, '/filter'),
+                              onPressed: _openFilters,
                             ),
                           ],
                         ),
@@ -94,6 +132,56 @@ class _SearchScreenState extends State<SearchScreen> {
                 ],
               ),
             ),
+            if (_hasActiveFilters) ...[
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: Row(
+                  children: [
+                    const Text(
+                      'Active Filters: ',
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(width: 6),
+                    Expanded(
+                      child: SingleChildScrollView(
+                        scrollDirection: Axis.horizontal,
+                        child: Row(
+                          children: [
+                            if (_appliedFilters!['cuisine'] != 'All')
+                              _filterTag('Cuisine: ${_appliedFilters!['cuisine']}', () {
+                                setState(() => _appliedFilters!['cuisine'] = 'All');
+                              }),
+                            if (_appliedFilters!['price'] != 'All')
+                              _filterTag('Price: ${_appliedFilters!['price']}', () {
+                                setState(() => _appliedFilters!['price'] = 'All');
+                              }),
+                            if (_appliedFilters!['distance'] != 'All')
+                              _filterTag('Distance: ${_appliedFilters!['distance']}', () {
+                                setState(() => _appliedFilters!['distance'] = 'All');
+                              }),
+                          ],
+                        ),
+                      ),
+                    ),
+                    GestureDetector(
+                      onTap: () => setState(() => _appliedFilters = null),
+                      child: const Text(
+                        'Clear',
+                        style: TextStyle(
+                          fontSize: 11,
+                          color: Colors.red,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 12),
+            ],
             Expanded(
               child: results.isEmpty
                   ? Center(
@@ -211,6 +299,36 @@ class _SearchScreenState extends State<SearchScreen> {
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _filterTag(String label, VoidCallback onClear) {
+    return Container(
+      margin: const EdgeInsets.only(right: 6),
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      decoration: BoxDecoration(
+        color: const Color(0xFFECF7EF),
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: const Color(0xFF0F7A5B)),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            label,
+            style: const TextStyle(
+              fontSize: 10,
+              fontWeight: FontWeight.bold,
+              color: Color(0xFF0F7A5B),
+            ),
+          ),
+          const SizedBox(width: 4),
+          GestureDetector(
+            onTap: onClear,
+            child: const Icon(Icons.close, size: 12, color: Color(0xFF0F7A5B)),
+          ),
+        ],
       ),
     );
   }

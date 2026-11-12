@@ -78,7 +78,7 @@ class _DealsFilterScreenState extends State<DealsFilterScreen> {
               Wrap(
                 spacing: 8,
                 runSpacing: 8,
-                children: ['All', 'Fast Food', 'Desserts', 'Drinks'].map((
+                children: ['All', 'Filipino', 'Fast Food', 'Desserts', 'Coffee', 'Asian', 'Mexican'].map((
                   cuisine,
                 ) {
                   return FilterChipWidget(
@@ -117,10 +117,11 @@ class _DealsFilterScreenState extends State<DealsFilterScreen> {
                 width: double.infinity,
                 child: ElevatedButton(
                   onPressed: () {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Tagum filters applied!')),
-                    );
-                    Navigator.pop(context);
+                    Navigator.pop(context, {
+                      'price': _priceFilter,
+                      'cuisine': _cuisineFilter,
+                      'distance': _distanceFilter,
+                    });
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFF0F7A5B),
