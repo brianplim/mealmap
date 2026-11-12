@@ -22,7 +22,6 @@ class _DealsFilterScreenState extends State<DealsFilterScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-
               Row(
                 children: [
                   Text(
@@ -35,7 +34,10 @@ class _DealsFilterScreenState extends State<DealsFilterScreen> {
                   ),
                   const Spacer(),
                   IconButton(
-                    icon: Icon(Icons.close, color: Theme.of(context).colorScheme.onSurface),
+                    icon: Icon(
+                      Icons.close,
+                      color: Theme.of(context).colorScheme.onSurface,
+                    ),
                     onPressed: () => Navigator.pop(context),
                   ),
                 ],
@@ -43,13 +45,19 @@ class _DealsFilterScreenState extends State<DealsFilterScreen> {
               const SizedBox(height: 16),
               Text(
                 'Price Range',
-                style: TextStyle(fontWeight: FontWeight.w800, fontSize: 14, color: Theme.of(context).colorScheme.onSurface),
+                style: TextStyle(
+                  fontWeight: FontWeight.w800,
+                  fontSize: 14,
+                  color: Theme.of(context).colorScheme.onSurface,
+                ),
               ),
               const SizedBox(height: 10),
               Wrap(
                 spacing: 8,
                 runSpacing: 8,
-                children: ['All', '₱0 - ₱50', '₱51 - ₱100', '₱101+'].map((price) {
+                children: ['All', '₱0 - ₱50', '₱51 - ₱100', '₱101+'].map((
+                  price,
+                ) {
                   return FilterChipWidget(
                     label: price,
                     selected: _priceFilter == price,
@@ -60,13 +68,19 @@ class _DealsFilterScreenState extends State<DealsFilterScreen> {
               const SizedBox(height: 20),
               Text(
                 'Cuisine',
-                style: TextStyle(fontWeight: FontWeight.w800, fontSize: 14, color: Theme.of(context).colorScheme.onSurface),
+                style: TextStyle(
+                  fontWeight: FontWeight.w800,
+                  fontSize: 14,
+                  color: Theme.of(context).colorScheme.onSurface,
+                ),
               ),
               const SizedBox(height: 10),
               Wrap(
                 spacing: 8,
                 runSpacing: 8,
-                children: ['All', 'Filipino', 'Fast Food', 'Asian', 'Western', 'Mexican', 'Desserts', 'Drinks'].map((cuisine) {
+                children: ['All', 'Fast Food', 'Desserts', 'Drinks'].map((
+                  cuisine,
+                ) {
                   return FilterChipWidget(
                     label: cuisine,
                     selected: _cuisineFilter == cuisine,
@@ -77,17 +91,24 @@ class _DealsFilterScreenState extends State<DealsFilterScreen> {
               const SizedBox(height: 20),
               Text(
                 'Distance from ACES College',
-                style: TextStyle(fontWeight: FontWeight.w800, fontSize: 14, color: Theme.of(context).colorScheme.onSurface),
+                style: TextStyle(
+                  fontWeight: FontWeight.w800,
+                  fontSize: 14,
+                  color: Theme.of(context).colorScheme.onSurface,
+                ),
               ),
               const SizedBox(height: 10),
               Wrap(
                 spacing: 8,
                 runSpacing: 8,
-                children: ['All', 'Within 500m', '1 km', '2+ km'].map((distance) {
+                children: ['All', 'Within 500m', '1 km', '2+ km'].map((
+                  distance,
+                ) {
                   return FilterChipWidget(
                     label: distance,
                     selected: _distanceFilter == distance,
-                    onSelected: () => setState(() => _distanceFilter = distance),
+                    onSelected: () =>
+                        setState(() => _distanceFilter = distance),
                   );
                 }).toList(),
               ),
@@ -109,7 +130,10 @@ class _DealsFilterScreenState extends State<DealsFilterScreen> {
                       borderRadius: BorderRadius.circular(16),
                     ),
                   ),
-                  child: const Text('Apply Filters', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700)),
+                  child: const Text(
+                    'Apply Filters',
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
+                  ),
                 ),
               ),
               const SizedBox(height: 12),
@@ -122,7 +146,10 @@ class _DealsFilterScreenState extends State<DealsFilterScreen> {
                   }),
                   child: const Text(
                     'Clear All',
-                    style: TextStyle(color: Color(0xFF0F7A5B), fontWeight: FontWeight.w700),
+                    style: TextStyle(
+                      color: Color(0xFF0F7A5B),
+                      fontWeight: FontWeight.w700,
+                    ),
                   ),
                 ),
               ),
@@ -153,17 +180,23 @@ class FilterChipWidget extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
         decoration: BoxDecoration(
-          color: selected ? const Color(0xFFECF7EF) : Theme.of(context).cardColor,
+          color: selected
+              ? const Color(0xFFECF7EF)
+              : Theme.of(context).cardColor,
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
-            color: selected ? const Color(0xFF0F7A5B) : Theme.of(context).dividerColor,
+            color: selected
+                ? const Color(0xFF0F7A5B)
+                : Theme.of(context).dividerColor,
           ),
         ),
         child: Text(
           label,
           style: TextStyle(
             fontSize: 12,
-            color: selected ? const Color(0xFF0F7A5B) : Theme.of(context).colorScheme.onSurface,
+            color: selected
+                ? const Color(0xFF0F7A5B)
+                : Theme.of(context).colorScheme.onSurface,
             fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
           ),
         ),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import '../../models/app_models.dart';
 
 class SearchScreen extends StatefulWidget {
@@ -40,7 +41,10 @@ class _SearchScreenState extends State<SearchScreen> {
                   CircleAvatar(
                     backgroundColor: Theme.of(context).cardColor,
                     child: IconButton(
-                      icon: Icon(Icons.arrow_back, color: Theme.of(context).colorScheme.onSurface),
+                      icon: Icon(
+                        Icons.arrow_back,
+                        color: Theme.of(context).colorScheme.onSurface,
+                      ),
                       onPressed: () => Navigator.pop(context),
                     ),
                   ),
@@ -51,20 +55,39 @@ class _SearchScreenState extends State<SearchScreen> {
                       autofocus: true,
                       onChanged: (val) => setState(() => _query = val),
                       decoration: InputDecoration(
-                        hintText: 'Search eateries, tacos, coffee, halo-halo...',
-                        prefixIcon: const Icon(Icons.search, color: Color(0xFF0F7A5B)),
-                        suffixIcon: _query.isNotEmpty
-                            ? IconButton(
-                                icon: const Icon(Icons.clear),
+                        hintText: 'Search eateries, coffee, halo-halo...',
+                        prefixIcon: const Icon(
+                          Icons.search,
+                          color: Color(0xFF0F7A5B),
+                        ),
+                        suffixIcon: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            if (_query.isNotEmpty)
+                              IconButton(
+                                icon: const Icon(Icons.clear, size: 18),
                                 onPressed: () {
                                   _searchController.clear();
                                   setState(() => _query = '');
                                 },
-                              )
-                            : null,
+                              ),
+                            IconButton(
+                              icon: const Icon(
+                                Icons.tune,
+                                color: Color(0xFF0F7A5B),
+                                size: 20,
+                              ),
+                              onPressed: () =>
+                                  Navigator.pushNamed(context, '/filter'),
+                            ),
+                          ],
+                        ),
                         filled: true,
                         fillColor: Theme.of(context).cardColor,
-                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: BorderSide.none),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(14),
+                          borderSide: BorderSide.none,
+                        ),
                       ),
                     ),
                   ),
@@ -76,7 +99,10 @@ class _SearchScreenState extends State<SearchScreen> {
                   ? Center(
                       child: Text(
                         'No food spots found for "$_query"',
-                        style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7)),
+                        style: TextStyle(
+                          color: Theme.of(context).colorScheme.onSurface
+                              .withValues(alpha: 0.7),
+                        ),
                       ),
                     )
                   : ListView.builder(
@@ -87,7 +113,11 @@ class _SearchScreenState extends State<SearchScreen> {
                         return Padding(
                           padding: const EdgeInsets.only(bottom: 12),
                           child: InkWell(
-                            onTap: () => Navigator.pushNamed(context, '/restaurant', arguments: eatery),
+                            onTap: () => Navigator.pushNamed(
+                              context,
+                              '/restaurant',
+                              arguments: eatery,
+                            ),
                             borderRadius: BorderRadius.circular(16),
                             child: Container(
                               padding: const EdgeInsets.all(12),
@@ -111,42 +141,66 @@ class _SearchScreenState extends State<SearchScreen> {
                                       width: 60,
                                       height: 60,
                                       fit: BoxFit.cover,
-                                      errorBuilder: (context, error, stackTrace) => placeholderImage(width: 60, height: 60),
+                                      errorBuilder:
+                                          (context, error, stackTrace) =>
+                                              placeholderImage(
+                                                width: 60,
+                                                height: 60,
+                                              ),
                                     ),
                                   ),
                                   const SizedBox(width: 12),
                                   Expanded(
                                     child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
                                       children: [
                                         Text(
                                           eatery.name,
                                           style: TextStyle(
                                             fontWeight: FontWeight.w800,
                                             fontSize: 14,
-                                            color: Theme.of(context).colorScheme.onSurface,
+                                            color: Theme.of(context)
+                                                .colorScheme
+                                                .onSurface,
                                           ),
                                         ),
                                         const SizedBox(height: 2),
                                         Text(
                                           '${eatery.cuisine} • ${eatery.distance} km near ACES',
-                                          style: const TextStyle(fontSize: 11, color: Color(0xFF6E7D79)),
+                                          style: const TextStyle(
+                                            fontSize: 11,
+                                            color: Color(0xFF6E7D79),
+                                          ),
                                         ),
                                         const SizedBox(height: 4),
                                         Row(
                                           children: [
-                                            const Icon(Icons.star, size: 12, color: Colors.amber),
+                                            const Icon(
+                                              Icons.star,
+                                              size: 12,
+                                              color: Colors.amber,
+                                            ),
                                             const SizedBox(width: 4),
                                             Text(
                                               eatery.rating.toString(),
-                                              style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: Theme.of(context).colorScheme.onSurface),
+                                              style: TextStyle(
+                                                fontSize: 11,
+                                                fontWeight: FontWeight.w700,
+                                                color: Theme.of(context)
+                                                    .colorScheme
+                                                    .onSurface,
+                                              ),
                                             ),
                                           ],
                                         ),
                                       ],
                                     ),
                                   ),
-                                  const Icon(Icons.chevron_right, color: Color(0xFF8E9D99)),
+                                  const Icon(
+                                    Icons.chevron_right,
+                                    color: Color(0xFF8E9D99),
+                                  ),
                                 ],
                               ),
                             ),
