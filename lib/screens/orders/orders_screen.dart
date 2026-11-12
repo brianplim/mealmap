@@ -9,6 +9,70 @@ class OrdersScreen extends StatefulWidget {
 }
 
 class _OrdersScreenState extends State<OrdersScreen> {
+  void _showRatingDialog(BuildContext context, FoodOrder order) {
+    int selectedStars = 5;
+    showDialog(
+      context: context,
+      builder: (context) {
+        return StatefulBuilder(
+          builder: (context, setRatingState) {
+            return AlertDialog(
+              title: Text('Rate ${order.itemName}'),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    'How was your food from ${order.eateryName}?',
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(fontSize: 13, color: Colors.grey),
+                  ),
+                  const SizedBox(height: 16),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: List.generate(5, (index) {
+                      final starNum = index + 1;
+                      return IconButton(
+                        icon: Icon(
+                          starNum <= selectedStars ? Icons.star : Icons.star_border,
+                          color: Colors.amber,
+                          size: 32,
+                        ),
+                        onPressed: () {
+                          setRatingState(() {
+                            selectedStars = starNum;
+                          });
+                        },
+                      );
+                    }),
+                  ),
+                ],
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: const Text('Close'),
+                ),
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF0F7A5B),
+                    foregroundColor: Colors.white,
+                  ),
+                  onPressed: () {
+                    Navigator.pop(context);
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('Thank you for rating $selectedStars stars for ${order.itemName}!')),
+                    );
+                  },
+                  child: const Text('Submit Rating'),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -163,25 +227,32 @@ class _OrdersScreenState extends State<OrdersScreen> {
                                 children: [
                                   OutlinedButton.icon(
                                     onPressed: () {
-                                      setState(() {
-                                        if (isTakenOrDelivered) {
-                                          order.status = 'Out for Delivery / Preparing';
-                                        } else {
+                                      if (!isTakenOrDelivered) {
+                                        setState(() {
                                           order.status = 'Food Taken / Delivered Successfully';
-                                        }
-                                      });
+                                        });
+                                        _showRatingDialog(context, order);
+                                      } else {
+                                        _showRatingDialog(context, order);
+                                      }
                                     },
                                     icon: Icon(
-                                      isTakenOrDelivered ? Icons.refresh : Icons.check,
+                                      isTakenOrDelivered ? Icons.star : Icons.check,
                                       size: 16,
-                                      color: const Color(0xFF0F7A5B),
+                                      color: isTakenOrDelivered ? Colors.amber[800] : const Color(0xFF0F7A5B),
                                     ),
                                     label: Text(
-                                      isTakenOrDelivered ? 'Mark In Progress' : 'Confirm Food Taken',
-                                      style: const TextStyle(fontSize: 11, color: Color(0xFF0F7A5B)),
+                                      isTakenOrDelivered ? 'Rate Order' : 'Confirm Food Taken',
+                                      style: TextStyle(
+                                        fontSize: 11,
+                                        fontWeight: FontWeight.bold,
+                                        color: isTakenOrDelivered ? Colors.amber[800] : const Color(0xFF0F7A5B),
+                                      ),
                                     ),
                                     style: OutlinedButton.styleFrom(
-                                      side: const BorderSide(color: Color(0xFF0F7A5B)),
+                                      side: BorderSide(
+                                        color: isTakenOrDelivered ? Colors.amber[800]! : const Color(0xFF0F7A5B),
+                                      ),
                                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                                     ),
                                   ),
