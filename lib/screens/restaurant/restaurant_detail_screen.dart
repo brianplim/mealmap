@@ -17,12 +17,18 @@ class _RestaurantDetailScreenState extends State<RestaurantDetailScreen> {
     final cleanPriceStr = item.price.replaceAll(RegExp(r'[^0-9.]'), '');
     final unitPrice = double.tryParse(cleanPriceStr) ?? 75.0;
 
+    final cleanFeeStr = eatery.deliveryFee.replaceAll(RegExp(r'[^0-9.]'), '');
+    final numericDeliveryFee = eatery.deliveryFee.toLowerCase().contains('free') || cleanFeeStr.isEmpty
+        ? 0.0
+        : (double.tryParse(cleanFeeStr) ?? 0.0);
+
     showDialog(
       context: context,
       builder: (context) {
         return StatefulBuilder(
           builder: (context, setStateDialog) {
-            final totalPrice = unitPrice * quantity;
+            final deliveryFee = fulfillment == 'Delivery' ? numericDeliveryFee : 0.0;
+            final totalPrice = (unitPrice * quantity) + deliveryFee;
             final formattedTotal = '₱${totalPrice.toStringAsFixed(0)}';
 
             return AlertDialog(
@@ -34,6 +40,8 @@ class _RestaurantDetailScreenState extends State<RestaurantDetailScreen> {
                   Text('Eatery: ${eatery.name}'),
                   const SizedBox(height: 4),
                   Text('Unit Price: ${item.price}', style: const TextStyle(color: Colors.grey, fontSize: 12)),
+                  const SizedBox(height: 2),
+                  Text('Delivery Fee: ${eatery.deliveryFee}', style: const TextStyle(color: Colors.grey, fontSize: 12)),
                   const SizedBox(height: 12),
                   Row(
                     children: [
@@ -138,7 +146,7 @@ class _RestaurantDetailScreenState extends State<RestaurantDetailScreen> {
                     final ok = await showConfirmDialog(
                       context: context,
                       title: 'Confirm Order',
-                      message: 'Place order for ${item.name} (x$quantity) totaling $formattedTotal via $fulfillment?',
+                      message: 'Place order for ${item.name} (x$quantity) totaling $formattedTotal (Delivery Fee: ${fulfillment == 'Delivery' ? eatery.deliveryFee : 'Free'}) via $fulfillment?',
                       confirmText: 'Confirm',
                     );
                     if (ok && context.mounted) {

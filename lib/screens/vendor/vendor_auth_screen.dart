@@ -1,5 +1,5 @@
-import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
 
 class VendorAuthScreen extends StatefulWidget {
   const VendorAuthScreen({super.key});
@@ -25,7 +25,8 @@ class _VendorAuthScreenState extends State<VendorAuthScreen> {
   }
 
   Future<void> _submit() async {
-    if (_emailController.text.trim().isEmpty || _passwordController.text.trim().isEmpty) {
+    if (_emailController.text.trim().isEmpty ||
+        _passwordController.text.trim().isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Please enter email and password')),
       );
@@ -50,17 +51,25 @@ class _VendorAuthScreenState extends State<VendorAuthScreen> {
       }
     } catch (e) {
       final errorStr = e.toString().toLowerCase();
-      if (errorStr.contains('api-key-not-valid') || errorStr.contains('no-app') || errorStr.contains('network-request-failed')) {
+      if (errorStr.contains('api-key-not-valid') ||
+          errorStr.contains('no-app') ||
+          errorStr.contains('network-request-failed')) {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Vendor login successful! (Connected)')),
+            const SnackBar(
+              content: Text('Vendor login successful! (Connected)'),
+            ),
           );
           Navigator.pushReplacementNamed(context, '/vendor');
         }
       } else {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Vendor Auth Error: ${e.toString().replaceAll(RegExp(r'\[.*?\]'), '').trim()}')),
+            SnackBar(
+              content: Text(
+                ' ${e.toString().replaceAll(RegExp(r'\[.*?\]'), '').trim()}',
+              ),
+            ),
           );
         }
       }
@@ -84,12 +93,17 @@ class _VendorAuthScreenState extends State<VendorAuthScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   IconButton(
-                    icon: Icon(Icons.arrow_back, color: Theme.of(context).colorScheme.onSurface),
+                    icon: Icon(
+                      Icons.arrow_back,
+                      color: Theme.of(context).colorScheme.onSurface,
+                    ),
                     onPressed: () => Navigator.pop(context),
                   ),
                   const SizedBox(height: 16),
                   Text(
-                    _isLogin ? 'Eatery Vendor Login' : 'Eatery Vendor Registration',
+                    _isLogin
+                        ? 'Eatery Vendor Login'
+                        : 'Eatery Vendor Registration',
                     style: TextStyle(
                       fontSize: 26,
                       fontWeight: FontWeight.w800,
@@ -103,7 +117,8 @@ class _VendorAuthScreenState extends State<VendorAuthScreen> {
                         : 'Create a new vendor account for your food business near ACES College.',
                     style: TextStyle(
                       fontSize: 13,
-                      color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
+                      color: Theme.of(context).colorScheme.onSurface
+                          .withValues(alpha: 0.7),
                       height: 1.4,
                     ),
                   ),
@@ -113,8 +128,13 @@ class _VendorAuthScreenState extends State<VendorAuthScreen> {
                       controller: _businessNameController,
                       decoration: InputDecoration(
                         labelText: 'Business / Eatery Name',
-                        prefixIcon: const Icon(Icons.storefront, color: Color(0xFF0F7A5B)),
-                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(14)),
+                        prefixIcon: const Icon(
+                          Icons.storefront,
+                          color: Color(0xFF0F7A5B),
+                        ),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(14),
+                        ),
                       ),
                     ),
                     const SizedBox(height: 16),
@@ -123,8 +143,13 @@ class _VendorAuthScreenState extends State<VendorAuthScreen> {
                     controller: _emailController,
                     decoration: InputDecoration(
                       labelText: 'Vendor Email',
-                      prefixIcon: const Icon(Icons.email_outlined, color: Color(0xFF0F7A5B)),
-                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(14)),
+                      prefixIcon: const Icon(
+                        Icons.email_outlined,
+                        color: Color(0xFF0F7A5B),
+                      ),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(14),
+                      ),
                     ),
                   ),
                   const SizedBox(height: 16),
@@ -133,12 +158,24 @@ class _VendorAuthScreenState extends State<VendorAuthScreen> {
                     obscureText: _obscurePassword,
                     decoration: InputDecoration(
                       labelText: 'Password',
-                      prefixIcon: const Icon(Icons.lock_outline, color: Color(0xFF0F7A5B)),
-                      suffixIcon: IconButton(
-                        icon: Icon(_obscurePassword ? Icons.visibility_off : Icons.visibility, color: const Color(0xFF0F7A5B)),
-                        onPressed: () => setState(() => _obscurePassword = !_obscurePassword),
+                      prefixIcon: const Icon(
+                        Icons.lock_outline,
+                        color: Color(0xFF0F7A5B),
                       ),
-                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(14)),
+                      suffixIcon: IconButton(
+                        icon: Icon(
+                          _obscurePassword
+                              ? Icons.visibility_off
+                              : Icons.visibility,
+                          color: const Color(0xFF0F7A5B),
+                        ),
+                        onPressed: () => setState(
+                          () => _obscurePassword = !_obscurePassword,
+                        ),
+                      ),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(14),
+                      ),
                     ),
                   ),
                   const SizedBox(height: 24),
@@ -150,13 +187,27 @@ class _VendorAuthScreenState extends State<VendorAuthScreen> {
                         backgroundColor: const Color(0xFF0F7A5B),
                         foregroundColor: Colors.white,
                         padding: const EdgeInsets.symmetric(vertical: 16),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(14),
+                        ),
                       ),
                       child: _isLoading
-                          ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
+                          ? const SizedBox(
+                              width: 20,
+                              height: 20,
+                              child: CircularProgressIndicator(
+                                color: Colors.white,
+                                strokeWidth: 2,
+                              ),
+                            )
                           : Text(
-                              _isLogin ? 'Log In as Vendor' : 'Create Vendor Account',
-                              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
+                              _isLogin
+                                  ? 'Log In as Vendor'
+                                  : 'Create Vendor Account',
+                              style: const TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w700,
+                              ),
                             ),
                     ),
                   ),
@@ -165,8 +216,13 @@ class _VendorAuthScreenState extends State<VendorAuthScreen> {
                     child: TextButton(
                       onPressed: () => setState(() => _isLogin = !_isLogin),
                       child: Text(
-                        _isLogin ? "Don't have a vendor account? Register" : "Already have a vendor account? Log In",
-                        style: const TextStyle(color: Color(0xFF0F7A5B), fontWeight: FontWeight.w700),
+                        _isLogin
+                            ? "Don't have a vendor account? Register"
+                            : "Already have a vendor account? Log In",
+                        style: const TextStyle(
+                          color: Color(0xFF0F7A5B),
+                          fontWeight: FontWeight.w700,
+                        ),
                       ),
                     ),
                   ),
