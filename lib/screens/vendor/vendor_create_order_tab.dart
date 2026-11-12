@@ -21,7 +21,6 @@ class _VendorCreateOrderTabState extends State<VendorCreateOrderTab> {
   final _deliveryFeeController = TextEditingController();
   bool _hasDiscount = true;
   bool _hasDeliveryFee = false;
-  bool _showOnMap = false;
   String _selectedCuisine = 'Filipino';
   String _imageUrl = 'https://images.unsplash.com/photo-1555939594-58d7cb561ad1?auto=format&fit=crop&w=400&q=80';
   LatLng _businessLocation = const LatLng(7.4578, 125.7921);
@@ -163,7 +162,7 @@ class _VendorCreateOrderTabState extends State<VendorCreateOrderTab> {
       hasStudentDiscount: _hasDiscount,
       location: _businessLocation,
       vendorEmail: userEmail,
-      showOnMap: _showOnMap,
+      showOnMap: true,
       deliveryFee: deliveryFeeStr,
       menu: [
         MenuItem(
@@ -176,21 +175,19 @@ class _VendorCreateOrderTabState extends State<VendorCreateOrderTab> {
 
     mockEateries.insert(0, newEatery);
     FirestoreService.uploadEatery(newEatery, newEatery.location);
-    if (_showOnMap) {
-      globalVendorPins.add(
-        CustomVendorPin(
-          id: newEatery.id,
-          label: _menuNameController.text.trim(),
-          location: _businessLocation,
-          eatery: newEatery,
-        ),
-      );
-    }
+    globalVendorPins.add(
+      CustomVendorPin(
+        id: newEatery.id,
+        label: _menuNameController.text.trim(),
+        location: _businessLocation,
+        eatery: newEatery,
+      ),
+    );
     eateryNotifier.value = List.from(mockEateries);
 
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(_showOnMap ? 'Posted to Student Feed and Map!' : 'Posted to Student Feed!')),
+        const SnackBar(content: Text('Posted to Student Feed and Map!')),
       );
       _menuNameController.clear();
       _priceController.clear();
@@ -321,17 +318,6 @@ class _VendorCreateOrderTabState extends State<VendorCreateOrderTab> {
                     ),
                   ),
                 ],
-                const SizedBox(height: 16),
-                Row(
-                  children: [
-                    Checkbox(
-                      value: _showOnMap,
-                      activeColor: const Color(0xFF0F7A5B),
-                      onChanged: (val) => setState(() => _showOnMap = val ?? false),
-                    ),
-                    const Text('Pinpoint this post on the Student Map', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 13)),
-                  ],
-                ),
                 const SizedBox(height: 20),
                 const Text('Food Photo', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 13)),
                 const SizedBox(height: 8),
