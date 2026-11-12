@@ -233,18 +233,18 @@ class _VendorCreateOrderTabState extends State<VendorCreateOrderTab> {
               padding: const EdgeInsets.all(20),
               children: [
                 TextField(
-                  controller: _eateryNameController,
+                  controller: _menuNameController,
                   decoration: InputDecoration(
-                    labelText: 'Eatery / Business Name',
+                    labelText: 'Menu Item Name',
+                    hintText: 'e.g. Special Pork Adobo Meal',
                     border: OutlineInputBorder(borderRadius: BorderRadius.circular(14)),
                   ),
                 ),
                 const SizedBox(height: 16),
                 TextField(
-                  controller: _menuNameController,
+                  controller: _eateryNameController,
                   decoration: InputDecoration(
-                    labelText: 'Menu Item Name',
-                    hintText: 'e.g. Special Pork Adobo Meal',
+                    labelText: 'Eatery / Business Name',
                     border: OutlineInputBorder(borderRadius: BorderRadius.circular(14)),
                   ),
                 ),
