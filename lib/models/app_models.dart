@@ -61,6 +61,7 @@ class FoodOrder {
   String status;
   final String timestamp;
   final String? vendorEmail;
+  String prepTime;
 
   FoodOrder({
     required this.id,
@@ -71,6 +72,7 @@ class FoodOrder {
     required this.status,
     required this.timestamp,
     this.vendorEmail,
+    this.prepTime = '15 mins',
   });
 }
 

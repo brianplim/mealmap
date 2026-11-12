@@ -9,6 +9,40 @@ class VendorReceivedOrderTab extends StatefulWidget {
 }
 
 class _VendorReceivedOrderTabState extends State<VendorReceivedOrderTab> {
+  void _showPrepTimeDialog(BuildContext context, FoodOrder order) {
+    final times = ['10 mins', '15 mins', '20 mins', '30 mins', '45 mins'];
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Set Preparation / Arrival Time'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: times.map((t) => ListTile(
+              title: Text(t),
+              onTap: () {
+                setState(() {
+                  order.prepTime = t;
+                  order.status = 'Preparing (Ready in $t)';
+                });
+                Navigator.pop(context);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text('Prep time set to $t and sent to student!')),
+                );
+              },
+            )).toList(),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Cancel'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -118,6 +152,25 @@ class _VendorReceivedOrderTabState extends State<VendorReceivedOrderTab> {
                               '${order.eateryName} • ${order.price} • ${order.fulfillmentType}',
                               style: const TextStyle(fontSize: 12, color: Color(0xFF6E7D79)),
                             ),
+                            const SizedBox(height: 6),
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                              decoration: BoxDecoration(
+                                color: const Color(0xFFECF7EF),
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  const Icon(Icons.timer_outlined, size: 14, color: Color(0xFF0F7A5B)),
+                                  const SizedBox(width: 6),
+                                  Text(
+                                    'Prep / Arrival Time: ${order.prepTime}',
+                                    style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Color(0xFF0F7A5B)),
+                                  ),
+                                ],
+                              ),
+                            ),
                             const SizedBox(height: 4),
                             Text(
                               'Status: ${order.status}',
@@ -128,13 +181,9 @@ class _VendorReceivedOrderTabState extends State<VendorReceivedOrderTab> {
                               mainAxisAlignment: MainAxisAlignment.end,
                               children: [
                                 OutlinedButton.icon(
-                                  onPressed: isReceived ? null : () {
-                                    setState(() {
-                                      order.status = 'Preparing order';
-                                    });
-                                  },
+                                  onPressed: isReceived ? null : () => _showPrepTimeDialog(context, order),
                                   icon: Icon(Icons.kitchen, size: 16, color: isReceived ? Colors.grey : (isPreparing ? const Color(0xFF0F7A5B) : Colors.grey)),
-                                  label: const Text('Preparing', style: TextStyle(fontSize: 12)),
+                                  label: Text(isPreparing ? 'Preparing (${order.prepTime})' : 'Preparing (Set Time)', style: const TextStyle(fontSize: 12)),
                                   style: OutlinedButton.styleFrom(
                                     foregroundColor: isReceived ? Colors.grey : (isPreparing ? const Color(0xFF0F7A5B) : Colors.grey),
                                     side: BorderSide(color: isReceived ? Colors.grey[300]! : (isPreparing ? const Color(0xFF0F7A5B) : Colors.grey[300]!)),
@@ -144,7 +193,7 @@ class _VendorReceivedOrderTabState extends State<VendorReceivedOrderTab> {
                                 OutlinedButton.icon(
                                   onPressed: isReceived ? null : () {
                                     setState(() {
-                                      order.status = 'Out for Delivery';
+                                      order.status = 'Out for Delivery (Arriving in ${order.prepTime})';
                                     });
                                   },
                                   icon: Icon(Icons.delivery_dining, size: 16, color: isReceived ? Colors.grey : (isDelivering ? Colors.blue : Colors.grey)),

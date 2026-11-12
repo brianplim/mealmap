@@ -16,7 +16,6 @@ class _OrdersScreenState extends State<OrdersScreen> {
       body: SafeArea(
         child: Column(
           children: [
-
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               child: Row(
@@ -117,6 +116,25 @@ class _OrdersScreenState extends State<OrdersScreen> {
                               Text(
                                 '${order.eateryName} • ${order.price}',
                                 style: const TextStyle(fontSize: 12, color: Color(0xFF6E7D79)),
+                              ),
+                              const SizedBox(height: 6),
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFFECF7EF),
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    const Icon(Icons.timer_outlined, size: 14, color: Color(0xFF0F7A5B)),
+                                    const SizedBox(width: 6),
+                                    Text(
+                                      'Estimated Ready / Arrival Time: ${order.prepTime}',
+                                      style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Color(0xFF0F7A5B)),
+                                    ),
+                                  ],
+                                ),
                               ),
                               const SizedBox(height: 12),
                               Row(
