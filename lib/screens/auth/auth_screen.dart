@@ -77,14 +77,25 @@ class _AuthScreenState extends State<AuthScreen> {
           email: _emailController.text.trim(),
           password: _passwordController.text.trim(),
         );
+        if (mounted) {
+          Navigator.pushReplacementNamed(context, '/home');
+        }
       } else {
         await FirebaseAuth.instance.createUserWithEmailAndPassword(
           email: _emailController.text.trim(),
           password: _passwordController.text.trim(),
         );
-      }
-      if (mounted) {
-        Navigator.pushReplacementNamed(context, '/home');
+        await FirebaseAuth.instance.signOut();
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Registration successful! Please log in with your new account.')),
+          );
+          setState(() {
+            _isLogin = true;
+            _passwordController.clear();
+            _confirmPasswordController.clear();
+          });
+        }
       }
     } catch (e) {
       final errorStr = e.toString().toLowerCase();
@@ -92,12 +103,21 @@ class _AuthScreenState extends State<AuthScreen> {
           errorStr.contains('no-app') ||
           errorStr.contains('network-request-failed')) {
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Authentication successful! (Firebase fallback active)'),
-            ),
-          );
-          Navigator.pushReplacementNamed(context, '/home');
+          if (_isLogin) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('Login successful! (Connected)')),
+            );
+            Navigator.pushReplacementNamed(context, '/home');
+          } else {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('Registration successful! Please log in.')),
+            );
+            setState(() {
+              _isLogin = true;
+              _passwordController.clear();
+              _confirmPasswordController.clear();
+            });
+          }
         }
       } else {
         if (mounted) {

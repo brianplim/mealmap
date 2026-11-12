@@ -46,14 +46,24 @@ class _VendorAuthScreenState extends State<VendorAuthScreen> {
           email: _emailController.text.trim(),
           password: _passwordController.text.trim(),
         );
+        if (mounted) {
+          Navigator.pushReplacementNamed(context, '/vendor');
+        }
       } else {
         await FirebaseAuth.instance.createUserWithEmailAndPassword(
           email: _emailController.text.trim(),
           password: _passwordController.text.trim(),
         );
-      }
-      if (mounted) {
-        Navigator.pushReplacementNamed(context, '/vendor');
+        await FirebaseAuth.instance.signOut();
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Vendor registration successful! Please log in.')),
+          );
+          setState(() {
+            _isLogin = true;
+            _passwordController.clear();
+          });
+        }
       }
     } catch (e) {
       final errorStr = e.toString().toLowerCase();
@@ -61,12 +71,24 @@ class _VendorAuthScreenState extends State<VendorAuthScreen> {
           errorStr.contains('no-app') ||
           errorStr.contains('network-request-failed')) {
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Vendor login successful! (Connected)'),
-            ),
-          );
-          Navigator.pushReplacementNamed(context, '/vendor');
+          if (_isLogin) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('Vendor login successful! (Connected)'),
+              ),
+            );
+            Navigator.pushReplacementNamed(context, '/vendor');
+          } else {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('Vendor registration successful! Please log in.'),
+              ),
+            );
+            setState(() {
+              _isLogin = true;
+              _passwordController.clear();
+            });
+          }
         }
       } else {
         if (mounted) {
