@@ -92,12 +92,14 @@ class _VendorAuthScreenState extends State<VendorAuthScreen> {
         }
       } else {
         if (mounted) {
+          String displayMsg = 'Incorrect email or password. Please try again.';
+          if (errorStr.contains('email-already-in-use')) {
+            displayMsg = 'This email address is already registered.';
+          } else if (errorStr.contains('user-not-found')) {
+            displayMsg = 'No account found with this email. Please register first.';
+          }
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(
-                ' ${e.toString().replaceAll(RegExp(r'\[.*?\]'), '').trim()}',
-              ),
-            ),
+            SnackBar(content: Text(displayMsg)),
           );
         }
       }

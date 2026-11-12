@@ -1,5 +1,6 @@
-import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
+
 import '../../models/app_models.dart';
 
 class AuthScreen extends StatefulWidget {
@@ -63,9 +64,9 @@ class _AuthScreenState extends State<AuthScreen> {
         return;
       }
       if (_passwordController.text != _confirmPasswordController.text) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Passwords do not match')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('Passwords do not match')));
         return;
       }
     }
@@ -88,7 +89,11 @@ class _AuthScreenState extends State<AuthScreen> {
         await FirebaseAuth.instance.signOut();
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Registration successful! Please log in with your new account.')),
+            const SnackBar(
+              content: Text(
+                'Registration successful! Please log in with your new account.',
+              ),
+            ),
           );
           setState(() {
             _isLogin = true;
@@ -110,7 +115,9 @@ class _AuthScreenState extends State<AuthScreen> {
             Navigator.pushReplacementNamed(context, '/home');
           } else {
             ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('Registration successful! Please log in.')),
+              const SnackBar(
+                content: Text('Registration successful! Please log in.'),
+              ),
             );
             setState(() {
               _isLogin = true;
@@ -121,12 +128,14 @@ class _AuthScreenState extends State<AuthScreen> {
         }
       } else {
         if (mounted) {
+          String displayMsg = 'Incorrect email or password. Please try again.';
+          if (errorStr.contains('email-already-in-use')) {
+            displayMsg = 'This email address is already registered.';
+          } else if (errorStr.contains('user-not-found')) {
+            displayMsg = 'No account found with this email. Please register first.';
+          }
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(
-                ' ${e.toString().replaceAll(RegExp(r'\[.*?\]'), '').trim()}',
-              ),
-            ),
+            SnackBar(content: Text(displayMsg)),
           );
         }
       }
@@ -197,7 +206,7 @@ class _AuthScreenState extends State<AuthScreen> {
                       controller: _emailController,
                       keyboardType: TextInputType.emailAddress,
                       decoration: InputDecoration(
-                        labelText: 'Gmail Address',
+                        labelText: 'Email Address',
                         hintText: 'example@gmail.com',
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(14),
@@ -215,10 +224,14 @@ class _AuthScreenState extends State<AuthScreen> {
                         ),
                         suffixIcon: IconButton(
                           icon: Icon(
-                            _obscurePassword ? Icons.visibility_off : Icons.visibility,
+                            _obscurePassword
+                                ? Icons.visibility_off
+                                : Icons.visibility,
                             color: const Color(0xFF0F7A5B),
                           ),
-                          onPressed: () => setState(() => _obscurePassword = !_obscurePassword),
+                          onPressed: () => setState(
+                            () => _obscurePassword = !_obscurePassword,
+                          ),
                         ),
                       ),
                     ),
@@ -234,10 +247,15 @@ class _AuthScreenState extends State<AuthScreen> {
                           ),
                           suffixIcon: IconButton(
                             icon: Icon(
-                              _obscureConfirmPassword ? Icons.visibility_off : Icons.visibility,
+                              _obscureConfirmPassword
+                                  ? Icons.visibility_off
+                                  : Icons.visibility,
                               color: const Color(0xFF0F7A5B),
                             ),
-                            onPressed: () => setState(() => _obscureConfirmPassword = !_obscureConfirmPassword),
+                            onPressed: () => setState(
+                              () => _obscureConfirmPassword =
+                                  !_obscureConfirmPassword,
+                            ),
                           ),
                         ),
                       ),
@@ -259,7 +277,10 @@ class _AuthScreenState extends State<AuthScreen> {
                             ? const SizedBox(
                                 width: 20,
                                 height: 20,
-                                child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
+                                child: CircularProgressIndicator(
+                                  color: Colors.white,
+                                  strokeWidth: 2,
+                                ),
                               )
                             : Text(
                                 _isLogin ? 'Login' : 'Register',

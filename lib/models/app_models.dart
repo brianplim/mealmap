@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:url_launcher/url_launcher.dart';
 import 'package:latlong2/latlong.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 final ValueNotifier<ThemeMode> themeNotifier = ValueNotifier(ThemeMode.light);
 final ValueNotifier<List<Eatery>> eateryNotifier = ValueNotifier(mockEateries);
-final ValueNotifier<String> businessNameNotifier = ValueNotifier('ACES Canteen Bites & Deals');
+final ValueNotifier<String> businessNameNotifier = ValueNotifier(
+  'ACES Canteen Bites & Deals',
+);
 final ValueNotifier<int> vendorTabNotifier = ValueNotifier(0);
 final ValueNotifier<bool> vendorNotifReadNotifier = ValueNotifier(false);
 final ValueNotifier<bool> locationSharingNotifier = ValueNotifier(true);
@@ -75,7 +77,7 @@ class FoodOrder {
     required this.status,
     required this.timestamp,
     this.vendorEmail,
-    this.prepTime = '15 mins',
+    this.prepTime = 'Waiting...',
   });
 }
 
@@ -119,14 +121,21 @@ final List<String> globalFavoriteIds = [];
 
 final List<Eatery> mockEateries = [];
 
-Widget statusBar({String time = '9:41', Color color = const Color(0xFF1E1E1E)}) {
+Widget statusBar({
+  String time = '9:41',
+  Color color = const Color(0xFF1E1E1E),
+}) {
   return Padding(
     padding: const EdgeInsets.only(left: 16, right: 16, top: 10, bottom: 6),
     child: Row(
       children: [
         Text(
           time,
-          style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: color),
+          style: TextStyle(
+            fontSize: 13,
+            fontWeight: FontWeight.w700,
+            color: color,
+          ),
         ),
         const Spacer(),
         Icon(Icons.signal_cellular_4_bar, size: 14, color: color),
@@ -159,7 +168,9 @@ Future<void> launchAcesMap(BuildContext context) async {
   } catch (e) {
     if (context.mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Opening ACES Tagum College Google Maps link')),
+        const SnackBar(
+          content: Text('Opening ACES Tagum College Google Maps link'),
+        ),
       );
     }
   }
@@ -200,7 +211,10 @@ class AppLogo extends StatelessWidget {
                 height: size * 0.55,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  border: Border.all(color: isDark ? const Color(0xFF121816) : Colors.white, width: 3),
+                  border: Border.all(
+                    color: isDark ? const Color(0xFF121816) : Colors.white,
+                    width: 3,
+                  ),
                 ),
               ),
               Icon(
@@ -245,7 +259,10 @@ Future<bool> showConfirmDialog({
             child: const Text('Cancel'),
           ),
           ElevatedButton(
-            style: ElevatedButton.styleFrom(backgroundColor: confirmColor, foregroundColor: Colors.white),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: confirmColor,
+              foregroundColor: Colors.white,
+            ),
             onPressed: () => Navigator.pop(context, true),
             child: Text(confirmText),
           ),

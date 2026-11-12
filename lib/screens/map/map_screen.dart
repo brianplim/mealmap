@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
+
 import '../../models/app_models.dart';
 
 class MapScreenContent extends StatefulWidget {
@@ -51,7 +52,8 @@ class _MapScreenContentState extends State<MapScreenContent> {
                   ),
                   children: [
                     TileLayer(
-                      urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+                      urlTemplate:
+                          'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
                       userAgentPackageName: 'com.example.mealmap',
                     ),
                     ValueListenableBuilder<bool>(
@@ -69,34 +71,68 @@ class _MapScreenContentState extends State<MapScreenContent> {
                                   mainAxisSize: MainAxisSize.min,
                                   children: [
                                     Container(
-                                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 6,
+                                        vertical: 2,
+                                      ),
                                       decoration: BoxDecoration(
                                         color: Colors.white,
                                         borderRadius: BorderRadius.circular(6),
-                                        boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.2), blurRadius: 4)],
+                                        boxShadow: [
+                                          BoxShadow(
+                                            color: Colors.black.withValues(
+                                              alpha: 0.2,
+                                            ),
+                                            blurRadius: 4,
+                                          ),
+                                        ],
                                       ),
-                                      child: const Text('Aces Tagum College', style: TextStyle(fontSize: 8, fontWeight: FontWeight.w900, color: Color(0xFF1E2D2A))),
+                                      child: const Text(
+                                        'Aces Tagum College',
+                                        style: TextStyle(
+                                          fontSize: 8,
+                                          fontWeight: FontWeight.w900,
+                                          color: Color(0xFF1E2D2A),
+                                        ),
+                                      ),
                                     ),
                                     const SizedBox(height: 2),
                                     Container(
                                       padding: const EdgeInsets.all(6),
-                                      decoration: const BoxDecoration(color: Colors.red, shape: BoxShape.circle),
-                                      child: const Icon(Icons.school, color: Colors.white, size: 16),
+                                      decoration: const BoxDecoration(
+                                        color: Colors.red,
+                                        shape: BoxShape.circle,
+                                      ),
+                                      child: const Icon(
+                                        Icons.school,
+                                        color: Colors.white,
+                                        size: 16,
+                                      ),
                                     ),
                                   ],
                                 ),
                               ),
                             ),
                             if (sharingEnabled)
-                              ...eateries.where((e) => e.showOnMap).map((eatery) => Marker(
-                                    point: eatery.location,
-                                    width: 110,
-                                    height: 85,
-                                    child: GestureDetector(
-                                      onTap: () => Navigator.pushNamed(context, '/restaurant', arguments: eatery),
-                                      child: _eateryMarkerContent(eatery.name),
+                              ...eateries
+                                  .where((e) => e.showOnMap)
+                                  .map(
+                                    (eatery) => Marker(
+                                      point: eatery.location,
+                                      width: 110,
+                                      height: 85,
+                                      child: GestureDetector(
+                                        onTap: () => Navigator.pushNamed(
+                                          context,
+                                          '/restaurant',
+                                          arguments: eatery,
+                                        ),
+                                        child: _eateryMarkerContent(
+                                          eatery.name,
+                                        ),
+                                      ),
                                     ),
-                                  )),
+                                  ),
                           ],
                         );
                       },
@@ -148,14 +184,20 @@ class _MapScreenContentState extends State<MapScreenContent> {
                   heroTag: 'zoomIn',
                   backgroundColor: Theme.of(context).cardColor,
                   onPressed: _zoomIn,
-                  child: Icon(Icons.add, color: Theme.of(context).colorScheme.onSurface),
+                  child: Icon(
+                    Icons.add,
+                    color: Theme.of(context).colorScheme.onSurface,
+                  ),
                 ),
                 const SizedBox(height: 8),
                 FloatingActionButton.small(
                   heroTag: 'zoomOut',
                   backgroundColor: Theme.of(context).cardColor,
                   onPressed: _zoomOut,
-                  child: Icon(Icons.remove, color: Theme.of(context).colorScheme.onSurface),
+                  child: Icon(
+                    Icons.remove,
+                    color: Theme.of(context).colorScheme.onSurface,
+                  ),
                 ),
               ],
             ),
@@ -188,7 +230,11 @@ class _MapScreenContentState extends State<MapScreenContent> {
                         color: const Color(0xFFE2EFE3),
                         borderRadius: BorderRadius.circular(12),
                       ),
-                      child: const Icon(Icons.ramen_dining, color: Color(0xFF0F7A5B), size: 26),
+                      child: const Icon(
+                        Icons.ramen_dining,
+                        color: Color(0xFF0F7A5B),
+                        size: 26,
+                      ),
                     ),
                     const SizedBox(width: 14),
                     Expanded(
@@ -196,7 +242,7 @@ class _MapScreenContentState extends State<MapScreenContent> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'Cuisine & Student Deals',
+                            'Cuisine & Deals',
                             style: TextStyle(
                               fontWeight: FontWeight.w800,
                               fontSize: 15,
@@ -206,7 +252,10 @@ class _MapScreenContentState extends State<MapScreenContent> {
                           const SizedBox(height: 2),
                           const Text(
                             'Pioneer Avenue • Tagum City',
-                            style: TextStyle(fontSize: 12, color: Color(0xFF6E7D79)),
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: Color(0xFF6E7D79),
+                            ),
                           ),
                           const SizedBox(height: 4),
                           Row(
@@ -215,14 +264,22 @@ class _MapScreenContentState extends State<MapScreenContent> {
                               SizedBox(width: 4),
                               Text(
                                 'Explore food spots',
-                                style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: Color(0xFF0F7A5B)),
+                                style: TextStyle(
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.w600,
+                                  color: Color(0xFF0F7A5B),
+                                ),
                               ),
                             ],
                           ),
                         ],
                       ),
                     ),
-                    Icon(Icons.chevron_right, color: Theme.of(context).colorScheme.onSurface, size: 22),
+                    Icon(
+                      Icons.chevron_right,
+                      color: Theme.of(context).colorScheme.onSurface,
+                      size: 22,
+                    ),
                   ],
                 ),
               ),
@@ -245,7 +302,11 @@ class _MapScreenContentState extends State<MapScreenContent> {
               color: Color(0xFFD81B60),
               size: 46,
               shadows: [
-                Shadow(color: Colors.black45, blurRadius: 4, offset: Offset(0, 2)),
+                Shadow(
+                  color: Colors.black45,
+                  blurRadius: 4,
+                  offset: Offset(0, 2),
+                ),
               ],
             ),
             Positioned(
@@ -275,12 +336,19 @@ class _MapScreenContentState extends State<MapScreenContent> {
             color: Colors.white,
             borderRadius: BorderRadius.circular(6),
             boxShadow: [
-              BoxShadow(color: Colors.black.withValues(alpha: 0.2), blurRadius: 3),
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.2),
+                blurRadius: 3,
+              ),
             ],
           ),
           child: Text(
             name,
-            style: const TextStyle(fontSize: 9, fontWeight: FontWeight.bold, color: Color(0xFF1E2D2A)),
+            style: const TextStyle(
+              fontSize: 9,
+              fontWeight: FontWeight.bold,
+              color: Color(0xFF1E2D2A),
+            ),
           ),
         ),
       ],
