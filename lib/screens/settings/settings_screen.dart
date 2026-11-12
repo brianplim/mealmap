@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import '../../models/app_models.dart';
 
 class SettingsScreen extends StatefulWidget {
@@ -11,13 +13,47 @@ class SettingsScreen extends StatefulWidget {
 class _SettingsScreenState extends State<SettingsScreen> {
   bool _pushNotifications = true;
   late bool _darkMode;
-  bool _studentVerified = true;
-  bool _locationSharing = true;
 
   @override
   void initState() {
     super.initState();
     _darkMode = themeNotifier.value == ThemeMode.dark;
+  }
+
+  Future<void> _deleteAccount() async {
+    final ok = await showConfirmDialog(
+      context: context,
+      title: 'Delete Account Permanently',
+      message: 'Are you sure you want to permanently delete your account? This action cannot be undone and all your data will be erased.',
+      confirmText: 'Delete Permanently',
+      confirmColor: Colors.red,
+    );
+
+    if (!ok) return;
+
+    try {
+      final user = FirebaseAuth.instance.currentUser;
+      if (user != null) {
+        // Delete user profile document from Firestore database
+        await FirebaseFirestore.instance.collection('users').doc(user.uid).delete();
+        // Delete user from Firebase Auth
+        await user.delete();
+      }
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Account permanently deleted.')),
+        );
+        Navigator.pushNamedAndRemoveUntil(context, '/', (route) => false);
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error deleting account: ${e.toString()}')),
+        );
+        // Fallback navigation if re-auth required
+        Navigator.pushNamedAndRemoveUntil(context, '/', (route) => false);
+      }
+    }
   }
 
   @override
@@ -27,7 +63,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
       body: SafeArea(
         child: Column(
           children: [
-
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               child: Row(
@@ -93,15 +128,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             );
                           },
                         ),
-                        const Divider(height: 1),
-                        SwitchListTile(
-                          title: Text('Location Sharing', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 14, color: Theme.of(context).colorScheme.onSurface)),
-                          subtitle: const Text('Find food spots near ACES Tagum College', style: TextStyle(fontSize: 12, color: Colors.grey)),
-                          value: _locationSharing,
-                          activeTrackColor: const Color(0xFF0F7A5B),
-                          activeThumbColor: Colors.white,
-                          onChanged: (val) => setState(() => _locationSharing = val),
-                        ),
                       ],
                     ),
                   ),
@@ -118,20 +144,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     ),
                     child: Column(
                       children: [
-                        SwitchListTile(
-                          title: Text('ACES Student ID Status', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 14, color: Theme.of(context).colorScheme.onSurface)),
-                          subtitle: Text(_studentVerified ? 'Verified Student (20% Off Active)' : 'Unverified', style: TextStyle(fontSize: 12, color: _studentVerified ? const Color(0xFF0F7A5B) : Colors.red)),
-                          value: _studentVerified,
-                          activeTrackColor: const Color(0xFF0F7A5B),
-                          activeThumbColor: Colors.white,
-                          onChanged: (val) => setState(() {
-                            _studentVerified = val;
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(content: Text(_studentVerified ? 'Student ID Verified successfully!' : 'Student ID verification revoked.')),
-                            );
-                          }),
-                        ),
-                        const Divider(height: 1),
                         ListTile(
                           title: Text('Change Password', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 14, color: Theme.of(context).colorScheme.onSurface)),
                           trailing: Icon(Icons.chevron_right, color: Theme.of(context).colorScheme.onSurface),
@@ -162,6 +174,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
                               ),
                             );
                           },
+                        ),
+                        const Divider(height: 1),
+                        ListTile(
+                          title: const Text('Delete Account', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 14, color: Colors.red)),
+                          subtitle: const Text('Permanently remove your account and data', style: TextStyle(fontSize: 12, color: Colors.grey)),
+                          trailing: const Icon(Icons.delete_forever, color: Colors.red),
+                          onTap: _deleteAccount,
                         ),
                       ],
                     ),
