@@ -107,21 +107,13 @@ class _MapScreenContentState extends State<MapScreenContent> {
                 children: [
                   Row(
                     children: [
-                      CircleAvatar(
-                        backgroundColor: Theme.of(context).cardColor,
-                        child: IconButton(
-                          icon: Icon(Icons.arrow_back, color: Theme.of(context).colorScheme.onSurface),
-                          onPressed: () => Navigator.pop(context),
-                        ),
-                      ),
-                      const SizedBox(width: 12),
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
                             'Food Map',
                             style: TextStyle(
-                              fontSize: 20,
+                              fontSize: 22,
                               fontWeight: FontWeight.w800,
                               color: Theme.of(context).colorScheme.onSurface,
                             ),
