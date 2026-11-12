@@ -22,6 +22,7 @@ class FirestoreService {
         'lng': location.longitude,
         'vendorEmail': eatery.vendorEmail,
         'showOnMap': eatery.showOnMap,
+        'deliveryFee': eatery.deliveryFee,
         'menu': eatery.menu.map((m) => {'name': m.name, 'price': m.price, 'imageUrl': m.imageUrl}).toList(),
       });
     } catch (e) {
@@ -38,6 +39,7 @@ class FirestoreService {
         final lat = data['lat'] ?? 7.4578;
         final lng = data['lng'] ?? 125.7921;
         final showMap = data['showOnMap'] ?? false;
+        final deliveryFee = data['deliveryFee'] ?? 'Free Delivery';
         final menuList = (data['menu'] as List<dynamic>? ?? []).map((m) => MenuItem(
           name: m['name'] ?? '',
           price: m['price'] ?? '',
@@ -57,6 +59,7 @@ class FirestoreService {
           location: LatLng(lat, lng),
           vendorEmail: data['vendorEmail'],
           showOnMap: showMap,
+          deliveryFee: deliveryFee,
           menu: menuList,
         ));
       }

@@ -18,8 +18,10 @@ class _VendorCreateOrderTabState extends State<VendorCreateOrderTab> {
   final _menuNameController = TextEditingController();
   final _priceController = TextEditingController();
   final _discountController = TextEditingController();
+  final _deliveryFeeController = TextEditingController();
   bool _hasDiscount = true;
-  bool _showOnMap = false; // Default false so it doesn't automatically pinpoint on student map
+  bool _hasDeliveryFee = false;
+  bool _showOnMap = false;
   String _selectedCuisine = 'Filipino';
   String _imageUrl = 'https://images.unsplash.com/photo-1555939594-58d7cb561ad1?auto=format&fit=crop&w=400&q=80';
   LatLng _businessLocation = const LatLng(7.4578, 125.7921);
@@ -48,6 +50,7 @@ class _VendorCreateOrderTabState extends State<VendorCreateOrderTab> {
     _menuNameController.dispose();
     _priceController.dispose();
     _discountController.dispose();
+    _deliveryFeeController.dispose();
     super.dispose();
   }
 
@@ -121,7 +124,7 @@ class _VendorCreateOrderTabState extends State<VendorCreateOrderTab> {
     );
   }
 
-  void _publishMenu() {
+  void _publishMenu() async {
     if (_menuNameController.text.trim().isEmpty || _priceController.text.trim().isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Please enter menu name and price')),
@@ -129,9 +132,22 @@ class _VendorCreateOrderTabState extends State<VendorCreateOrderTab> {
       return;
     }
 
+    final ok = await showConfirmDialog(
+      context: context,
+      title: 'Publish Menu & Deal',
+      message: 'Are you sure you want to publish ${_menuNameController.text.trim()} to the student feed?',
+      confirmText: 'Publish',
+    );
+
+    if (!ok) return;
+
     final rawPrice = _priceController.text.trim().replaceAll('₱', '');
     final formattedPrice = '₱$rawPrice';
     final userEmail = FirebaseAuth.instance.currentUser?.email;
+
+    final deliveryFeeStr = _hasDeliveryFee && _deliveryFeeController.text.trim().isNotEmpty
+        ? '₱${_deliveryFeeController.text.trim().replaceAll('₱', '')}'
+        : 'Free Delivery';
 
     final newEatery = Eatery(
       id: 'vendor-${DateTime.now().millisecondsSinceEpoch}',
@@ -148,6 +164,7 @@ class _VendorCreateOrderTabState extends State<VendorCreateOrderTab> {
       location: _businessLocation,
       vendorEmail: userEmail,
       showOnMap: _showOnMap,
+      deliveryFee: deliveryFeeStr,
       menu: [
         MenuItem(
           name: _menuNameController.text.trim(),
@@ -171,12 +188,16 @@ class _VendorCreateOrderTabState extends State<VendorCreateOrderTab> {
     }
     eateryNotifier.value = List.from(mockEateries);
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(_showOnMap ? 'Posted to Student Feed and Map!' : 'Posted to Student Feed!')),
-    );
-    _menuNameController.clear();
-    _priceController.clear();
-    _discountController.clear();
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(_showOnMap ? 'Posted to Student Feed and Map!' : 'Posted to Student Feed!')),
+      );
+      _menuNameController.clear();
+      _priceController.clear();
+      _discountController.clear();
+      _deliveryFeeController.clear();
+      setState(() => _hasDeliveryFee = false);
+    }
   }
 
   @override
@@ -272,6 +293,30 @@ class _VendorCreateOrderTabState extends State<VendorCreateOrderTab> {
                     decoration: InputDecoration(
                       labelText: 'Student Discount Description',
                       hintText: 'e.g. 20% OFF with valid student ID',
+                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(14)),
+                    ),
+                  ),
+                ],
+                const SizedBox(height: 16),
+                Row(
+                  children: [
+                    Checkbox(
+                      value: _hasDeliveryFee,
+                      activeColor: const Color(0xFF0F7A5B),
+                      onChanged: (val) => setState(() => _hasDeliveryFee = val ?? false),
+                    ),
+                    const Text('Charge Delivery Fee', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 13)),
+                  ],
+                ),
+                if (_hasDeliveryFee) ...[
+                  const SizedBox(height: 8),
+                  TextField(
+                    controller: _deliveryFeeController,
+                    keyboardType: TextInputType.number,
+                    decoration: InputDecoration(
+                      labelText: 'Delivery Fee Amount',
+                      hintText: '35',
+                      prefixText: '₱ ',
                       border: OutlineInputBorder(borderRadius: BorderRadius.circular(14)),
                     ),
                   ),

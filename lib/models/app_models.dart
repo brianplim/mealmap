@@ -22,6 +22,7 @@ class Eatery {
   final LatLng location;
   final String? vendorEmail;
   final bool showOnMap;
+  final String deliveryFee;
 
   const Eatery({
     required this.id,
@@ -37,6 +38,7 @@ class Eatery {
     this.location = const LatLng(7.4578, 125.7921),
     this.vendorEmail,
     this.showOnMap = true,
+    this.deliveryFee = 'Free Delivery',
   });
 }
 
