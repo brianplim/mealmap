@@ -10,7 +10,7 @@ class VendorReceivedOrderTab extends StatefulWidget {
 
 class _VendorReceivedOrderTabState extends State<VendorReceivedOrderTab> {
   void _showPrepTimeDialog(BuildContext context, FoodOrder order) {
-    final times = ['10 mins', '15 mins', '20 mins', '30 mins', '45 mins'];
+    final times = ['5 mins', '10 mins', '15 mins', '20 mins', '30 mins', '45 mins'];
     showDialog(
       context: context,
       builder: (context) {
