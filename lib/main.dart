@@ -13,6 +13,7 @@ import 'screens/settings/settings_screen.dart';
 import 'screens/vendor/vendor_portal_shell.dart';
 import 'screens/vendor/vendor_auth_screen.dart';
 import 'screens/search/search_screen.dart';
+import 'services/notification_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -22,6 +23,7 @@ void main() async {
         options: DefaultFirebaseOptions.currentPlatform,
       );
     }
+    await NotificationService.initialize();
   } catch (e) {
     debugPrint('Firebase initialization note: $e');
   }
