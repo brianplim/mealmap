@@ -360,25 +360,40 @@ class _HomeScreenContentState extends State<HomeScreenContent> {
                                               ],
                                             ),
                                             const Spacer(),
-                                            if (eatery.hasStudentDiscount)
-                                              Container(
-                                                padding: const EdgeInsets.symmetric(
-                                                  horizontal: 10,
-                                                  vertical: 6,
-                                                ),
-                                                decoration: BoxDecoration(
-                                                  color: const Color(0xFFECF7EF),
-                                                  borderRadius: BorderRadius.circular(10),
-                                                ),
-                                                child: const Text(
-                                                  'Student Discount',
+                                            Column(
+                                              crossAxisAlignment: CrossAxisAlignment.end,
+                                              children: [
+                                                if (eatery.hasStudentDiscount)
+                                                  Container(
+                                                    padding: const EdgeInsets.symmetric(
+                                                      horizontal: 10,
+                                                      vertical: 6,
+                                                    ),
+                                                    decoration: BoxDecoration(
+                                                      color: const Color(0xFFECF7EF),
+                                                      borderRadius: BorderRadius.circular(10),
+                                                    ),
+                                                    child: const Text(
+                                                      'Student Discount',
+                                                      style: TextStyle(
+                                                        fontSize: 11,
+                                                        fontWeight: FontWeight.w700,
+                                                        color: Color(0xFF0F7A5B),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                const SizedBox(height: 8),
+                                                Text(
+                                                  'View More',
                                                   style: TextStyle(
-                                                    fontSize: 11,
-                                                    fontWeight: FontWeight.w700,
-                                                    color: Color(0xFF0F7A5B),
+                                                    fontSize: 12,
+                                                    fontWeight: FontWeight.bold,
+                                                    color: const Color(0xFF0F7A5B),
+                                                    decoration: TextDecoration.underline,
                                                   ),
                                                 ),
-                                              ),
+                                              ],
+                                            ),
                                           ],
                                         ),
                                       ),
