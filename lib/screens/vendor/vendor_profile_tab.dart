@@ -52,6 +52,8 @@ class _VendorProfileTabState extends State<VendorProfileTab> {
   void _showEditProfileDialog() {
     final nameController = TextEditingController(text: _businessName);
     final handleController = TextEditingController(text: _handle);
+    final miniMapController = MapController();
+    double miniMapZoom = 17.0;
     LatLng tempLocation = _businessLocation;
     bool tempShowMap = _showMapLocation;
 
@@ -117,36 +119,89 @@ class _VendorProfileTabState extends State<VendorProfileTab> {
                         const Text('Tap anywhere on the map to set your business location:', style: TextStyle(fontSize: 11, color: Colors.grey)),
                         const SizedBox(height: 8),
                         SizedBox(
-                          height: 160,
+                          height: 170,
                           child: ClipRRect(
                             borderRadius: BorderRadius.circular(12),
-                            child: FlutterMap(
-                              options: MapOptions(
-                                initialCenter: tempLocation,
-                                initialZoom: 17.0,
-                                onTap: (tapPosition, latLng) {
-                                  setDialogState(() {
-                                    tempLocation = latLng;
-                                  });
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(content: Text('Business location pinpointed!')),
-                                  );
-                                },
-                              ),
+                            child: Stack(
                               children: [
-                                TileLayer(
-                                  urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-                                  userAgentPackageName: 'com.example.mealmap',
-                                ),
-                                MarkerLayer(
-                                  markers: [
-                                    Marker(
-                                      point: tempLocation,
-                                      width: 40,
-                                      height: 40,
-                                      child: const Icon(Icons.location_on, color: Colors.red, size: 36),
+                                FlutterMap(
+                                  mapController: miniMapController,
+                                  options: MapOptions(
+                                    initialCenter: tempLocation,
+                                    initialZoom: miniMapZoom,
+                                    onTap: (tapPosition, latLng) {
+                                      setDialogState(() {
+                                        tempLocation = latLng;
+                                      });
+                                      ScaffoldMessenger.of(context).showSnackBar(
+                                        const SnackBar(content: Text('Business location pinpointed!')),
+                                      );
+                                    },
+                                  ),
+                                  children: [
+                                    TileLayer(
+                                      urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+                                      userAgentPackageName: 'com.example.mealmap',
+                                    ),
+                                    MarkerLayer(
+                                      markers: [
+                                        Marker(
+                                          point: tempLocation,
+                                          width: 40,
+                                          height: 40,
+                                          child: const Icon(Icons.location_on, color: Colors.red, size: 36),
+                                        ),
+                                      ],
                                     ),
                                   ],
+                                ),
+                                Positioned(
+                                  right: 8,
+                                  top: 8,
+                                  child: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      InkWell(
+                                        onTap: () {
+                                          if (miniMapZoom < 20.0) {
+                                            setDialogState(() {
+                                              miniMapZoom += 1.0;
+                                              miniMapController.move(tempLocation, miniMapZoom);
+                                            });
+                                          }
+                                        },
+                                        child: Container(
+                                          padding: const EdgeInsets.all(6),
+                                          decoration: BoxDecoration(
+                                            color: Colors.white,
+                                            borderRadius: BorderRadius.circular(8),
+                                            boxShadow: const [BoxShadow(color: Colors.black26, blurRadius: 4)],
+                                          ),
+                                          child: const Icon(Icons.add, size: 18, color: Color(0xFF1E2D2A)),
+                                        ),
+                                      ),
+                                      const SizedBox(height: 6),
+                                      InkWell(
+                                        onTap: () {
+                                          if (miniMapZoom > 5.0) {
+                                            setDialogState(() {
+                                              miniMapZoom -= 1.0;
+                                              miniMapController.move(tempLocation, miniMapZoom);
+                                            });
+                                          }
+                                        },
+                                        child: Container(
+                                          padding: const EdgeInsets.all(6),
+                                          decoration: BoxDecoration(
+                                            color: Colors.white,
+                                            borderRadius: BorderRadius.circular(8),
+                                            boxShadow: const [BoxShadow(color: Colors.black26, blurRadius: 4)],
+                                          ),
+                                          child: const Icon(Icons.remove, size: 18, color: Color(0xFF1E2D2A)),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
                                 ),
                               ],
                             ),

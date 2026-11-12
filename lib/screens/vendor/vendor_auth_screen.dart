@@ -34,7 +34,9 @@ class _VendorAuthScreenState extends State<VendorAuthScreen> {
     }
     if (!_emailController.text.trim().toLowerCase().endsWith('@gmail.com')) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Incorrect email or password. Please try again.')),
+        const SnackBar(
+          content: Text('Incorrect email or password. Please try again.'),
+        ),
       );
       return;
     }
@@ -57,7 +59,9 @@ class _VendorAuthScreenState extends State<VendorAuthScreen> {
         await FirebaseAuth.instance.signOut();
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Vendor registration successful! Please log in.')),
+            const SnackBar(
+              content: Text('Vendor registration successful! Please log in.'),
+            ),
           );
           setState(() {
             _isLogin = true;
@@ -96,11 +100,11 @@ class _VendorAuthScreenState extends State<VendorAuthScreen> {
           if (errorStr.contains('email-already-in-use')) {
             displayMsg = 'This email address is already registered.';
           } else if (errorStr.contains('user-not-found')) {
-            displayMsg = 'No account found with this email. Please register first.';
+            displayMsg =
+                'No account found with this email. Please register first.';
           }
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(displayMsg)),
-          );
+          ScaffoldMessenger.of(context)
+              .showSnackBar(SnackBar(content: Text(displayMsg)));
         }
       }
     } finally {
@@ -172,7 +176,7 @@ class _VendorAuthScreenState extends State<VendorAuthScreen> {
                   TextField(
                     controller: _emailController,
                     decoration: InputDecoration(
-                      labelText: 'Vendor Email (e.g. name@gmail.com)',
+                      labelText: 'Vendor Email',
                       prefixIcon: const Icon(
                         Icons.email_outlined,
                         color: Color(0xFF0F7A5B),

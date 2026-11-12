@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import '../../models/app_models.dart';
 
 class WelcomeScreen extends StatelessWidget {
@@ -28,13 +29,17 @@ class WelcomeScreen extends StatelessWidget {
                     obscureText: obscurePassword,
                     decoration: InputDecoration(
                       labelText: 'Password',
-                      hintText: 'Contact the MealMap for More Info.',
+                      hintText: 'Enter the Password',
                       suffixIcon: IconButton(
                         icon: Icon(
-                          obscurePassword ? Icons.visibility_off : Icons.visibility,
+                          obscurePassword
+                              ? Icons.visibility_off
+                              : Icons.visibility,
                           color: const Color(0xFF0F7A5B),
                         ),
-                        onPressed: () => setDialogState(() => obscurePassword = !obscurePassword),
+                        onPressed: () => setDialogState(
+                          () => obscurePassword = !obscurePassword,
+                        ),
                       ),
                     ),
                   ),
@@ -56,7 +61,9 @@ class WelcomeScreen extends StatelessWidget {
                       Navigator.pushNamed(context, '/vendor-auth');
                     } else {
                       ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Incorrect vendor password')),
+                        const SnackBar(
+                          content: Text('Incorrect vendor password'),
+                        ),
                       );
                     }
                   },
