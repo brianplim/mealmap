@@ -12,11 +12,19 @@ class RestaurantDetailScreen extends StatefulWidget {
 class _RestaurantDetailScreenState extends State<RestaurantDetailScreen> {
   void _showOrderDialog(BuildContext context, Eatery eatery, MenuItem item) {
     String fulfillment = 'Delivery';
+    int quantity = 1;
+
+    final cleanPriceStr = item.price.replaceAll(RegExp(r'[^0-9.]'), '');
+    final unitPrice = double.tryParse(cleanPriceStr) ?? 75.0;
+
     showDialog(
       context: context,
       builder: (context) {
         return StatefulBuilder(
           builder: (context, setStateDialog) {
+            final totalPrice = unitPrice * quantity;
+            final formattedTotal = '₱${totalPrice.toStringAsFixed(0)}';
+
             return AlertDialog(
               title: Text('Order ${item.name}'),
               content: Column(
@@ -25,7 +33,47 @@ class _RestaurantDetailScreenState extends State<RestaurantDetailScreen> {
                 children: [
                   Text('Eatery: ${eatery.name}'),
                   const SizedBox(height: 4),
-                  Text('Price: ${item.price}', style: const TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF0F7A5B))),
+                  Text('Unit Price: ${item.price}', style: const TextStyle(color: Colors.grey, fontSize: 12)),
+                  const SizedBox(height: 12),
+                  Row(
+                    children: [
+                      const Text('Quantity:', style: TextStyle(fontWeight: FontWeight.w700)),
+                      const Spacer(),
+                      IconButton(
+                        icon: const Icon(Icons.remove_circle_outline, color: Color(0xFF0F7A5B)),
+                        onPressed: () {
+                          if (quantity > 1) {
+                            setStateDialog(() => quantity--);
+                          }
+                        },
+                      ),
+                      Text('$quantity', style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                      IconButton(
+                        icon: const Icon(Icons.add_circle_outline, color: Color(0xFF0F7A5B)),
+                        onPressed: () {
+                          setStateDialog(() => quantity++);
+                        },
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  Container(
+                    padding: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFECF7EF),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Row(
+                      children: [
+                        const Text('Total Estimated Price:', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: Color(0xFF0F7A5B))),
+                        const Spacer(),
+                        Text(
+                          formattedTotal,
+                          style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 16, color: Color(0xFF0F7A5B)),
+                        ),
+                      ],
+                    ),
+                  ),
                   const SizedBox(height: 16),
                   const Text('Select Fulfillment:', style: TextStyle(fontWeight: FontWeight.w700)),
                   const SizedBox(height: 10),
@@ -90,18 +138,19 @@ class _RestaurantDetailScreenState extends State<RestaurantDetailScreen> {
                     final newOrder = FoodOrder(
                       id: 'ORD-${DateTime.now().millisecondsSinceEpoch.toString().substring(8)}',
                       eateryName: eatery.name,
-                      itemName: item.name,
-                      price: item.price,
+                      itemName: '${item.name} (x$quantity)',
+                      price: formattedTotal,
                       fulfillmentType: fulfillment,
                       status: fulfillment == 'Delivery' ? 'Out for Delivery' : 'Ready for Pickup',
                       timestamp: 'Just now',
+                      vendorEmail: eatery.vendorEmail,
                     );
                     globalOrders.insert(0, newOrder);
                     vendorNotifReadNotifier.value = false;
                     FirestoreService.uploadOrder(newOrder);
                     Navigator.pop(context);
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Order placed successfully! Check Deliveries/Orders status.')),
+                      SnackBar(content: Text('Order placed successfully! Total: $formattedTotal')),
                     );
                   },
                   style: ElevatedButton.styleFrom(
@@ -126,265 +175,213 @@ class _RestaurantDetailScreenState extends State<RestaurantDetailScreen> {
     return Scaffold(
       body: Column(
         children: [
-          SizedBox(
-            height: 260,
-            width: double.infinity,
-            child: Stack(
-              children: [
-                Positioned.fill(
-                  child: Image.network(
-                    eatery.imageUrl,
-                    fit: BoxFit.cover,
-                    errorBuilder: (context, error, stackTrace) =>
-                        placeholderImage(width: double.infinity, height: 260),
+          Stack(
+            children: [
+              Image.network(
+                eatery.imageUrl,
+                height: 240,
+                width: double.infinity,
+                fit: BoxFit.cover,
+                errorBuilder: (context, error, stackTrace) =>
+                    placeholderImage(width: double.infinity, height: 240),
+              ),
+              SafeArea(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  child: Row(
+                    children: [
+                      CircleAvatar(
+                        backgroundColor: Colors.white,
+                        child: IconButton(
+                          icon: const Icon(Icons.arrow_back, color: Color(0xFF1E2D2A)),
+                          onPressed: () => Navigator.pop(context),
+                        ),
+                      ),
+                      const Spacer(),
+                      CircleAvatar(
+                        backgroundColor: Colors.white,
+                        child: IconButton(
+                          icon: Icon(
+                            isFav ? Icons.favorite : Icons.favorite_border,
+                            color: isFav ? Colors.red : const Color(0xFF1E2D2A),
+                          ),
+                          onPressed: () {
+                            setState(() {
+                              if (isFav) {
+                                globalFavoriteIds.remove(eatery.id);
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(content: Text('Removed ${eatery.name} from favorites')),
+                                );
+                              } else {
+                                globalFavoriteIds.add(eatery.id);
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(content: Text('Added ${eatery.name} to favorites')),
+                                );
+                              }
+                            });
+                          },
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-                SafeArea(
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                    child: Row(
-                      children: [
-                        CircleAvatar(
-                          backgroundColor: Colors.white.withValues(alpha: 0.9),
-                          child: IconButton(
-                            icon: const Icon(Icons.arrow_back, color: Color(0xFF1E2D2A)),
-                            onPressed: () => Navigator.pop(context),
-                          ),
-                        ),
-                        const Spacer(),
-                        CircleAvatar(
-                          backgroundColor: Colors.white.withValues(alpha: 0.9),
-                          child: IconButton(
-                            icon: Icon(
-                              isFav ? Icons.favorite : Icons.favorite_border,
-                              color: isFav ? Colors.red : const Color(0xFF1E2D2A),
-                            ),
-                            onPressed: () {
-                              setState(() {
-                                if (isFav) {
-                                  globalFavoriteIds.remove(eatery.id);
-                                } else {
-                                  globalFavoriteIds.add(eatery.id);
-                                }
-                              });
-                            },
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ],
-            ),
+              ),
+            ],
           ),
           Expanded(
-            child: Container(
-              width: double.infinity,
-              padding: const EdgeInsets.all(20),
-              color: Theme.of(context).cardColor,
-              child: SingleChildScrollView(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+            child: ListView(
+              padding: const EdgeInsets.all(16),
+              children: [
+                Row(
                   children: [
-                    Row(
-                      children: [
-                        Expanded(
-                          child: Text(
-                            eatery.name,
-                            style: TextStyle(
-                              fontSize: 26,
-                              fontWeight: FontWeight.w800,
-                              color: Theme.of(context).colorScheme.onSurface,
-                            ),
-                          ),
-                        ),
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 10,
-                            vertical: 6,
-                          ),
-                          decoration: BoxDecoration(
-                            color: const Color(0xFFECF7EF),
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          child: Text(
-                            '${eatery.rating} (${eatery.reviewsCount} reviews)',
-                            style: const TextStyle(
-                              fontSize: 12,
-                              fontWeight: FontWeight.w700,
-                              color: Color(0xFF0F7A5B),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 8),
-                    Row(
-                      children: [
-                        const Icon(Icons.location_on, size: 16, color: Color(0xFF5A6A64)),
-                        const SizedBox(width: 4),
-                        Text(
-                          '${eatery.distance} km from ACES Tagum College',
-                          style: const TextStyle(fontSize: 13, color: Color(0xFF5A6A64)),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 16),
-                    Text(
-                      eatery.description,
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.8),
-                        height: 1.5,
-                      ),
-                    ),
-                    const SizedBox(height: 20),
-                    Text(
-                      'Menu & Delivery Tap to Order',
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.w800,
-                        color: Theme.of(context).colorScheme.onSurface,
-                      ),
-                    ),
-                    const SizedBox(height: 12),
-                    SizedBox(
-                      height: 160,
-                      child: ListView.builder(
-                        scrollDirection: Axis.horizontal,
-                        itemCount: eatery.menu.length,
-                        itemBuilder: (context, index) {
-                          final item = eatery.menu[index];
-                          return GestureDetector(
-                            onTap: () => _showOrderDialog(context, eatery, item),
-                            child: Container(
-                              width: 120,
-                              margin: const EdgeInsets.only(right: 12),
-                              decoration: BoxDecoration(
-                                color: Theme.of(context).cardColor,
-                                borderRadius: BorderRadius.circular(14),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.black.withValues(alpha: 0.05),
-                                    blurRadius: 6,
-                                    offset: const Offset(0, 3),
-                                  ),
-                                ],
-                              ),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  ClipRRect(
-                                    borderRadius: const BorderRadius.vertical(
-                                      top: Radius.circular(14),
-                                    ),
-                                    child: Image.network(
-                                      item.imageUrl,
-                                      height: 80,
-                                      width: double.infinity,
-                                      fit: BoxFit.cover,
-                                      errorBuilder: (context, error, stackTrace) =>
-                                          placeholderImage(width: double.infinity, height: 80),
-                                    ),
-                                  ),
-                                  Padding(
-                                    padding: const EdgeInsets.all(8),
-                                    child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          item.name,
-                                          style: TextStyle(
-                                            fontWeight: FontWeight.w700,
-                                            fontSize: 12,
-                                            color: Theme.of(context).colorScheme.onSurface,
-                                          ),
-                                          maxLines: 1,
-                                          overflow: TextOverflow.ellipsis,
-                                        ),
-                                        const SizedBox(height: 2),
-                                        Row(
-                                          children: [
-                                            Text(
-                                              item.price,
-                                              style: const TextStyle(
-                                                fontSize: 11,
-                                                fontWeight: FontWeight.w700,
-                                                color: Color(0xFF0F7A5B),
-                                              ),
-                                            ),
-                                            const Spacer(),
-                                            const Icon(Icons.add_shopping_cart, size: 14, color: Color(0xFF0F7A5B)),
-                                          ],
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          );
-                        },
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    if (eatery.hasStudentDiscount)
-                      Container(
-                        padding: const EdgeInsets.all(12),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFFECF7EF),
-                          borderRadius: BorderRadius.circular(14),
-                          border: Border.all(color: const Color(0xFFB5E3C7)),
-                        ),
-                        child: Row(
-                          children: [
-                            const Icon(Icons.local_offer, color: Color(0xFF0F7A5B)),
-                            const SizedBox(width: 10),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: const [
-                                  Text(
-                                    'Student Deal (Tagum)',
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.w800,
-                                      fontSize: 13,
-                                      color: Color(0xFF0F7A5B),
-                                    ),
-                                  ),
-                                  SizedBox(height: 2),
-                                  Text(
-                                    '20% OFF on all delivery & pickup orders with valid student ID',
-                                    style: TextStyle(fontSize: 12, color: Color(0xFF3D554F)),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
+                    Expanded(
+                      child: Text(
+                        eatery.name,
+                        style: TextStyle(
+                          fontSize: 22,
+                          fontWeight: FontWeight.w900,
+                          color: Theme.of(context).colorScheme.onSurface,
                         ),
                       ),
-                    const SizedBox(height: 24),
-                    SizedBox(
-                      width: double.infinity,
-                      child: ElevatedButton(
-                        onPressed: () => launchAcesMap(context),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFF0F7A5B),
-                          foregroundColor: Colors.white,
-                          padding: const EdgeInsets.symmetric(vertical: 16),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(16),
-                          ),
-                        ),
-                        child: const Text(
-                          'Open ACES Tagum College in Google Maps',
-                          style: TextStyle(fontSize: 15, fontWeight: FontWeight.w700),
+                    ),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFECF7EF),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: Text(
+                        eatery.cuisine,
+                        style: const TextStyle(
+                          color: Color(0xFF0F7A5B),
+                          fontWeight: FontWeight.w700,
+                          fontSize: 12,
                         ),
                       ),
                     ),
                   ],
                 ),
-              ),
+                const SizedBox(height: 6),
+                Row(
+                  children: [
+                    const Icon(Icons.star, size: 16, color: Colors.amber),
+                    const SizedBox(width: 4),
+                    Text(
+                      '${eatery.rating} (${eatery.reviewsCount} reviews)',
+                      style: TextStyle(
+                        fontWeight: FontWeight.w700,
+                        fontSize: 13,
+                        color: Theme.of(context).colorScheme.onSurface,
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    const Icon(Icons.location_on, size: 16, color: Color(0xFF0F7A5B)),
+                    const SizedBox(width: 2),
+                    Text(
+                      '${eatery.distance} km near ACES',
+                      style: const TextStyle(fontSize: 13, color: Color(0xFF6E7D79)),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                Text(
+                  eatery.description,
+                  style: TextStyle(
+                    fontSize: 13,
+                    color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.8),
+                    height: 1.4,
+                  ),
+                ),
+                const SizedBox(height: 20),
+                Text(
+                  'Menu Items & Specials',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w800,
+                    color: Theme.of(context).colorScheme.onSurface,
+                  ),
+                ),
+                const SizedBox(height: 12),
+                if (eatery.menu.isEmpty)
+                  const Center(child: Text('No menu items posted yet.'))
+                else
+                  ...eatery.menu.map((item) => Padding(
+                        padding: const EdgeInsets.only(bottom: 12),
+                        child: InkWell(
+                          onTap: () => _showOrderDialog(context, eatery, item),
+                          borderRadius: BorderRadius.circular(16),
+                          child: Container(
+                            padding: const EdgeInsets.all(12),
+                            decoration: BoxDecoration(
+                              color: Theme.of(context).cardColor,
+                              borderRadius: BorderRadius.circular(16),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withValues(alpha: 0.04),
+                                  blurRadius: 6,
+                                  offset: const Offset(0, 2),
+                                ),
+                              ],
+                            ),
+                            child: Row(
+                              children: [
+                                ClipRRect(
+                                  borderRadius: BorderRadius.circular(12),
+                                  child: Image.network(
+                                    item.imageUrl,
+                                    width: 70,
+                                    height: 70,
+                                    fit: BoxFit.cover,
+                                    errorBuilder: (context, error, stackTrace) =>
+                                        placeholderImage(width: 70, height: 70),
+                                  ),
+                                ),
+                                const SizedBox(width: 14),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        item.name,
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.w800,
+                                          fontSize: 15,
+                                          color: Theme.of(context).colorScheme.onSurface,
+                                        ),
+                                      ),
+                                      const SizedBox(height: 4),
+                                      Text(
+                                        item.price,
+                                        style: const TextStyle(
+                                          fontWeight: FontWeight.w900,
+                                          fontSize: 14,
+                                          color: Color(0xFF0F7A5B),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                                  decoration: BoxDecoration(
+                                    color: const Color(0xFF0F7A5B),
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                  child: const Text(
+                                    'Order',
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 12,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      )),
+              ],
             ),
           ),
         ],
