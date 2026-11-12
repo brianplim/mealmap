@@ -22,8 +22,7 @@ class _RestaurantDetailScreenState extends State<RestaurantDetailScreen> {
       builder: (context) {
         return StatefulBuilder(
           builder: (context, setStateDialog) {
-            final deliveryFee = fulfillment == 'Delivery' ? 35.0 : 0.0;
-            final totalPrice = (unitPrice * quantity) + deliveryFee;
+            final totalPrice = unitPrice * quantity;
             final formattedTotal = '₱${totalPrice.toStringAsFixed(0)}';
 
             return AlertDialog(
@@ -58,16 +57,6 @@ class _RestaurantDetailScreenState extends State<RestaurantDetailScreen> {
                     ],
                   ),
                   const SizedBox(height: 8),
-                  if (fulfillment == 'Delivery') ...[
-                    Row(
-                      children: [
-                        const Text('Delivery Fee:', style: TextStyle(fontSize: 12, color: Colors.grey)),
-                        const Spacer(),
-                        const Text('₱35', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.grey)),
-                      ],
-                    ),
-                    const SizedBox(height: 4),
-                  ],
                   Container(
                     padding: const EdgeInsets.all(10),
                     decoration: BoxDecoration(
