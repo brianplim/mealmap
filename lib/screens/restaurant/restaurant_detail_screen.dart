@@ -177,7 +177,16 @@ class _RestaurantDetailScreenState extends State<RestaurantDetailScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final eatery = ModalRoute.of(context)?.settings.arguments as Eatery? ?? mockEateries[0];
+    final eatery = ModalRoute.of(context)?.settings.arguments as Eatery? ?? (mockEateries.isNotEmpty ? mockEateries[0] : Eatery(id: '1', name: 'Eatery', cuisine: 'Filipino', distance: 0.1, rating: 5.0, reviewsCount: 1, imageUrl: '', description: '', hasStudentDiscount: true, menu: []));
+
+    // Group all menu items from any post sharing the same eatery name
+    final allRelatedEateries = eateryNotifier.value.where((e) => e.name.toLowerCase().trim() == eatery.name.toLowerCase().trim()).toList();
+    final List<MenuItem> combinedMenu = [];
+    for (var e in allRelatedEateries) {
+      combinedMenu.addAll(e.menu);
+    }
+    final menuItems = combinedMenu.isNotEmpty ? combinedMenu : eatery.menu;
+
     bool isFav = globalFavoriteIds.contains(eatery.id);
 
     return Scaffold(
@@ -310,10 +319,10 @@ class _RestaurantDetailScreenState extends State<RestaurantDetailScreen> {
                   ),
                 ),
                 const SizedBox(height: 12),
-                if (eatery.menu.isEmpty)
+                if (menuItems.isEmpty)
                   const Center(child: Text('No menu items posted yet.'))
                 else
-                  ...eatery.menu.map((item) => Padding(
+                  ...menuItems.map((item) => Padding(
                         padding: const EdgeInsets.only(bottom: 12),
                         child: InkWell(
                           onTap: () => _showOrderDialog(context, eatery, item),
