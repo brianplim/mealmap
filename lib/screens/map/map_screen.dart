@@ -127,20 +127,6 @@ class _MapScreenContentState extends State<MapScreenContent> {
                           ),
                         ],
                       ),
-                      const Spacer(),
-                      Container(
-                        decoration: BoxDecoration(
-                          color: Theme.of(context).cardColor,
-                          borderRadius: BorderRadius.circular(12),
-                          boxShadow: [
-                            BoxShadow(color: Colors.black.withValues(alpha: 0.1), blurRadius: 4),
-                          ],
-                        ),
-                        child: IconButton(
-                          icon: Icon(Icons.tune, color: Theme.of(context).colorScheme.onSurface, size: 20),
-                          onPressed: () => Navigator.pushNamed(context, '/filter'),
-                        ),
-                      ),
                     ],
                   ),
                 ],

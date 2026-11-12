@@ -29,11 +29,6 @@ class _DailyDealsScreenContentState extends State<DailyDealsScreenContent> {
                     color: Theme.of(context).colorScheme.onSurface,
                   ),
                 ),
-                const Spacer(),
-                IconButton(
-                  icon: Icon(Icons.tune, color: Theme.of(context).colorScheme.onSurface),
-                  onPressed: () => Navigator.pushNamed(context, '/filter'),
-                ),
               ],
             ),
           ),
