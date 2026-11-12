@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import '../../models/app_models.dart';
 
 class AuthScreen extends StatefulWidget {
   const AuthScreen({super.key, this.isLogin = true});
@@ -12,7 +13,6 @@ class AuthScreen extends StatefulWidget {
 
 class _AuthScreenState extends State<AuthScreen> {
   late bool _isLogin;
-  bool _obscurePassword = true;
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
@@ -37,7 +37,13 @@ class _AuthScreenState extends State<AuthScreen> {
   Future<void> _submit() async {
     if (_emailController.text.trim().isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please enter your student email or ID')),
+        const SnackBar(content: Text('Please enter your student email')),
+      );
+      return;
+    }
+    if (!_emailController.text.trim().toLowerCase().endsWith('@gmail.com')) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Only @gmail.com email addresses are allowed')),
       );
       return;
     }
@@ -80,34 +86,25 @@ class _AuthScreenState extends State<AuthScreen> {
       }
     } catch (e) {
       final errorStr = e.toString().toLowerCase();
-      if (errorStr.contains('api-key-not-valid') || errorStr.contains('no-app') || errorStr.contains('network-request-failed')) {
-        debugPrint('Firebase web auth fallback active: $e');
+      if (errorStr.contains('api-key-not-valid') ||
+          errorStr.contains('no-app') ||
+          errorStr.contains('network-request-failed')) {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Login successful! (MealMap Connected)')),
+            const SnackBar(
+              content: Text('Authentication successful! (Firebase fallback active)'),
+            ),
           );
           Navigator.pushReplacementNamed(context, '/home');
         }
       } else {
-        String message = 'Authentication failed';
-        if (e is FirebaseAuthException) {
-          if (e.code == 'user-not-found' || errorStr.contains('user-not-found' ) || errorStr.contains('no user record')) {
-            message = 'Couldn’t find this account';
-          } else if (e.code == 'wrong-password' || e.code == 'invalid-credential' || errorStr.contains('wrong-password') || errorStr.contains('invalid-credential')) {
-            message = 'Incorrect password or credentials';
-          } else if (e.code == 'email-already-in-use' || errorStr.contains('email-already-in-use')) {
-            message = 'Email is already registered. Please log in.';
-          } else if (e.code == 'weak-password' || errorStr.contains('weak-password')) {
-            message = 'Password should be at least 6 characters.';
-          } else {
-            message = 'Firebase [${e.code}]: ${e.message ?? e.toString()}';
-          }
-        } else {
-          message = 'Error: ${e.toString()}';
-        }
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(message)),
+            SnackBar(
+              content: Text(
+                ' ${e.toString().replaceAll(RegExp(r'\[.*?\]'), '').trim()}',
+              ),
+            ),
           );
         }
       }
@@ -121,164 +118,148 @@ class _AuthScreenState extends State<AuthScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(24),
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: themeNotifier.value == ThemeMode.dark
+                ? [const Color(0xFF121816), const Color(0xFF0A2B20)]
+                : [const Color(0xFFE0F5EB), const Color(0xFF93D0B3)],
+          ),
+        ),
+        child: SafeArea(
           child: Center(
             child: SingleChildScrollView(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const SizedBox(height: 12),
-                  IconButton(
-                    icon: Icon(Icons.arrow_back, color: Theme.of(context).colorScheme.onSurface),
-                    onPressed: () => Navigator.pop(context),
-                  ),
-                  const SizedBox(height: 16),
-                  Text(
-                    _isLogin ? 'Welcome Back!' : 'Create Account',
-                    style: TextStyle(
-                      fontSize: 28,
-                      fontWeight: FontWeight.w800,
-                      color: Theme.of(context).colorScheme.onSurface,
+              padding: const EdgeInsets.symmetric(horizontal: 24),
+              child: Container(
+                padding: const EdgeInsets.all(24),
+                decoration: BoxDecoration(
+                  color: Theme.of(context).cardColor,
+                  borderRadius: BorderRadius.circular(24),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.1),
+                      blurRadius: 16,
+                      offset: const Offset(0, 6),
                     ),
-                  ),
-                  const SizedBox(height: 6),
-                  Text(
-                    _isLogin
-                        ? 'Log in to access Tagum student deals near ACES Tagum College.'
-                        : 'Sign up to save your favorite eateries and deals.',
-                    style: TextStyle(
-                      fontSize: 13,
-                      color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
-                      height: 1.4,
-                    ),
-                  ),
-                  const SizedBox(height: 24),
-                  if (!_isLogin) ...[
-                    TextField(
-                      controller: _nameController,
-                      decoration: InputDecoration(
-                        labelText: 'Full Name',
-                        prefixIcon: const Icon(Icons.person_outline, color: Color(0xFF0F7A5B)),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(14),
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(14),
-                          borderSide: const BorderSide(color: Color(0xFF0F7A5B), width: 2),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 16),
                   ],
-                  TextField(
-                    controller: _emailController,
-                    decoration: InputDecoration(
-                      labelText: 'Student Email / ID',
-                      prefixIcon: const Icon(Icons.email_outlined, color: Color(0xFF0F7A5B)),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(14),
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(14),
-                        borderSide: const BorderSide(color: Color(0xFF0F7A5B), width: 2),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  TextField(
-                    controller: _passwordController,
-                    obscureText: _obscurePassword,
-                    decoration: InputDecoration(
-                      labelText: 'Password',
-                      prefixIcon: const Icon(Icons.lock_outline, color: Color(0xFF0F7A5B)),
-                      suffixIcon: IconButton(
-                        icon: Icon(
-                          _obscurePassword ? Icons.visibility_off : Icons.visibility,
-                          color: const Color(0xFF0F7A5B),
-                        ),
-                        onPressed: () => setState(() => _obscurePassword = !_obscurePassword),
-                      ),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(14),
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(14),
-                        borderSide: const BorderSide(color: Color(0xFF0F7A5B), width: 2),
-                      ),
-                    ),
-                  ),
-                  if (!_isLogin) ...[
+                ),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const AppLogo(size: 70),
                     const SizedBox(height: 16),
-                    TextField(
-                      controller: _confirmPasswordController,
-                      obscureText: _obscurePassword,
-                      decoration: InputDecoration(
-                        labelText: 'Confirm Password',
-                        prefixIcon: const Icon(Icons.lock_reset, color: Color(0xFF0F7A5B)),
-                        suffixIcon: IconButton(
-                          icon: Icon(
-                            _obscurePassword ? Icons.visibility_off : Icons.visibility,
-                            color: const Color(0xFF0F7A5B),
+                    Text(
+                      _isLogin ? 'Student Login' : 'Student Registration',
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.w900,
+                        color: Theme.of(context).colorScheme.onSurface,
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    if (!_isLogin) ...[
+                      TextField(
+                        controller: _nameController,
+                        decoration: InputDecoration(
+                          labelText: 'Full Name',
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(14),
                           ),
-                          onPressed: () => setState(() => _obscurePassword = !_obscurePassword),
                         ),
+                      ),
+                      const SizedBox(height: 14),
+                    ],
+                    TextField(
+                      controller: _emailController,
+                      keyboardType: TextInputType.emailAddress,
+                      decoration: InputDecoration(
+                        labelText: 'Gmail Address',
+                        hintText: 'example@gmail.com',
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(14),
                         ),
-                        focusedBorder: OutlineInputBorder(
+                      ),
+                    ),
+                    const SizedBox(height: 14),
+                    TextField(
+                      controller: _passwordController,
+                      obscureText: true,
+                      decoration: InputDecoration(
+                        labelText: 'Password',
+                        border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(14),
-                          borderSide: const BorderSide(color: Color(0xFF0F7A5B), width: 2),
                         ),
                       ),
                     ),
-                  ],
-                  const SizedBox(height: 24),
-                  SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton(
-                      onPressed: _isLoading ? null : _submit,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF0F7A5B),
-                        foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(16),
+                    if (!_isLogin) ...[
+                      const SizedBox(height: 14),
+                      TextField(
+                        controller: _confirmPasswordController,
+                        obscureText: true,
+                        decoration: InputDecoration(
+                          labelText: 'Confirm Password',
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(14),
+                          ),
                         ),
                       ),
-                      child: _isLoading
-                          ? const SizedBox(
-                              width: 20,
-                              height: 20,
-                              child: CircularProgressIndicator(
-                                color: Colors.white,
-                                strokeWidth: 2,
+                    ],
+                    const SizedBox(height: 24),
+                    SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton(
+                        onPressed: _isLoading ? null : _submit,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFF0F7A5B),
+                          foregroundColor: Colors.white,
+                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(14),
+                          ),
+                        ),
+                        child: _isLoading
+                            ? const SizedBox(
+                                width: 20,
+                                height: 20,
+                                child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
+                              )
+                            : Text(
+                                _isLogin ? 'Login' : 'Register',
+                                style: const TextStyle(
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.w700,
+                                ),
                               ),
-                            )
-                          : Text(
-                              _isLogin ? 'Log In' : 'Sign Up',
-                              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
-                            ),
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: 16),
-                  Center(
-                    child: TextButton(
+                    const SizedBox(height: 12),
+                    TextButton(
                       onPressed: () => setState(() => _isLogin = !_isLogin),
                       child: Text(
                         _isLogin
-                            ? "Don't have an account? Sign Up"
-                            : "Already have an account? Log In",
+                            ? "Don't have an account? Register"
+                            : 'Already have an account? Login',
                         style: const TextStyle(
                           color: Color(0xFF0F7A5B),
                           fontWeight: FontWeight.w700,
+                          fontSize: 13,
                         ),
                       ),
                     ),
-                  ),
-                ],
+                    TextButton(
+                      onPressed: () => Navigator.pop(context),
+                      child: const Text(
+                        'Back to Welcome',
+                        style: TextStyle(
+                          color: Color(0xFF8E9D99),
+                          fontSize: 12,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
           ),

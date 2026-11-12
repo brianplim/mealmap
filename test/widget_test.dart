@@ -12,18 +12,18 @@ void main() {
     await tester.tap(find.text('Login'));
     await tester.pumpAndSettle();
 
-    expect(find.text('Welcome Back!'), findsOneWidget);
+    expect(find.text('Student Login'), findsOneWidget);
 
-    await tester.tap(find.text('Log In'));
+    await tester.tap(find.text('Login').last);
     await tester.pumpAndSettle();
 
-    expect(find.text('Please enter your student email or ID'), findsOneWidget);
+    expect(find.text('Please enter your student email'), findsOneWidget);
 
-    await tester.enterText(find.byType(TextField).at(0), 'student@aces.edu.ph');
+    await tester.enterText(find.byType(TextField).at(0), 'student@gmail.com');
     await tester.enterText(find.byType(TextField).at(1), 'password123');
     await tester.pump();
 
-    await tester.tap(find.text('Log In'));
+    await tester.tap(find.text('Login').last);
     await tester.pumpAndSettle();
   });
 }

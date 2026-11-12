@@ -32,6 +32,12 @@ class _VendorAuthScreenState extends State<VendorAuthScreen> {
       );
       return;
     }
+    if (!_emailController.text.trim().toLowerCase().endsWith('@gmail.com')) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Only @gmail.com email addresses are allowed')),
+      );
+      return;
+    }
 
     setState(() => _isLoading = true);
     try {
@@ -142,7 +148,7 @@ class _VendorAuthScreenState extends State<VendorAuthScreen> {
                   TextField(
                     controller: _emailController,
                     decoration: InputDecoration(
-                      labelText: 'Vendor Email',
+                      labelText: 'Vendor Email (e.g. name@gmail.com)',
                       prefixIcon: const Icon(
                         Icons.email_outlined,
                         color: Color(0xFF0F7A5B),
