@@ -46,7 +46,7 @@ class _AuthScreenState extends State<AuthScreen> {
     }
     if (!_emailController.text.trim().toLowerCase().endsWith('@gmail.com')) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Only @gmail.com email addresses are allowed')),
+        const SnackBar(content: Text('Incorrect email or password. Please try again.')),
       );
       return;
     }
