@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../models/app_models.dart';
+import '../../services/firestore_service.dart';
 
 class OrdersScreen extends StatefulWidget {
   const OrdersScreen({super.key});
@@ -58,6 +59,21 @@ class _OrdersScreenState extends State<OrdersScreen> {
                     foregroundColor: Colors.white,
                   ),
                   onPressed: () {
+                    setState(() {
+                      order.userRating = selectedStars;
+                    });
+
+                    final matches = mockEateries.where(
+                      (e) => e.name.toLowerCase().trim() == order.eateryName.toLowerCase().trim(),
+                    );
+                    for (var eatery in matches) {
+                      eatery.reviewsCount += 1;
+                      eatery.ratingSum += selectedStars;
+                      eatery.rating = double.parse((eatery.ratingSum / eatery.reviewsCount).toStringAsFixed(1));
+                      FirestoreService.uploadEatery(eatery, eatery.location);
+                    }
+                    eateryNotifier.value = List.from(mockEateries);
+
                     Navigator.pop(context);
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(content: Text('Thank you for rating $selectedStars stars for ${order.itemName}!')),
@@ -221,6 +237,19 @@ class _OrdersScreenState extends State<OrdersScreen> {
                                   ),
                                 ],
                               ),
+                              if (order.userRating != null) ...[
+                                const SizedBox(height: 8),
+                                Row(
+                                  children: [
+                                    const Text('Your Rating: ', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
+                                    ...List.generate(5, (i) => Icon(
+                                      i < order.userRating! ? Icons.star : Icons.star_border,
+                                      size: 16,
+                                      color: Colors.amber,
+                                    )),
+                                  ],
+                                ),
+                              ],
                               const SizedBox(height: 12),
                               Row(
                                 mainAxisAlignment: MainAxisAlignment.end,
@@ -242,7 +271,9 @@ class _OrdersScreenState extends State<OrdersScreen> {
                                       color: isTakenOrDelivered ? Colors.amber[800] : const Color(0xFF0F7A5B),
                                     ),
                                     label: Text(
-                                      isTakenOrDelivered ? 'Rate Order' : 'Confirm Food Taken',
+                                      order.userRating != null
+                                          ? 'Rated ${order.userRating}★ (Change)'
+                                          : (isTakenOrDelivered ? 'Rate Order' : 'Confirm Food Taken'),
                                       style: TextStyle(
                                         fontSize: 11,
                                         fontWeight: FontWeight.bold,

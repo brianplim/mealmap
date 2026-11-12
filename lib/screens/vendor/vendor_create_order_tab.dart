@@ -153,8 +153,9 @@ class _VendorCreateOrderTabState extends State<VendorCreateOrderTab> {
       name: _eateryNameController.text.trim().isNotEmpty ? _eateryNameController.text.trim() : 'ACES Canteen Bites',
       cuisine: _selectedCuisine,
       distance: 0.1,
-      rating: 5.0,
-      reviewsCount: 1,
+      rating: 0.0,
+      reviewsCount: 0,
+      ratingSum: 0.0,
       imageUrl: _imageUrl,
       description: _hasDiscount && _discountController.text.trim().isNotEmpty
           ? _discountController.text.trim()
