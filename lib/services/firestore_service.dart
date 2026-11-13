@@ -102,9 +102,36 @@ class FirestoreService {
         'fulfillmentType': order.fulfillmentType,
         'status': order.status,
         'timestamp': order.timestamp,
+        'vendorEmail': order.vendorEmail,
+        'prepTime': order.prepTime,
       });
     } catch (e) {
       debugPrint('Firestore uploadOrder error: $e');
+    }
+  }
+
+  static Future<List<FoodOrder>> getOrdersForVendor(String vendorEmail) async {
+    try {
+      final snapshot = await _db.collection('orders').where('vendorEmail', isEqualTo: vendorEmail).get();
+      List<FoodOrder> orders = [];
+      for (var doc in snapshot.docs) {
+        final data = doc.data();
+        orders.add(FoodOrder(
+          id: data['id'] ?? doc.id,
+          eateryName: data['eateryName'] ?? '',
+          itemName: data['itemName'] ?? '',
+          price: data['price'] ?? '',
+          fulfillmentType: data['fulfillmentType'] ?? 'Delivery',
+          status: data['status'] ?? 'Out for Delivery',
+          timestamp: data['timestamp'] ?? 'Just now',
+          vendorEmail: data['vendorEmail'],
+          prepTime: data['prepTime'] ?? '15 mins',
+        ));
+      }
+      return orders;
+    } catch (e) {
+      debugPrint('Firestore getOrdersForVendor error: $e');
+      return [];
     }
   }
 

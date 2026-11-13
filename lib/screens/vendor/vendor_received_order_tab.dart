@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../../models/app_models.dart';
+import '../../services/firestore_service.dart';
 
 class VendorReceivedOrderTab extends StatefulWidget {
   const VendorReceivedOrderTab({super.key});
@@ -10,6 +11,25 @@ class VendorReceivedOrderTab extends StatefulWidget {
 }
 
 class _VendorReceivedOrderTabState extends State<VendorReceivedOrderTab> {
+  @override
+  void initState() {
+    super.initState();
+    _fetchVendorOrders();
+  }
+
+  Future<void> _fetchVendorOrders() async {
+    final userEmail = FirebaseAuth.instance.currentUser?.email;
+    if (userEmail != null) {
+      final orders = await FirestoreService.getOrdersForVendor(userEmail);
+      if (mounted) {
+        setState(() {
+          globalOrders.clear();
+          globalOrders.addAll(orders);
+        });
+      }
+    }
+  }
+
   void _showPrepTimeDialog(BuildContext context, FoodOrder order, {bool isDelivery = false}) {
     final times = ['5 mins', '10 mins', '15 mins', '20 mins', '30 mins', '45 mins'];
     showDialog(
@@ -30,6 +50,7 @@ class _VendorReceivedOrderTabState extends State<VendorReceivedOrderTab> {
                     order.status = 'Preparing (Ready in $t)';
                   }
                 });
+                FirestoreService.updateOrderStatus(order.id, order.status);
                 Navigator.pop(context);
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(content: Text(isDelivery ? 'Delivery time set to $t!' : 'Prep time set to $t!')),
