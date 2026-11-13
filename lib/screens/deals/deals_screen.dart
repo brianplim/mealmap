@@ -66,7 +66,27 @@ class _DailyDealsScreenContentState extends State<DailyDealsScreenContent> {
             child: ValueListenableBuilder<List<Eatery>>(
               valueListenable: eateryNotifier,
               builder: (context, eateries, child) {
-                final dealEateries = eateries.where((e) => e.hasStudentDiscount).toList();
+                final dealEateries = eateries.where((e) {
+                  if (_filter == 'All') return true;
+                  if (_filter == 'Discounts') return e.dealType == 'Discounts' || e.hasStudentDiscount;
+                  if (_filter == 'Specials') return e.dealType == 'Specials';
+                  if (_filter == 'New') return e.dealType == 'New';
+                  return true;
+                }).toList();
+
+                if (dealEateries.isEmpty) {
+                  return Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 40),
+                    child: Center(
+                      child: Text(
+                        'No $_filter deals posted yet.\nCheck back soon for new student offers!',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6)),
+                      ),
+                    ),
+                  );
+                }
+
                 return ListView.builder(
                   padding: const EdgeInsets.symmetric(horizontal: 16),
                   itemCount: dealEateries.length,
@@ -75,11 +95,20 @@ class _DailyDealsScreenContentState extends State<DailyDealsScreenContent> {
                     final firstMenuItem = eatery.menu.isNotEmpty ? eatery.menu.first.name : 'Special Meal';
                     final firstPrice = eatery.menu.isNotEmpty ? eatery.menu.first.price : '';
 
+                    String badgeLabel = 'DISCOUNT';
+                    if (eatery.dealType == 'Specials') {
+                      badgeLabel = 'SPECIAL';
+                    } else if (eatery.dealType == 'New') {
+                      badgeLabel = 'NEW OFFER';
+                    } else if (eatery.hasStudentDiscount) {
+                      badgeLabel = 'STUDENT DEAL';
+                    }
+
                     return DealItemCard(
                       title: eatery.name,
                       cuisine: '${eatery.cuisine} • ${eatery.distance} km near ACES',
                       dealText: '$firstMenuItem - $firstPrice (${eatery.description})',
-                      badge: 'STUDENT DEAL',
+                      badge: badgeLabel,
                       image: eatery.imageUrl,
                       onTap: () => Navigator.pushNamed(context, '/restaurant', arguments: eatery),
                     );

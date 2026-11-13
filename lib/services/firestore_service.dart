@@ -33,6 +33,7 @@ class FirestoreService {
         'vendorEmail': eatery.vendorEmail,
         'showOnMap': eatery.showOnMap,
         'deliveryFee': eatery.deliveryFee,
+        'dealType': eatery.dealType,
         'menu': eatery.menu.map((m) => {'name': m.name, 'price': m.price, 'imageUrl': m.imageUrl}).toList(),
       });
     } catch (e) {
@@ -72,6 +73,7 @@ class FirestoreService {
           vendorEmail: data['vendorEmail'],
           showOnMap: showMap,
           deliveryFee: deliveryFee,
+          dealType: data['dealType'] ?? 'Discounts',
           menu: menuList,
         ));
       }

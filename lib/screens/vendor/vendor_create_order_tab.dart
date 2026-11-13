@@ -22,6 +22,7 @@ class _VendorCreateOrderTabState extends State<VendorCreateOrderTab> {
   bool _hasDiscount = true;
   bool _hasDeliveryFee = false;
   String _selectedCuisine = 'Filipino';
+  String _selectedDealType = 'Discounts';
   String _imageUrl = 'https://images.unsplash.com/photo-1555939594-58d7cb561ad1?auto=format&fit=crop&w=400&q=80';
   LatLng _businessLocation = const LatLng(7.4578, 125.7921);
 
@@ -167,6 +168,7 @@ class _VendorCreateOrderTabState extends State<VendorCreateOrderTab> {
       vendorEmail: userEmail,
       showOnMap: true,
       deliveryFee: deliveryFeeStr,
+      dealType: _selectedDealType,
       menu: [
         MenuItem(
           name: _menuNameController.text.trim(),
@@ -253,6 +255,22 @@ class _VendorCreateOrderTabState extends State<VendorCreateOrderTab> {
                   onChanged: (val) {
                     if (val != null) {
                       setState(() => _selectedCuisine = val);
+                    }
+                  },
+                ),
+                const SizedBox(height: 16),
+                DropdownButtonFormField<String>(
+                  initialValue: _selectedDealType,
+                  decoration: InputDecoration(
+                    labelText: 'Deal / Offer Category (Student Feed)',
+                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(14)),
+                  ),
+                  items: ['Discounts', 'Specials', 'New'].map((t) {
+                    return DropdownMenuItem(value: t, child: Text(t));
+                  }).toList(),
+                  onChanged: (val) {
+                    if (val != null) {
+                      setState(() => _selectedDealType = val);
                     }
                   },
                 ),

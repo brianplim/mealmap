@@ -24,6 +24,7 @@ class Eatery {
   final LatLng location;
   final String? vendorEmail;
   final bool showOnMap;
+  final String dealType;
   final String deliveryFee;
 
   Eatery({
@@ -42,6 +43,7 @@ class Eatery {
     this.vendorEmail,
     this.showOnMap = true,
     this.deliveryFee = 'Free Delivery',
+    this.dealType = 'Discounts',
   });
 }
 
