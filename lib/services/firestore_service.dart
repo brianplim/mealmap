@@ -143,7 +143,7 @@ class FirestoreService {
     }
   }
 
-  static Future<void> saveVendorProfile(String uid, String businessName, String handle, String logoUrl, LatLng location) async {
+  static Future<void> saveVendorProfile(String uid, String businessName, String handle, String logoUrl, LatLng location, {String? vendorEmail}) async {
     try {
       await _db.collection('vendors').doc(uid).set({
         'businessName': businessName,
@@ -153,6 +153,19 @@ class FirestoreService {
         'lng': location.longitude,
         'updatedAt': FieldValue.serverTimestamp(),
       }, SetOptions(merge: true));
+
+      if (vendorEmail != null && vendorEmail.isNotEmpty) {
+        final distance = calculateKmFromAces(location);
+        final snapshot = await _db.collection('eateries').where('vendorEmail', isEqualTo: vendorEmail).get();
+        for (var doc in snapshot.docs) {
+          await doc.reference.update({
+            'lat': location.latitude,
+            'lng': location.longitude,
+            'distance': distance,
+            'name': businessName,
+          });
+        }
+      }
     } catch (e) {
       debugPrint('Firestore saveVendorProfile error: $e');
     }

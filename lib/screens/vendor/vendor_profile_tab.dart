@@ -234,7 +234,33 @@ class _VendorProfileTabState extends State<VendorProfileTab> {
                         _handle,
                         _imagePath ?? '',
                         _businessLocation,
+                        vendorEmail: user.email,
                       );
+
+                      final distance = FirestoreService.calculateKmFromAces(_businessLocation);
+                      for (var i = 0; i < mockEateries.length; i++) {
+                        if (mockEateries[i].vendorEmail == user.email) {
+                          mockEateries[i] = Eatery(
+                            id: mockEateries[i].id,
+                            name: _businessName,
+                            cuisine: mockEateries[i].cuisine,
+                            distance: distance,
+                            rating: mockEateries[i].rating,
+                            reviewsCount: mockEateries[i].reviewsCount,
+                            ratingSum: mockEateries[i].ratingSum,
+                            imageUrl: mockEateries[i].imageUrl,
+                            description: mockEateries[i].description,
+                            hasStudentDiscount: mockEateries[i].hasStudentDiscount,
+                            location: _businessLocation,
+                            vendorEmail: mockEateries[i].vendorEmail,
+                            showOnMap: mockEateries[i].showOnMap,
+                            deliveryFee: mockEateries[i].deliveryFee,
+                            dealType: mockEateries[i].dealType,
+                            menu: mockEateries[i].menu,
+                          );
+                        }
+                      }
+                      eateryNotifier.value = List.from(mockEateries);
                     }
                     if (context.mounted) {
                       Navigator.pop(context);
