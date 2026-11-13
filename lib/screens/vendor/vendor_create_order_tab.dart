@@ -137,9 +137,9 @@ class _VendorCreateOrderTabState extends State<VendorCreateOrderTab> {
 
     final ok = await showConfirmDialog(
       context: context,
-      title: 'Publish Menu & Deal',
-      message: 'Are you sure you want to publish ${_menuNameController.text.trim()} to the student feed?',
-      confirmText: 'Publish',
+      title: 'Submit Menu for Admin Approval',
+      message: 'Are you sure you want to submit ${_menuNameController.text.trim()} to the Admin for confirmation?',
+      confirmText: 'Submit',
     );
 
     if (!ok) return;
@@ -176,6 +176,7 @@ class _VendorCreateOrderTabState extends State<VendorCreateOrderTab> {
       showOnMap: true,
       deliveryFee: deliveryFeeStr,
       dealType: _selectedDealType,
+      isApproved: false, // Requires admin approval before appearing in student feeds
       menu: [
         MenuItem(
           name: _menuNameController.text.trim(),
@@ -187,22 +188,14 @@ class _VendorCreateOrderTabState extends State<VendorCreateOrderTab> {
 
     mockEateries.insert(0, newEatery);
     FirestoreService.uploadEatery(newEatery, newEatery.location);
-    globalVendorPins.add(
-      CustomVendorPin(
-        id: newEatery.id,
-        label: _menuNameController.text.trim(),
-        location: _businessLocation,
-        eatery: newEatery,
-      ),
-    );
     eateryNotifier.value = List.from(mockEateries);
 
     if (mounted) {
       showDialog(
         context: context,
         builder: (context) => AlertDialog(
-          title: const Text('Success'),
-          content: const Text('Your menu has been successfully created!'),
+          title: const Text('Submitted for Approval'),
+          content: const Text('Your menu has been submitted to Admin for confirmation and will appear in student feeds once approved!'),
           actions: [
             ElevatedButton(
               style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF0F7A5B), foregroundColor: Colors.white),
@@ -424,7 +417,7 @@ class _VendorCreateOrderTabState extends State<VendorCreateOrderTab> {
                       ),
                     ),
                     child: const Text(
-                      'Publish Menu & Deal',
+                      'Submit for Admin Approval',
                       style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
                     ),
                   ),

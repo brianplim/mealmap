@@ -26,6 +26,7 @@ class Eatery {
   final bool showOnMap;
   final String dealType;
   final String deliveryFee;
+  bool isApproved;
 
   Eatery({
     required this.id,
@@ -44,6 +45,7 @@ class Eatery {
     this.showOnMap = true,
     this.deliveryFee = 'Free Delivery',
     this.dealType = 'Discounts',
+    this.isApproved = true,
   });
 }
 

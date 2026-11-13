@@ -247,6 +247,7 @@ class _HomeScreenContentState extends State<HomeScreenContent> {
                   valueListenable: eateryNotifier,
                   builder: (context, eateries, child) {
                     final filteredEateries = eateries.where((e) {
+                      if (!e.isApproved) return false;
                       if (_selectedCategory == 'All') return true;
                       if (e.cuisine.toLowerCase().trim() == _selectedCategory.toLowerCase().trim()) return true;
                       if (_selectedCategory == 'Fast Food' && (e.cuisine.toLowerCase().contains('fast') || e.cuisine.toLowerCase().contains('mexican'))) return true;

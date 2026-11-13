@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../models/app_models.dart';
+import '../../services/firestore_service.dart';
 
 class AdminPortalShell extends StatefulWidget {
   const AdminPortalShell({super.key});
@@ -9,7 +10,7 @@ class AdminPortalShell extends StatefulWidget {
 }
 
 class _AdminPortalShellState extends State<AdminPortalShell> {
-  int _tabIndex = 0; // 0: Overview, 1: Eateries / Posts, 2: System Orders
+  int _tabIndex = 0; // 0: Overview, 1: Pending Approvals, 2: Active Eateries, 3: System Orders
 
   @override
   Widget build(BuildContext context) {
@@ -63,7 +64,7 @@ class _AdminPortalShellState extends State<AdminPortalShell> {
                               style: TextStyle(
                                 color: _tabIndex == 0 ? Colors.white : const Color(0xFF6E7D79),
                                 fontWeight: FontWeight.w700,
-                                fontSize: 13,
+                                fontSize: 12,
                               ),
                             ),
                           ),
@@ -81,11 +82,11 @@ class _AdminPortalShellState extends State<AdminPortalShell> {
                           ),
                           child: Center(
                             child: Text(
-                              'Eateries (${mockEateries.length})',
+                              'Pending (${mockEateries.where((e) => !e.isApproved).length})',
                               style: TextStyle(
                                 color: _tabIndex == 1 ? Colors.white : const Color(0xFF6E7D79),
                                 fontWeight: FontWeight.w700,
-                                fontSize: 13,
+                                fontSize: 12,
                               ),
                             ),
                           ),
@@ -103,11 +104,33 @@ class _AdminPortalShellState extends State<AdminPortalShell> {
                           ),
                           child: Center(
                             child: Text(
-                              'Orders (${globalOrders.length})',
+                              'Active (${mockEateries.where((e) => e.isApproved).length})',
                               style: TextStyle(
                                 color: _tabIndex == 2 ? Colors.white : const Color(0xFF6E7D79),
                                 fontWeight: FontWeight.w700,
-                                fontSize: 13,
+                                fontSize: 12,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                    Expanded(
+                      child: GestureDetector(
+                        onTap: () => setState(() => _tabIndex = 3),
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(vertical: 10),
+                          decoration: BoxDecoration(
+                            color: _tabIndex == 3 ? const Color(0xFF0F7A5B) : Colors.transparent,
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Center(
+                            child: Text(
+                              'Orders (${globalOrders.length})',
+                              style: TextStyle(
+                                color: _tabIndex == 3 ? Colors.white : const Color(0xFF6E7D79),
+                                fontWeight: FontWeight.w700,
+                                fontSize: 12,
                               ),
                             ),
                           ),
@@ -121,7 +144,7 @@ class _AdminPortalShellState extends State<AdminPortalShell> {
             Expanded(
               child: _tabIndex == 0
                   ? _buildOverviewTab()
-                  : (_tabIndex == 1 ? _buildEateriesTab() : _buildOrdersTab()),
+                  : (_tabIndex == 1 ? _buildPendingTab() : (_tabIndex == 2 ? _buildEateriesTab() : _buildOrdersTab())),
             ),
           ],
         ),
@@ -130,6 +153,9 @@ class _AdminPortalShellState extends State<AdminPortalShell> {
   }
 
   Widget _buildOverviewTab() {
+    final pendingCount = mockEateries.where((e) => !e.isApproved).length;
+    final activeCount = mockEateries.where((e) => e.isApproved).length;
+
     return ListView(
       padding: const EdgeInsets.all(16),
       children: [
@@ -148,9 +174,9 @@ class _AdminPortalShellState extends State<AdminPortalShell> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
-                  _statItem('Active Eateries', '${mockEateries.length}'),
-                  _statItem('Total Orders', '${globalOrders.length}'),
-                  _statItem('Active Pins', '${globalVendorPins.length}'),
+                  _statItem('Pending', '$pendingCount'),
+                  _statItem('Active Posts', '$activeCount'),
+                  _statItem('Orders', '${globalOrders.length}'),
                 ],
               ),
             ],
@@ -162,8 +188,8 @@ class _AdminPortalShellState extends State<AdminPortalShell> {
         ListTile(
           tileColor: Theme.of(context).cardColor,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-          leading: const Icon(Icons.restaurant, color: Color(0xFF0F7A5B)),
-          title: const Text('Manage Published Eateries & Deals', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+          leading: const Icon(Icons.pending_actions, color: Colors.orange),
+          title: Text('Review Pending Vendor Posts ($pendingCount)', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
           trailing: const Icon(Icons.chevron_right),
           onTap: () => setState(() => _tabIndex = 1),
         ),
@@ -171,8 +197,8 @@ class _AdminPortalShellState extends State<AdminPortalShell> {
         ListTile(
           tileColor: Theme.of(context).cardColor,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-          leading: const Icon(Icons.receipt_long, color: Color(0xFF0F7A5B)),
-          title: const Text('View All System Orders & Deliveries', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+          leading: const Icon(Icons.restaurant, color: Color(0xFF0F7A5B)),
+          title: const Text('Manage Active Published Eateries & Deals', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
           trailing: const Icon(Icons.chevron_right),
           onTap: () => setState(() => _tabIndex = 2),
         ),
@@ -180,40 +206,101 @@ class _AdminPortalShellState extends State<AdminPortalShell> {
     );
   }
 
-  Widget _buildEateriesTab() {
-    return ValueListenableBuilder<List<Eatery>>(
-      valueListenable: eateryNotifier,
-      builder: (context, eateries, child) {
-        if (eateries.isEmpty) {
-          return const Center(child: Text('No eateries or posts in the system.'));
-        }
-        return ListView.builder(
-          padding: const EdgeInsets.all(16),
-          itemCount: eateries.length,
-          itemBuilder: (context, index) {
-            final eatery = eateries[index];
-            return Card(
-              margin: const EdgeInsets.only(bottom: 12),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-              child: ListTile(
-                leading: ClipRRect(
+  Widget _buildPendingTab() {
+    final pending = mockEateries.where((e) => !e.isApproved).toList();
+    if (pending.isEmpty) {
+      return const Center(child: Text('No pending vendor posts awaiting approval.'));
+    }
+    return ListView.builder(
+      padding: const EdgeInsets.all(16),
+      itemCount: pending.length,
+      itemBuilder: (context, index) {
+        final eatery = pending[index];
+        final menuItemName = eatery.menu.isNotEmpty ? eatery.menu.first.name : eatery.name;
+        return Card(
+          margin: const EdgeInsets.only(bottom: 12),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          child: Padding(
+            padding: const EdgeInsets.all(12),
+            child: Row(
+              children: [
+                ClipRRect(
                   borderRadius: BorderRadius.circular(8),
-                  child: Image.network(eatery.imageUrl, width: 50, height: 50, fit: BoxFit.cover, errorBuilder: (c, e, s) => placeholderImage(width: 50, height: 50)),
+                  child: Image.network(eatery.imageUrl, width: 60, height: 60, fit: BoxFit.cover, errorBuilder: (c, e, s) => placeholderImage(width: 60, height: 60)),
                 ),
-                title: Text(eatery.name, style: const TextStyle(fontWeight: FontWeight.bold)),
-                subtitle: Text('${eatery.cuisine} • ${eatery.distance} km • Rating: ${eatery.rating}★'),
-                trailing: IconButton(
-                  icon: const Icon(Icons.delete, color: Colors.red),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(menuItemName, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+                      const SizedBox(height: 2),
+                      Text('${eatery.name} • ${eatery.cuisine}', style: const TextStyle(fontSize: 12, color: Colors.grey)),
+                    ],
+                  ),
+                ),
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF0F7A5B), foregroundColor: Colors.white, padding: const EdgeInsets.symmetric(horizontal: 10)),
+                  onPressed: () {
+                    setState(() {
+                      eatery.isApproved = true;
+                    });
+                    FirestoreService.uploadEatery(eatery, eatery.location);
+                    eateryNotifier.value = List.from(mockEateries);
+                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Approved "${eatery.name}"! Now live on student feeds.')));
+                  },
+                  child: const Text('Approve', style: TextStyle(fontSize: 12)),
+                ),
+                const SizedBox(width: 6),
+                IconButton(
+                  icon: const Icon(Icons.close, color: Colors.red),
                   onPressed: () {
                     mockEateries.removeWhere((e) => e.id == eatery.id);
                     eateryNotifier.value = List.from(mockEateries);
+                    FirestoreService.deleteEatery(eatery.id);
                     setState(() {});
-                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Deleted ${eatery.name} as Admin')));
+                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Rejected "${eatery.name}"')));
                   },
                 ),
-              ),
-            );
-          },
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildEateriesTab() {
+    final active = mockEateries.where((e) => e.isApproved).toList();
+    if (active.isEmpty) {
+      return const Center(child: Text('No active eateries published.'));
+    }
+    return ListView.builder(
+      padding: const EdgeInsets.all(16),
+      itemCount: active.length,
+      itemBuilder: (context, index) {
+        final eatery = active[index];
+        return Card(
+          margin: const EdgeInsets.only(bottom: 12),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          child: ListTile(
+            leading: ClipRRect(
+              borderRadius: BorderRadius.circular(8),
+              child: Image.network(eatery.imageUrl, width: 50, height: 50, fit: BoxFit.cover, errorBuilder: (c, e, s) => placeholderImage(width: 50, height: 50)),
+            ),
+            title: Text(eatery.name, style: const TextStyle(fontWeight: FontWeight.bold)),
+            subtitle: Text('${eatery.cuisine} • ${eatery.distance} km • Rating: ${eatery.rating}★'),
+            trailing: IconButton(
+              icon: const Icon(Icons.delete, color: Colors.red),
+              onPressed: () {
+                mockEateries.removeWhere((e) => e.id == eatery.id);
+                eateryNotifier.value = List.from(mockEateries);
+                FirestoreService.deleteEatery(eatery.id);
+                setState(() {});
+                ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Deleted ${eatery.name} as Admin')));
+              },
+            ),
+          ),
         );
       },
     );

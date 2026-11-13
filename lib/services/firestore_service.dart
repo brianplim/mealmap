@@ -34,6 +34,7 @@ class FirestoreService {
         'showOnMap': eatery.showOnMap,
         'deliveryFee': eatery.deliveryFee,
         'dealType': eatery.dealType,
+        'isApproved': eatery.isApproved,
         'menu': eatery.menu.map((m) => {'name': m.name, 'price': m.price, 'imageUrl': m.imageUrl}).toList(),
       });
     } catch (e) {
@@ -50,6 +51,7 @@ class FirestoreService {
         final lat = data['lat'] ?? 7.4578;
         final lng = data['lng'] ?? 125.7921;
         final showMap = data['showOnMap'] ?? false;
+        final isAppr = data['isApproved'] ?? true;
         final deliveryFee = data['deliveryFee'] ?? 'Free Delivery';
         final calculatedKm = calculateKmFromAces(LatLng(lat, lng));
         final menuList = (data['menu'] as List<dynamic>? ?? []).map((m) => MenuItem(
@@ -74,6 +76,7 @@ class FirestoreService {
           showOnMap: showMap,
           deliveryFee: deliveryFee,
           dealType: data['dealType'] ?? 'Discounts',
+          isApproved: isAppr,
           menu: menuList,
         ));
       }

@@ -67,6 +67,7 @@ class _DailyDealsScreenContentState extends State<DailyDealsScreenContent> {
               valueListenable: eateryNotifier,
               builder: (context, eateries, child) {
                 final dealEateries = eateries.where((e) {
+                  if (!e.isApproved) return false;
                   if (_filter == 'All') return true;
                   if (_filter == 'Discounts') return e.hasStudentDiscount || e.dealType == 'Discounts';
                   if (_filter == 'Specials') return e.dealType == 'Specials';
