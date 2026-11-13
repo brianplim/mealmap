@@ -68,9 +68,9 @@ class _DailyDealsScreenContentState extends State<DailyDealsScreenContent> {
               builder: (context, eateries, child) {
                 final dealEateries = eateries.where((e) {
                   if (_filter == 'All') return true;
-                  if (_filter == 'Discounts') return e.dealType == 'Discounts' || e.hasStudentDiscount;
+                  if (_filter == 'Discounts') return e.hasStudentDiscount || e.dealType == 'Discounts';
                   if (_filter == 'Specials') return e.dealType == 'Specials';
-                  if (_filter == 'New') return e.dealType == 'New';
+                  if (_filter == 'New') return true; // Shows all new posted orders
                   return true;
                 }).toList();
 
@@ -95,13 +95,11 @@ class _DailyDealsScreenContentState extends State<DailyDealsScreenContent> {
                     final firstMenuItem = eatery.menu.isNotEmpty ? eatery.menu.first.name : 'Special Meal';
                     final firstPrice = eatery.menu.isNotEmpty ? eatery.menu.first.price : '';
 
-                    String badgeLabel = 'DISCOUNT';
-                    if (eatery.dealType == 'Specials') {
-                      badgeLabel = 'SPECIAL';
-                    } else if (eatery.dealType == 'New') {
+                    String badgeLabel = 'STUDENT DEAL';
+                    if (_filter == 'New' || eatery.dealType == 'New') {
                       badgeLabel = 'NEW OFFER';
-                    } else if (eatery.hasStudentDiscount) {
-                      badgeLabel = 'STUDENT DEAL';
+                    } else if (_filter == 'Specials' || eatery.dealType == 'Specials') {
+                      badgeLabel = 'SPECIAL';
                     }
 
                     return DealItemCard(
