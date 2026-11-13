@@ -6,13 +6,22 @@ import '../models/app_models.dart';
 class FirestoreService {
   static final FirebaseFirestore _db = FirebaseFirestore.instance;
 
+  static double calculateKmFromAces(LatLng location) {
+    const acesLocation = LatLng(7.4578, 125.7921);
+    const Distance distance = Distance();
+    final meters = distance(acesLocation, location);
+    final km = meters / 1000.0;
+    return double.parse(km.toStringAsFixed(1));
+  }
+
   static Future<void> uploadEatery(Eatery eatery, LatLng location) async {
+    final calculatedDistance = calculateKmFromAces(location);
     try {
       await _db.collection('eateries').doc(eatery.id).set({
         'id': eatery.id,
         'name': eatery.name,
         'cuisine': eatery.cuisine,
-        'distance': eatery.distance,
+        'distance': calculatedDistance,
         'rating': eatery.rating,
         'reviewsCount': eatery.reviewsCount,
         'ratingSum': eatery.ratingSum,
@@ -41,6 +50,7 @@ class FirestoreService {
         final lng = data['lng'] ?? 125.7921;
         final showMap = data['showOnMap'] ?? false;
         final deliveryFee = data['deliveryFee'] ?? 'Free Delivery';
+        final calculatedKm = calculateKmFromAces(LatLng(lat, lng));
         final menuList = (data['menu'] as List<dynamic>? ?? []).map((m) => MenuItem(
           name: m['name'] ?? '',
           price: m['price'] ?? '',
@@ -51,7 +61,7 @@ class FirestoreService {
           id: data['id'] ?? doc.id,
           name: data['name'] ?? '',
           cuisine: data['cuisine'] ?? 'Filipino',
-          distance: (data['distance'] ?? 0.1).toDouble(),
+          distance: calculatedKm,
           rating: (data['rating'] ?? 0.0).toDouble(),
           reviewsCount: data['reviewsCount'] ?? 0,
           ratingSum: (data['ratingSum'] ?? 0.0).toDouble(),

@@ -148,11 +148,13 @@ class _VendorCreateOrderTabState extends State<VendorCreateOrderTab> {
         ? '₱${_deliveryFeeController.text.trim().replaceAll('₱', '')}'
         : 'Free Delivery';
 
+    final calculatedKm = FirestoreService.calculateKmFromAces(_businessLocation);
+
     final newEatery = Eatery(
       id: 'vendor-${DateTime.now().millisecondsSinceEpoch}',
       name: _eateryNameController.text.trim().isNotEmpty ? _eateryNameController.text.trim() : 'ACES Canteen Bites',
       cuisine: _selectedCuisine,
-      distance: 0.1,
+      distance: calculatedKm,
       rating: 0.0,
       reviewsCount: 0,
       ratingSum: 0.0,
