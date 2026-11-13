@@ -32,7 +32,6 @@ class _HomeScreenContentState extends State<HomeScreenContent> {
     return SafeArea(
       child: Column(
         children: [
-          statusBar(time: '9:41', color: Theme.of(context).colorScheme.onSurface),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             child: Row(
