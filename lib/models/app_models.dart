@@ -123,6 +123,8 @@ final List<FoodOrder> globalOrders = [];
 
 final List<String> globalFavoriteIds = [];
 
+final List<String> globalFavoriteDealIds = [];
+
 final List<Eatery> mockEateries = [];
 
 Widget statusBar({String time = '9:41', Color color = const Color(0xFF1E1E1E)}) {

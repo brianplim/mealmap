@@ -70,7 +70,7 @@ class _DailyDealsScreenContentState extends State<DailyDealsScreenContent> {
                   if (_filter == 'All') return true;
                   if (_filter == 'Discounts') return e.hasStudentDiscount || e.dealType == 'Discounts';
                   if (_filter == 'Specials') return e.dealType == 'Specials';
-                  if (_filter == 'New') return true; // Shows all new posted orders
+                  if (_filter == 'New') return true;
                   return true;
                 }).toList();
 
@@ -94,6 +94,7 @@ class _DailyDealsScreenContentState extends State<DailyDealsScreenContent> {
                     final eatery = dealEateries[index];
                     final firstMenuItem = eatery.menu.isNotEmpty ? eatery.menu.first.name : 'Special Meal';
                     final firstPrice = eatery.menu.isNotEmpty ? eatery.menu.first.price : '';
+                    final isFav = globalFavoriteDealIds.contains(eatery.id);
 
                     String badgeLabel = 'STUDENT DEAL';
                     if (_filter == 'New' || eatery.dealType == 'New') {
@@ -108,6 +109,22 @@ class _DailyDealsScreenContentState extends State<DailyDealsScreenContent> {
                       dealText: '$firstMenuItem - $firstPrice (${eatery.description})',
                       badge: badgeLabel,
                       image: eatery.imageUrl,
+                      isFavorite: isFav,
+                      onFavoriteToggle: () {
+                        setState(() {
+                          if (isFav) {
+                            globalFavoriteDealIds.remove(eatery.id);
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text('Removed ${eatery.name} from favorite deals')),
+                            );
+                          } else {
+                            globalFavoriteDealIds.add(eatery.id);
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text('Saved ${eatery.name} to favorite deals!')),
+                            );
+                          }
+                        });
+                      },
                       onTap: () => Navigator.pushNamed(context, '/restaurant', arguments: eatery),
                     );
                   },
@@ -168,6 +185,8 @@ class DealItemCard extends StatelessWidget {
     required this.badge,
     this.badgeColor = const Color(0xFF0F7A5B),
     required this.image,
+    required this.isFavorite,
+    required this.onFavoriteToggle,
     required this.onTap,
   });
 
@@ -177,6 +196,8 @@ class DealItemCard extends StatelessWidget {
   final String badge;
   final Color badgeColor;
   final String image;
+  final bool isFavorite;
+  final VoidCallback onFavoriteToggle;
   final VoidCallback onTap;
 
   @override
@@ -265,6 +286,14 @@ class DealItemCard extends StatelessWidget {
                     ),
                   ],
                 ),
+              ),
+              IconButton(
+                icon: Icon(
+                  isFavorite ? Icons.favorite : Icons.favorite_border,
+                  color: isFavorite ? Colors.red : const Color(0xFF0F7A5B),
+                  size: 22,
+                ),
+                onPressed: onFavoriteToggle,
               ),
             ],
           ),

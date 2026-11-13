@@ -13,12 +13,13 @@ class _FavoritesScreenContentState extends State<FavoritesScreenContent> {
 
   @override
   Widget build(BuildContext context) {
-    final favoriteEateries = mockEateries.where((e) => globalFavoriteIds.contains(e.id)).toList();
+    final favoriteEateries = eateryNotifier.value.where((e) => globalFavoriteIds.contains(e.id)).toList();
+    final favoriteDeals = eateryNotifier.value.where((e) => globalFavoriteDealIds.contains(e.id)).toList();
+    final currentList = _tabIndex == 0 ? favoriteEateries : favoriteDeals;
 
     return SafeArea(
       child: Column(
         children: [
-
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             child: Row(
@@ -94,19 +95,24 @@ class _FavoritesScreenContentState extends State<FavoritesScreenContent> {
           ),
           const SizedBox(height: 12),
           Expanded(
-            child: favoriteEateries.isEmpty
+            child: currentList.isEmpty
                 ? Center(
                     child: Text(
-                      'No favorite eateries yet.\nTap the heart icon on any eatery to save it here!',
+                      _tabIndex == 0
+                          ? 'No favorite eateries yet.\nTap the heart icon on any eatery to save it here!'
+                          : 'No favorite deals yet.\nTap the heart icon on any deal to save it here!',
                       textAlign: TextAlign.center,
                       style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7)),
                     ),
                   )
                 : ListView.builder(
                     padding: const EdgeInsets.symmetric(horizontal: 16),
-                    itemCount: favoriteEateries.length,
+                    itemCount: currentList.length,
                     itemBuilder: (context, index) {
-                      final eatery = favoriteEateries[index];
+                      final eatery = currentList[index];
+                      final firstMenuItem = eatery.menu.isNotEmpty ? eatery.menu.first.name : eatery.name;
+                      final firstPrice = eatery.menu.isNotEmpty ? eatery.menu.first.price : '';
+
                       return Padding(
                         padding: const EdgeInsets.only(bottom: 10),
                         child: InkWell(
@@ -147,7 +153,7 @@ class _FavoritesScreenContentState extends State<FavoritesScreenContent> {
                                     crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
                                       Text(
-                                        eatery.name,
+                                        _tabIndex == 0 ? eatery.name : firstMenuItem,
                                         style: TextStyle(
                                           fontWeight: FontWeight.w800,
                                           fontSize: 14,
@@ -156,7 +162,9 @@ class _FavoritesScreenContentState extends State<FavoritesScreenContent> {
                                       ),
                                       const SizedBox(height: 2),
                                       Text(
-                                        '${eatery.cuisine} • ${eatery.distance} km from ACES',
+                                        _tabIndex == 0
+                                            ? '${eatery.cuisine} • ${eatery.distance} km from ACES'
+                                            : '${eatery.name} • $firstPrice • ${eatery.cuisine}',
                                         style: const TextStyle(fontSize: 11, color: Color(0xFF6E7D79)),
                                       ),
                                       const SizedBox(height: 4),
@@ -178,10 +186,20 @@ class _FavoritesScreenContentState extends State<FavoritesScreenContent> {
                                   tooltip: 'Unfavorite',
                                   onPressed: () {
                                     setState(() {
-                                      globalFavoriteIds.remove(eatery.id);
+                                      if (_tabIndex == 0) {
+                                        globalFavoriteIds.remove(eatery.id);
+                                      } else {
+                                        globalFavoriteDealIds.remove(eatery.id);
+                                      }
                                     });
                                     ScaffoldMessenger.of(context).showSnackBar(
-                                      SnackBar(content: Text('Removed ${eatery.name} from favorites')),
+                                      SnackBar(
+                                        content: Text(
+                                          _tabIndex == 0
+                                              ? 'Removed ${eatery.name} from favorite eateries'
+                                              : 'Removed ${eatery.name} from favorite deals',
+                                        ),
+                                      ),
                                     );
                                   },
                                 ),
