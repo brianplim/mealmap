@@ -17,7 +17,7 @@ void main() {
     await tester.tap(find.text('Login').last);
     await tester.pumpAndSettle();
 
-    expect(find.text('Please enter your student email'), findsOneWidget);
+    expect(find.text('Please enter your email address'), findsOneWidget);
 
     await tester.enterText(find.byType(TextField).at(0), 'student@gmail.com');
     await tester.enterText(find.byType(TextField).at(1), 'password123');

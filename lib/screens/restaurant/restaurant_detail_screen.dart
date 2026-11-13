@@ -145,9 +145,9 @@ class _RestaurantDetailScreenState extends State<RestaurantDetailScreen> {
                   onPressed: () async {
                     final ok = await showConfirmDialog(
                       context: context,
-                      title: 'Confirm Order',
-                      message: 'Place order for ${item.name} (x$quantity) totaling $formattedTotal (Delivery Fee: ${fulfillment == 'Delivery' ? eatery.deliveryFee : 'Free'}) via $fulfillment?',
-                      confirmText: 'Confirm',
+                      title: 'Confirm Order Details',
+                      message: '• Item & Quantity: ${item.name} (x$quantity)\n• Eatery: ${eatery.name}\n• Fulfillment: $fulfillment\n• Delivery Fee: ${fulfillment == 'Delivery' ? eatery.deliveryFee : 'Free'}\n• Total Price: $formattedTotal',
+                      confirmText: 'Confirm Order',
                     );
                     if (ok && context.mounted) {
                       final newOrder = FoodOrder(

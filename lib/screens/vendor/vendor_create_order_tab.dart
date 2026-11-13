@@ -19,8 +19,10 @@ class _VendorCreateOrderTabState extends State<VendorCreateOrderTab> {
   final _priceController = TextEditingController();
   final _discountController = TextEditingController();
   final _deliveryFeeController = TextEditingController();
+  final _customCuisineController = TextEditingController();
   bool _hasDiscount = true;
   bool _hasDeliveryFee = false;
+  bool _isCustomCuisine = false;
   String _selectedCuisine = 'Filipino';
   String _selectedDealType = 'Discounts';
   String _imageUrl = 'https://images.unsplash.com/photo-1555939594-58d7cb561ad1?auto=format&fit=crop&w=400&q=80';
@@ -51,6 +53,7 @@ class _VendorCreateOrderTabState extends State<VendorCreateOrderTab> {
     _priceController.dispose();
     _discountController.dispose();
     _deliveryFeeController.dispose();
+    _customCuisineController.dispose();
     super.dispose();
   }
 
@@ -141,6 +144,10 @@ class _VendorCreateOrderTabState extends State<VendorCreateOrderTab> {
 
     if (!ok) return;
 
+    final finalCuisine = _isCustomCuisine && _customCuisineController.text.trim().isNotEmpty
+        ? _customCuisineController.text.trim()
+        : _selectedCuisine;
+
     final rawPrice = _priceController.text.trim().replaceAll('₱', '');
     final formattedPrice = '₱$rawPrice';
     final userEmail = FirebaseAuth.instance.currentUser?.email;
@@ -154,7 +161,7 @@ class _VendorCreateOrderTabState extends State<VendorCreateOrderTab> {
     final newEatery = Eatery(
       id: 'vendor-${DateTime.now().millisecondsSinceEpoch}',
       name: _eateryNameController.text.trim().isNotEmpty ? _eateryNameController.text.trim() : 'ACES Canteen Bites',
-      cuisine: _selectedCuisine,
+      cuisine: finalCuisine,
       distance: calculatedKm,
       rating: 0.0,
       reviewsCount: 0,
@@ -191,14 +198,29 @@ class _VendorCreateOrderTabState extends State<VendorCreateOrderTab> {
     eateryNotifier.value = List.from(mockEateries);
 
     if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Posted to Student Feed and Map!')),
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Text('Success'),
+          content: const Text('Your menu has been successfully created!'),
+          actions: [
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF0F7A5B), foregroundColor: Colors.white),
+              onPressed: () => Navigator.pop(context),
+              child: const Text('OK'),
+            ),
+          ],
+        ),
       );
       _menuNameController.clear();
       _priceController.clear();
       _discountController.clear();
       _deliveryFeeController.clear();
-      setState(() => _hasDeliveryFee = false);
+      _customCuisineController.clear();
+      setState(() {
+        _hasDeliveryFee = false;
+        _isCustomCuisine = false;
+      });
     }
   }
 
@@ -244,20 +266,38 @@ class _VendorCreateOrderTabState extends State<VendorCreateOrderTab> {
                 ),
                 const SizedBox(height: 16),
                 DropdownButtonFormField<String>(
-                  initialValue: _selectedCuisine,
+                  initialValue: _isCustomCuisine ? 'Custom' : _selectedCuisine,
                   decoration: InputDecoration(
                     labelText: 'Cuisine Category',
                     border: OutlineInputBorder(borderRadius: BorderRadius.circular(14)),
                   ),
-                  items: ['Filipino', 'Fast Food', 'Coffee', 'Asian', 'Mexican', 'Desserts'].map((c) {
+                  items: ['Filipino', 'Fast Food', 'Coffee', 'Asian', 'Mexican', 'Desserts', 'Custom'].map((c) {
                     return DropdownMenuItem(value: c, child: Text(c));
                   }).toList(),
                   onChanged: (val) {
                     if (val != null) {
-                      setState(() => _selectedCuisine = val);
+                      setState(() {
+                        if (val == 'Custom') {
+                          _isCustomCuisine = true;
+                        } else {
+                          _isCustomCuisine = false;
+                          _selectedCuisine = val;
+                        }
+                      });
                     }
                   },
                 ),
+                if (_isCustomCuisine) ...[
+                  const SizedBox(height: 12),
+                  TextField(
+                    controller: _customCuisineController,
+                    decoration: InputDecoration(
+                      labelText: 'Enter Custom Cuisine Category',
+                      hintText: 'e.g. Italian, BBQ, Seafood',
+                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(14)),
+                    ),
+                  ),
+                ],
                 const SizedBox(height: 16),
                 DropdownButtonFormField<String>(
                   initialValue: _selectedDealType,

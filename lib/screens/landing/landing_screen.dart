@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-
 import '../../models/app_models.dart';
 
 class WelcomeScreen extends StatelessWidget {
@@ -61,9 +60,7 @@ class WelcomeScreen extends StatelessWidget {
                       Navigator.pushNamed(context, '/vendor-auth');
                     } else {
                       ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('Incorrect vendor password'),
-                        ),
+                        const SnackBar(content: Text('Incorrect password')),
                       );
                     }
                   },
@@ -72,6 +69,50 @@ class WelcomeScreen extends StatelessWidget {
               ],
             );
           },
+        );
+      },
+    );
+  }
+
+  void _showAdminLoginDialog(BuildContext context) {
+    final passwordController = TextEditingController();
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Administrator Portal'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Text('Enter admin password to access system controls:', style: TextStyle(fontSize: 13, color: Colors.grey)),
+              const SizedBox(height: 12),
+              TextField(
+                controller: passwordController,
+                obscureText: true,
+                decoration: const InputDecoration(labelText: 'Admin Password', hintText: 'admin2026'),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Cancel'),
+            ),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF0F7A5B), foregroundColor: Colors.white),
+              onPressed: () {
+                if (passwordController.text.trim() == 'admin2026') {
+                  Navigator.pop(context);
+                  Navigator.pushNamed(context, '/admin');
+                } else {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Incorrect admin password')),
+                  );
+                }
+              },
+              child: const Text('Access Admin'),
+            ),
+          ],
         );
       },
     );
@@ -158,21 +199,43 @@ class WelcomeScreen extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 8),
-                TextButton.icon(
-                  onPressed: () => _showVendorLoginDialog(context),
-                  icon: const Icon(
-                    Icons.storefront,
-                    size: 16,
-                    color: Color(0xFF0F7A5B),
-                  ),
-                  label: const Text(
-                    'Eatery Vendor Access',
-                    style: TextStyle(
-                      color: Color(0xFF0F7A5B),
-                      fontWeight: FontWeight.w700,
-                      fontSize: 13,
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    TextButton.icon(
+                      onPressed: () => _showVendorLoginDialog(context),
+                      icon: const Icon(
+                        Icons.storefront,
+                        size: 16,
+                        color: Color(0xFF0F7A5B),
+                      ),
+                      label: const Text(
+                        'Vendor',
+                        style: TextStyle(
+                          color: Color(0xFF0F7A5B),
+                          fontWeight: FontWeight.w700,
+                          fontSize: 13,
+                        ),
+                      ),
                     ),
-                  ),
+                    const Text('•', style: TextStyle(color: Color(0xFF0F7A5B))),
+                    TextButton.icon(
+                      onPressed: () => _showAdminLoginDialog(context),
+                      icon: const Icon(
+                        Icons.admin_panel_settings,
+                        size: 16,
+                        color: Color(0xFF0F7A5B),
+                      ),
+                      label: const Text(
+                        'Admin',
+                        style: TextStyle(
+                          color: Color(0xFF0F7A5B),
+                          fontWeight: FontWeight.w700,
+                          fontSize: 13,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
                 const SizedBox(height: 16),
               ],

@@ -27,11 +27,14 @@ class _ProfileScreenContentState extends State<ProfileScreenContent> {
   Future<void> _loadProfile() async {
     final user = FirebaseAuth.instance.currentUser;
     if (user != null) {
+      final email = user.email ?? 'student@gmail.com';
+      setState(() {
+        _handle = email;
+      });
       final data = await FirestoreService.getUserProfile(user.uid);
       if (data != null && mounted) {
         setState(() {
-          _name = data['name'] ?? _name;
-          _handle = data['handle'] ?? _handle;
+          _name = (data['name'] != null && data['name'].toString().isNotEmpty) ? data['name'] : _name;
           _imagePath = data['avatarUrl'] ?? _imagePath;
           if (_imagePath != null && _imagePath!.startsWith('http')) {
             _isNetworkImage = true;

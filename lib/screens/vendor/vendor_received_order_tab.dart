@@ -11,6 +11,8 @@ class VendorReceivedOrderTab extends StatefulWidget {
 }
 
 class _VendorReceivedOrderTabState extends State<VendorReceivedOrderTab> {
+  int _tabIndex = 0; // 0: Pending Orders, 1: Completed Orders
+
   @override
   void initState() {
     super.initState();
@@ -76,6 +78,10 @@ class _VendorReceivedOrderTabState extends State<VendorReceivedOrderTab> {
         ? globalOrders.where((o) => o.vendorEmail == currentUserEmail).toList()
         : <FoodOrder>[];
 
+    final pendingOrders = vendorOrders.where((o) => !o.status.contains('Taken') && !o.status.contains('Delivered') && !o.status.contains('Successfully')).toList();
+    final completedOrders = vendorOrders.where((o) => o.status.contains('Taken') || o.status.contains('Delivered') || o.status.contains('Successfully')).toList();
+    final currentList = _tabIndex == 0 ? pendingOrders : completedOrders;
+
     return SafeArea(
       child: Column(
         children: [
@@ -84,15 +90,15 @@ class _VendorReceivedOrderTabState extends State<VendorReceivedOrderTab> {
             child: Row(
               children: [
                 Text(
-                  'Received Orders (Incoming)',
+                  'Received Orders',
                   style: TextStyle(
-                    fontSize: 20,
+                    fontSize: 22,
                     fontWeight: FontWeight.w800,
                     color: Theme.of(context).colorScheme.onSurface,
                   ),
                 ),
                 const Spacer(),
-                if (vendorOrders.isNotEmpty)
+                if (pendingOrders.isNotEmpty)
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                     decoration: BoxDecoration(
@@ -100,28 +106,89 @@ class _VendorReceivedOrderTabState extends State<VendorReceivedOrderTab> {
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Text(
-                      '${vendorOrders.length} Active',
+                      '${pendingOrders.length} Pending',
                       style: const TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.bold),
                     ),
                   ),
               ],
             ),
           ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: Container(
+              padding: const EdgeInsets.all(4),
+              decoration: BoxDecoration(
+                color: Theme.of(context).cardColor,
+                borderRadius: BorderRadius.circular(14),
+              ),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: GestureDetector(
+                      onTap: () => setState(() => _tabIndex = 0),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(vertical: 10),
+                        decoration: BoxDecoration(
+                          color: _tabIndex == 0 ? const Color(0xFF0F7A5B) : Colors.transparent,
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Center(
+                          child: Text(
+                            'Pending (${pendingOrders.length})',
+                            style: TextStyle(
+                              color: _tabIndex == 0 ? Colors.white : const Color(0xFF6E7D79),
+                              fontWeight: FontWeight.w700,
+                              fontSize: 13,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  Expanded(
+                    child: GestureDetector(
+                      onTap: () => setState(() => _tabIndex = 1),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(vertical: 10),
+                        decoration: BoxDecoration(
+                          color: _tabIndex == 1 ? const Color(0xFF0F7A5B) : Colors.transparent,
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Center(
+                          child: Text(
+                            'Completed (${completedOrders.length})',
+                            style: TextStyle(
+                              color: _tabIndex == 1 ? Colors.white : const Color(0xFF6E7D79),
+                              fontWeight: FontWeight.w700,
+                              fontSize: 13,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(height: 12),
           Expanded(
-            child: vendorOrders.isEmpty
+            child: currentList.isEmpty
                 ? Center(
                     child: Text(
-                      'No student orders yet.\nNew orders placed by students for your store will appear here!',
+                      _tabIndex == 0
+                          ? 'No pending orders yet.'
+                          : 'No completed orders yet.',
                       textAlign: TextAlign.center,
                       style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7)),
                     ),
                   )
                 : ListView.builder(
                     padding: const EdgeInsets.all(16),
-                    itemCount: vendorOrders.length,
+                    itemCount: currentList.length,
                     itemBuilder: (context, index) {
-                      final order = vendorOrders[index];
-                      final isReceived = order.status.contains('Taken') || order.status.contains('Delivered') || order.status.contains('Received');
+                      final order = currentList[index];
+                      final isReceived = order.status.contains('Taken') || order.status.contains('Delivered') || order.status.contains('Successfully');
                       final isPreparing = order.status.contains('Preparing');
                       final isDelivering = order.status.contains('Delivery') || order.status.contains('Out');
 
@@ -145,23 +212,20 @@ class _VendorReceivedOrderTabState extends State<VendorReceivedOrderTab> {
                                   style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 14, color: Color(0xFF0F7A5B)),
                                 ),
                                 const Spacer(),
-                                Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    Checkbox(
-                                      value: isReceived,
-                                      onChanged: null,
-                                      activeColor: Colors.green,
+                                Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                  decoration: BoxDecoration(
+                                    color: isReceived ? Colors.green.withValues(alpha: 0.1) : Colors.orange.withValues(alpha: 0.1),
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                  child: Text(
+                                    isReceived ? 'Completed' : 'Pending',
+                                    style: TextStyle(
+                                      fontSize: 11,
+                                      fontWeight: FontWeight.bold,
+                                      color: isReceived ? Colors.green : Colors.orange,
                                     ),
-                                    Text(
-                                      isReceived ? 'Received by Student' : 'Not Received Yet',
-                                      style: TextStyle(
-                                        fontSize: 11,
-                                        fontWeight: FontWeight.bold,
-                                        color: isReceived ? Colors.green : Colors.orange,
-                                      ),
-                                    ),
-                                  ],
+                                  ),
                                 ),
                               ],
                             ),

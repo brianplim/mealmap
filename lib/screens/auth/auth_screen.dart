@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 import '../../models/app_models.dart';
+import '../../services/firestore_service.dart';
 
 class AuthScreen extends StatefulWidget {
   const AuthScreen({super.key, this.isLogin = true});
@@ -40,13 +41,15 @@ class _AuthScreenState extends State<AuthScreen> {
   Future<void> _submit() async {
     if (_emailController.text.trim().isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please enter your student email')),
+        const SnackBar(content: Text('Please enter your email address')),
       );
       return;
     }
     if (!_emailController.text.trim().toLowerCase().endsWith('@gmail.com')) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Incorrect email or password. Please try again.')),
+        const SnackBar(
+          content: Text('Please enter a valid Gmail address ending in @gmail.com'),
+        ),
       );
       return;
     }
@@ -82,10 +85,18 @@ class _AuthScreenState extends State<AuthScreen> {
           Navigator.pushReplacementNamed(context, '/home');
         }
       } else {
-        await FirebaseAuth.instance.createUserWithEmailAndPassword(
+        final cred = await FirebaseAuth.instance.createUserWithEmailAndPassword(
           email: _emailController.text.trim(),
           password: _passwordController.text.trim(),
         );
+        if (cred.user != null) {
+          await FirestoreService.saveUserProfile(
+            cred.user!.uid,
+            _nameController.text.trim().isNotEmpty ? _nameController.text.trim() : 'Student',
+            _emailController.text.trim(),
+            '',
+          );
+        }
         await FirebaseAuth.instance.signOut();
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(

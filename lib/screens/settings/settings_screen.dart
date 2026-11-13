@@ -20,6 +20,54 @@ class _SettingsScreenState extends State<SettingsScreen> {
     _darkMode = themeNotifier.value == ThemeMode.dark;
   }
 
+  Future<void> _changePassword() async {
+    final passwordController = TextEditingController();
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Change Password'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextField(
+              controller: passwordController,
+              obscureText: true,
+              decoration: const InputDecoration(labelText: 'New Password'),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel')),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF0F7A5B), foregroundColor: Colors.white),
+            onPressed: () async {
+              try {
+                final user = FirebaseAuth.instance.currentUser;
+                if (user != null && passwordController.text.trim().isNotEmpty) {
+                  await user.updatePassword(passwordController.text.trim());
+                  if (context.mounted) {
+                    Navigator.pop(context);
+                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Password updated successfully!')));
+                  }
+                } else {
+                  if (context.mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Please enter a valid new password')));
+                  }
+                }
+              } catch (e) {
+                if (context.mounted) {
+                  Navigator.pop(context);
+                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error updating password: ${e.toString()}')));
+                }
+              }
+            },
+            child: const Text('Update'),
+          ),
+        ],
+      ),
+    );
+  }
+
   Future<void> _deleteAccount() async {
     final ok = await showConfirmDialog(
       context: context,
@@ -125,22 +173,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             );
                           },
                         ),
-                        const Divider(height: 1),
-                        SwitchListTile(
-                          title: Text('Location Sharing', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 14, color: Theme.of(context).colorScheme.onSurface)),
-                          subtitle: const Text('Find food spots near ACES Tagum College', style: TextStyle(fontSize: 12, color: Colors.grey)),
-                          value: locationSharingNotifier.value,
-                          activeTrackColor: const Color(0xFF0F7A5B),
-                          activeThumbColor: Colors.white,
-                          onChanged: (val) {
-                            setState(() {
-                              locationSharingNotifier.value = val;
-                            });
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(content: Text(val ? 'Location sharing enabled on map!' : 'Location sharing disabled on map!')),
-                            );
-                          },
-                        ),
                       ],
                     ),
                   ),
@@ -160,33 +192,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         ListTile(
                           title: Text('Change Password', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 14, color: Theme.of(context).colorScheme.onSurface)),
                           trailing: Icon(Icons.chevron_right, color: Theme.of(context).colorScheme.onSurface),
-                          onTap: () {
-                            showDialog(
-                              context: context,
-                              builder: (context) => AlertDialog(
-                                title: const Text('Change Password'),
-                                content: Column(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: const [
-                                    TextField(obscureText: true, decoration: InputDecoration(labelText: 'Current Password')),
-                                    SizedBox(height: 8),
-                                    TextField(obscureText: true, decoration: InputDecoration(labelText: 'New Password')),
-                                  ],
-                                ),
-                                actions: [
-                                  TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel')),
-                                  ElevatedButton(
-                                    style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF0F7A5B), foregroundColor: Colors.white),
-                                    onPressed: () {
-                                      Navigator.pop(context);
-                                      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Password updated successfully!')));
-                                    },
-                                    child: const Text('Update'),
-                                  ),
-                                ],
-                              ),
-                            );
-                          },
+                          onTap: _changePassword,
                         ),
                         const Divider(height: 1),
                         ListTile(
@@ -230,12 +236,33 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         ),
                         const Divider(height: 1),
                         ListTile(
-                          title: Text('Contact Support', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 14, color: Theme.of(context).colorScheme.onSurface)),
-                          subtitle: const Text('support@mealmaptagum.ph', style: TextStyle(fontSize: 12, color: Colors.grey)),
+                          title: Text('Contact Support (Gmail & Socials)', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 14, color: Theme.of(context).colorScheme.onSurface)),
+                          subtitle: const Text('support@mealmaptagum.ph • FB: facebook.com/mealmaptagum', style: TextStyle(fontSize: 12, color: Colors.grey)),
                           trailing: Icon(Icons.support_agent, color: Theme.of(context).colorScheme.onSurface),
                           onTap: () {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(content: Text('Support ticket opened: support@mealmaptagum.ph')),
+                            showDialog(
+                              context: context,
+                              builder: (context) => AlertDialog(
+                                title: const Text('Contact Support & Socials'),
+                                content: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: const [
+                                    Text('• Support Gmail: support@mealmaptagum.ph', style: TextStyle(fontWeight: FontWeight.bold)),
+                                    SizedBox(height: 6),
+                                    Text('• Facebook Page: facebook.com/mealmaptagum', style: TextStyle(fontWeight: FontWeight.bold)),
+                                    SizedBox(height: 6),
+                                    Text('• Messenger: m.me/mealmaptagum', style: TextStyle(fontWeight: FontWeight.bold)),
+                                  ],
+                                ),
+                                actions: [
+                                  ElevatedButton(
+                                    style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF0F7A5B), foregroundColor: Colors.white),
+                                    onPressed: () => Navigator.pop(context),
+                                    child: const Text('Close'),
+                                  ),
+                                ],
+                              ),
                             );
                           },
                         ),

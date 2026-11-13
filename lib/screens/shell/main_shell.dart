@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../home/home_screen.dart';
 import '../map/map_screen.dart';
-import '../deals/deals_screen.dart';
+import '../orders/orders_screen.dart';
 import '../favorites/favorites_screen.dart';
 import '../profile/profile_screen.dart';
 
@@ -26,7 +26,7 @@ class _MainShellState extends State<MainShell> {
   final List<Widget> _screens = const [
     HomeScreenContent(),
     MapScreenContent(),
-    DailyDealsScreenContent(),
+    OrdersScreen(),
     FavoritesScreenContent(),
     ProfileScreenContent(),
   ];
@@ -52,7 +52,7 @@ class _MainShellState extends State<MainShell> {
           items: const [
             BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
             BottomNavigationBarItem(icon: Icon(Icons.map_outlined), label: 'Map'),
-            BottomNavigationBarItem(icon: Icon(Icons.local_offer_outlined), label: 'Deals'),
+            BottomNavigationBarItem(icon: Icon(Icons.receipt_long_outlined), label: 'Orders'),
             BottomNavigationBarItem(icon: Icon(Icons.favorite_border), label: 'Favorites'),
             BottomNavigationBarItem(icon: Icon(Icons.person_outline), label: 'Profile'),
           ],

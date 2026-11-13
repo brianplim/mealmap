@@ -8,11 +8,11 @@ import 'screens/shell/main_shell.dart';
 import 'screens/restaurant/restaurant_detail_screen.dart';
 import 'screens/filter/deals_filter_screen.dart';
 import 'screens/notifications/notifications_screen.dart';
-import 'screens/orders/orders_screen.dart';
 import 'screens/settings/settings_screen.dart';
 import 'screens/vendor/vendor_portal_shell.dart';
 import 'screens/vendor/vendor_auth_screen.dart';
 import 'screens/search/search_screen.dart';
+import 'screens/admin/admin_portal_shell.dart';
 import 'services/notification_service.dart';
 
 void main() async {
@@ -75,17 +75,17 @@ class MealMapApp extends StatelessWidget {
             },
             '/home': (context) => const MainShell(initialTab: 0),
             '/map': (context) => const MainShell(initialTab: 1),
-            '/deals': (context) => const MainShell(initialTab: 2),
+            '/orders': (context) => const MainShell(initialTab: 2),
             '/favorites': (context) => const MainShell(initialTab: 3),
             '/profile': (context) => const MainShell(initialTab: 4),
             '/restaurant': (context) => const RestaurantDetailScreen(),
             '/filter': (context) => const DealsFilterScreen(),
             '/notifications': (context) => const NotificationsScreen(),
-            '/orders': (context) => const OrdersScreen(),
             '/settings': (context) => const SettingsScreen(),
             '/vendor': (context) => const VendorPortalShell(),
             '/vendor-auth': (context) => const VendorAuthScreen(),
             '/search': (context) => const SearchScreen(),
+            '/admin': (context) => const AdminPortalShell(),
           },
         );
       },
