@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import '../../models/app_models.dart';
 
 class VendorReceivedOrderTab extends StatefulWidget {
@@ -49,6 +50,11 @@ class _VendorReceivedOrderTabState extends State<VendorReceivedOrderTab> {
 
   @override
   Widget build(BuildContext context) {
+    final currentUserEmail = FirebaseAuth.instance.currentUser?.email;
+    final vendorOrders = currentUserEmail != null
+        ? globalOrders.where((o) => o.vendorEmail == currentUserEmail).toList()
+        : <FoodOrder>[];
+
     return SafeArea(
       child: Column(
         children: [
@@ -65,7 +71,7 @@ class _VendorReceivedOrderTabState extends State<VendorReceivedOrderTab> {
                   ),
                 ),
                 const Spacer(),
-                if (globalOrders.isNotEmpty)
+                if (vendorOrders.isNotEmpty)
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                     decoration: BoxDecoration(
@@ -73,7 +79,7 @@ class _VendorReceivedOrderTabState extends State<VendorReceivedOrderTab> {
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Text(
-                      '${globalOrders.length} Active',
+                      '${vendorOrders.length} Active',
                       style: const TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.bold),
                     ),
                   ),
@@ -81,19 +87,19 @@ class _VendorReceivedOrderTabState extends State<VendorReceivedOrderTab> {
             ),
           ),
           Expanded(
-            child: globalOrders.isEmpty
+            child: vendorOrders.isEmpty
                 ? Center(
                     child: Text(
-                      'No student orders yet.\nNew orders placed by students will appear here!',
+                      'No student orders yet.\nNew orders placed by students for your store will appear here!',
                       textAlign: TextAlign.center,
                       style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7)),
                     ),
                   )
                 : ListView.builder(
                     padding: const EdgeInsets.all(16),
-                    itemCount: globalOrders.length,
+                    itemCount: vendorOrders.length,
                     itemBuilder: (context, index) {
-                      final order = globalOrders[index];
+                      final order = vendorOrders[index];
                       final isReceived = order.status.contains('Taken') || order.status.contains('Delivered') || order.status.contains('Received');
                       final isPreparing = order.status.contains('Preparing');
                       final isDelivering = order.status.contains('Delivery') || order.status.contains('Out');
@@ -176,23 +182,33 @@ class _VendorReceivedOrderTabState extends State<VendorReceivedOrderTab> {
                             Row(
                               mainAxisAlignment: MainAxisAlignment.end,
                               children: [
-                                OutlinedButton.icon(
-                                  onPressed: isReceived ? null : () => _showPrepTimeDialog(context, order, isDelivery: false),
-                                  icon: Icon(Icons.kitchen, size: 16, color: isReceived ? Colors.grey : (isPreparing ? const Color(0xFF0F7A5B) : Colors.grey)),
-                                  label: Text(isPreparing ? 'Preparing (${order.prepTime})' : 'Preparing (Set Time)', style: const TextStyle(fontSize: 12)),
-                                  style: OutlinedButton.styleFrom(
-                                    foregroundColor: isReceived ? Colors.grey : (isPreparing ? const Color(0xFF0F7A5B) : Colors.grey),
-                                    side: BorderSide(color: isReceived ? Colors.grey[300]! : (isPreparing ? const Color(0xFF0F7A5B) : Colors.grey[300]!)),
-                                  ),
-                                ),
-                                const SizedBox(width: 10),
-                                OutlinedButton.icon(
-                                  onPressed: isReceived ? null : () => _showPrepTimeDialog(context, order, isDelivery: true),
-                                  icon: Icon(Icons.delivery_dining, size: 16, color: isReceived ? Colors.grey : (isDelivering ? Colors.blue : Colors.grey)),
-                                  label: Text(isDelivering ? 'Delivering (${order.prepTime})' : 'Delivering (Set Time)', style: const TextStyle(fontSize: 12)),
-                                  style: OutlinedButton.styleFrom(
-                                    foregroundColor: isReceived ? Colors.grey : (isDelivering ? Colors.blue : Colors.grey),
-                                    side: BorderSide(color: isReceived ? Colors.grey[300]! : (isDelivering ? Colors.blue : Colors.grey[300]!)),
+                                Expanded(
+                                  child: Wrap(
+                                    alignment: WrapAlignment.end,
+                                    spacing: 6,
+                                    runSpacing: 6,
+                                    children: [
+                                      OutlinedButton.icon(
+                                        onPressed: isReceived ? null : () => _showPrepTimeDialog(context, order, isDelivery: false),
+                                        icon: Icon(Icons.kitchen, size: 15, color: isReceived ? Colors.grey : (isPreparing ? const Color(0xFF0F7A5B) : Colors.grey)),
+                                        label: Text(isPreparing ? 'Preparing (${order.prepTime})' : 'Preparing (Set Time)', style: const TextStyle(fontSize: 11)),
+                                        style: OutlinedButton.styleFrom(
+                                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+                                          foregroundColor: isReceived ? Colors.grey : (isPreparing ? const Color(0xFF0F7A5B) : Colors.grey),
+                                          side: BorderSide(color: isReceived ? Colors.grey[300]! : (isPreparing ? const Color(0xFF0F7A5B) : Colors.grey[300]!)),
+                                        ),
+                                      ),
+                                      OutlinedButton.icon(
+                                        onPressed: isReceived ? null : () => _showPrepTimeDialog(context, order, isDelivery: true),
+                                        icon: Icon(Icons.delivery_dining, size: 15, color: isReceived ? Colors.grey : (isDelivering ? Colors.blue : Colors.grey)),
+                                        label: Text(isDelivering ? 'Delivering (${order.prepTime})' : 'Delivering (Set Time)', style: const TextStyle(fontSize: 11)),
+                                        style: OutlinedButton.styleFrom(
+                                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+                                          foregroundColor: isReceived ? Colors.grey : (isDelivering ? Colors.blue : Colors.grey),
+                                          side: BorderSide(color: isReceived ? Colors.grey[300]! : (isDelivering ? Colors.blue : Colors.grey[300]!)),
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                 ),
                               ],
