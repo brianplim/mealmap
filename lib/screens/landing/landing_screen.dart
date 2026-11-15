@@ -60,7 +60,9 @@ class WelcomeScreen extends StatelessWidget {
                       Navigator.pushNamed(context, '/vendor-auth');
                     } else {
                       ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Incorrect password')),
+                        const SnackBar(
+                          content: Text('Incorrect password'),
+                        ),
                       );
                     }
                   },
@@ -76,43 +78,71 @@ class WelcomeScreen extends StatelessWidget {
 
   void _showAdminLoginDialog(BuildContext context) {
     final passwordController = TextEditingController();
+    bool obscurePassword = true;
+
     showDialog(
       context: context,
       builder: (context) {
-        return AlertDialog(
-          title: const Text('Administrator Portal'),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const Text('Enter admin password to access system controls:', style: TextStyle(fontSize: 13, color: Colors.grey)),
-              const SizedBox(height: 12),
-              TextField(
-                controller: passwordController,
-                obscureText: true,
-                decoration: const InputDecoration(labelText: 'Admin Password', hintText: 'admin2026'),
+        return StatefulBuilder(
+          builder: (context, setDialogState) {
+            return AlertDialog(
+              title: const Text('Administrator Portal'),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Text(
+                    'Enter admin password to access system controls:',
+                    style: TextStyle(fontSize: 13, color: Colors.grey),
+                  ),
+                  const SizedBox(height: 12),
+                  TextField(
+                    controller: passwordController,
+                    obscureText: obscurePassword,
+                    decoration: InputDecoration(
+                      labelText: 'Admin Password',
+                      hintText: 'Enter Password',
+                      suffixIcon: IconButton(
+                        icon: Icon(
+                          obscurePassword
+                              ? Icons.visibility_off
+                              : Icons.visibility,
+                          color: const Color(0xFF0F7A5B),
+                        ),
+                        onPressed: () => setDialogState(
+                          () => obscurePassword = !obscurePassword,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
               ),
-            ],
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text('Cancel'),
-            ),
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF0F7A5B), foregroundColor: Colors.white),
-              onPressed: () {
-                if (passwordController.text.trim() == 'admin2026') {
-                  Navigator.pop(context);
-                  Navigator.pushNamed(context, '/admin');
-                } else {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Incorrect admin password')),
-                  );
-                }
-              },
-              child: const Text('Access Admin'),
-            ),
-          ],
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: const Text('Cancel'),
+                ),
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF0F7A5B),
+                    foregroundColor: Colors.white,
+                  ),
+                  onPressed: () {
+                    if (passwordController.text.trim() == 'mealmap@admin') {
+                      Navigator.pop(context);
+                      Navigator.pushNamed(context, '/admin');
+                    } else {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('Incorrect admin password'),
+                        ),
+                      );
+                    }
+                  },
+                  child: const Text('Access Admin'),
+                ),
+              ],
+            );
+          },
         );
       },
     );
