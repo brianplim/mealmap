@@ -207,6 +207,7 @@ class _MapScreenContentState extends State<MapScreenContent> {
             left: 16,
             right: 16,
             child: GestureDetector(
+              behavior: HitTestBehavior.opaque,
               onTap: () => Navigator.pushNamed(context, '/deals'),
               child: Container(
                 padding: const EdgeInsets.all(14),
