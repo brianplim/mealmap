@@ -13,8 +13,8 @@ class _FavoritesScreenContentState extends State<FavoritesScreenContent> {
 
   @override
   Widget build(BuildContext context) {
-    final favoriteEateries = eateryNotifier.value.where((e) => globalFavoriteIds.contains(e.id)).toList();
-    final favoriteDeals = eateryNotifier.value.where((e) => globalFavoriteDealIds.contains(e.id)).toList();
+    final favoriteEateries = eateryNotifier.value.where((e) => globalFavoriteIds.contains(e.id) && e.isApproved).toList();
+    final favoriteDeals = eateryNotifier.value.where((e) => globalFavoriteDealIds.contains(e.id) && e.isApproved).toList();
     final currentList = _tabIndex == 0 ? favoriteEateries : favoriteDeals;
 
     return SafeArea(

@@ -27,6 +27,7 @@ class Eatery {
   final String dealType;
   final String deliveryFee;
   bool isApproved;
+  bool isDeletionRequested;
 
   Eatery({
     required this.id,
@@ -46,6 +47,7 @@ class Eatery {
     this.deliveryFee = 'Free Delivery',
     this.dealType = 'Discounts',
     this.isApproved = true,
+    this.isDeletionRequested = false,
   });
 }
 
@@ -72,6 +74,8 @@ class FoodOrder {
   final String? vendorEmail;
   String prepTime;
   int? userRating;
+  String? reviewComment;
+  String? reviewImagePath;
 
   FoodOrder({
     required this.id,
@@ -84,6 +88,8 @@ class FoodOrder {
     this.vendorEmail,
     this.prepTime = '15 mins',
     this.userRating,
+    this.reviewComment,
+    this.reviewImagePath,
   });
 }
 
@@ -126,6 +132,8 @@ final List<FoodOrder> globalOrders = [];
 final List<String> globalFavoriteIds = [];
 
 final List<String> globalFavoriteDealIds = [];
+
+String globalStudentName = 'Tagum Student';
 
 final List<Eatery> mockEateries = [];
 

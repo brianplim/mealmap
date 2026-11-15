@@ -1,5 +1,8 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:latlong2/latlong.dart';
+import '../../models/app_models.dart';
+import '../../services/firestore_service.dart';
 
 class VendorAuthScreen extends StatefulWidget {
   const VendorAuthScreen({super.key});
@@ -34,9 +37,7 @@ class _VendorAuthScreenState extends State<VendorAuthScreen> {
     }
     if (!_emailController.text.trim().toLowerCase().endsWith('@gmail.com')) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Incorrect email or password. Please try again.'),
-        ),
+        const SnackBar(content: Text('Incorrect email or password. Please try again.')),
       );
       return;
     }
@@ -52,16 +53,28 @@ class _VendorAuthScreenState extends State<VendorAuthScreen> {
           Navigator.pushReplacementNamed(context, '/vendor');
         }
       } else {
-        await FirebaseAuth.instance.createUserWithEmailAndPassword(
+        final cred = await FirebaseAuth.instance.createUserWithEmailAndPassword(
           email: _emailController.text.trim(),
           password: _passwordController.text.trim(),
         );
+        if (cred.user != null) {
+          final businessName = _businessNameController.text.trim().isNotEmpty
+              ? _businessNameController.text.trim()
+              : 'ACES Canteen Bites';
+          businessNameNotifier.value = '$businessName & Deals';
+          await FirestoreService.saveVendorProfile(
+            cred.user!.uid,
+            businessName,
+            '@${businessName.toLowerCase().replaceAll(' ', '_')}',
+            '',
+            const LatLng(7.4578, 125.7921),
+            vendorEmail: _emailController.text.trim(),
+          );
+        }
         await FirebaseAuth.instance.signOut();
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Vendor registration successful! Please log in.'),
-            ),
+            const SnackBar(content: Text('Vendor registration successful! Please log in.')),
           );
           setState(() {
             _isLogin = true;
@@ -100,11 +113,11 @@ class _VendorAuthScreenState extends State<VendorAuthScreen> {
           if (errorStr.contains('email-already-in-use')) {
             displayMsg = 'This email address is already registered.';
           } else if (errorStr.contains('user-not-found')) {
-            displayMsg =
-                'No account found with this email. Please register first.';
+            displayMsg = 'No account found with this email. Please register first.';
           }
-          ScaffoldMessenger.of(context)
-              .showSnackBar(SnackBar(content: Text(displayMsg)));
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(displayMsg)),
+          );
         }
       }
     } finally {

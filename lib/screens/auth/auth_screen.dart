@@ -190,7 +190,10 @@ class _AuthScreenState extends State<AuthScreen> {
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    const AppLogo(size: 70),
+                    GestureDetector(
+                      onTap: () => Navigator.pushReplacementNamed(context, '/'),
+                      child: const AppLogo(size: 70),
+                    ),
                     const SizedBox(height: 16),
                     Text(
                       _isLogin ? 'Student Login' : 'Student Registration',

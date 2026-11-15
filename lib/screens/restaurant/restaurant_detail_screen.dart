@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../models/app_models.dart';
 import '../../services/firestore_service.dart';
+import 'eatery_reviews_screen.dart';
 
 class RestaurantDetailScreen extends StatefulWidget {
   const RestaurantDetailScreen({super.key});
@@ -143,13 +144,16 @@ class _RestaurantDetailScreenState extends State<RestaurantDetailScreen> {
                 ),
                 ElevatedButton(
                   onPressed: () async {
-                    final ok = await showConfirmDialog(
-                      context: context,
-                      title: 'Confirm Order Details',
-                      message: '• Item & Quantity: ${item.name} (x$quantity)\n• Eatery: ${eatery.name}\n• Fulfillment: $fulfillment\n• Delivery Fee: ${fulfillment == 'Delivery' ? eatery.deliveryFee : 'Free'}\n• Total Price: $formattedTotal',
-                      confirmText: 'Confirm Order',
+                    final ok = await _showReceiptDialog(
+                      context,
+                      item,
+                      quantity,
+                      eatery,
+                      fulfillment,
+                      eatery.deliveryFee,
+                      formattedTotal,
                     );
-                    if (ok && context.mounted) {
+                    if (ok == true && context.mounted) {
                       final newOrder = FoodOrder(
                         id: 'ORD-${DateTime.now().millisecondsSinceEpoch.toString().substring(8)}',
                         eateryName: eatery.name,
@@ -163,7 +167,7 @@ class _RestaurantDetailScreenState extends State<RestaurantDetailScreen> {
                       globalOrders.insert(0, newOrder);
                       vendorNotifReadNotifier.value = false;
                       FirestoreService.uploadOrder(newOrder);
-                      Navigator.pop(context);
+                      Navigator.pop(context); // close order dialog
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(content: Text('Order placed successfully! Total: $formattedTotal')),
                       );
@@ -180,6 +184,114 @@ class _RestaurantDetailScreenState extends State<RestaurantDetailScreen> {
           },
         );
       },
+    );
+  }
+
+  Future<bool?> _showReceiptDialog(
+    BuildContext context,
+    MenuItem item,
+    int quantity,
+    Eatery eatery,
+    String fulfillment,
+    String deliveryFeeStr,
+    String formattedTotal,
+  ) async {
+    final refNo = 'MM-${DateTime.now().millisecondsSinceEpoch.toString().substring(5)}';
+    final nowStr = '${DateTime.now().month}/${DateTime.now().day}/${DateTime.now().year} ${DateTime.now().hour}:${DateTime.now().minute.toString().padLeft(2, '0')}';
+
+    return showDialog<bool>(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          title: Row(
+            children: const [
+              Icon(Icons.receipt_long, color: Color(0xFF0F7A5B), size: 26),
+              SizedBox(width: 10),
+              Text('MealMap E-Receipt', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w900)),
+            ],
+          ),
+          content: Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: const Color(0xFFF9FBF9),
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: const Color(0xFF0F7A5B).withValues(alpha: 0.2)),
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Center(
+                  child: Text(
+                    'TRANSACTION SUMMARY',
+                    style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: Colors.grey[600], letterSpacing: 1.2),
+                  ),
+                ),
+                const Divider(height: 20),
+                _receiptRow('Reference No.', refNo),
+                const SizedBox(height: 8),
+                _receiptRow('Date & Time', nowStr),
+                const SizedBox(height: 8),
+                _receiptRow('Eatery / Merchant', eatery.name),
+                const SizedBox(height: 8),
+                _receiptRow('Item & Qty', '${item.name} (x$quantity)'),
+                const SizedBox(height: 8),
+                _receiptRow('Fulfillment', fulfillment),
+                const SizedBox(height: 8),
+                _receiptRow('Delivery Fee', fulfillment == 'Delivery' ? deliveryFeeStr : 'Free'),
+                const Divider(height: 20),
+                Row(
+                  children: [
+                    const Text('Total Amount', style: TextStyle(fontWeight: FontWeight.w900, fontSize: 15, color: Color(0xFF1E2D2A))),
+                    const Spacer(),
+                    Text(formattedTotal, style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 16, color: Color(0xFF0F7A5B))),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                Center(
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFECF7EF),
+                      borderRadius: BorderRadius.circular(6),
+                    ),
+                    child: const Text('✓ Verified Secure Order', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Color(0xFF0F7A5B))),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context, false),
+              child: const Text('Cancel', style: TextStyle(color: Colors.grey)),
+            ),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFF0F7A5B),
+                foregroundColor: Colors.white,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              ),
+              onPressed: () => Navigator.pop(context, true),
+              child: const Text('Confirm Order', style: TextStyle(fontWeight: FontWeight.bold)),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Widget _receiptRow(String label, String value) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(label, style: const TextStyle(fontSize: 12, color: Colors.grey, fontWeight: FontWeight.w600)),
+        const SizedBox(width: 8),
+        Expanded(
+          child: Text(value, textAlign: TextAlign.right, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w800, color: Color(0xFF1E2D2A))),
+        ),
+      ],
     );
   }
 
@@ -289,14 +401,32 @@ class _RestaurantDetailScreenState extends State<RestaurantDetailScreen> {
                 const SizedBox(height: 6),
                 Row(
                   children: [
-                    const Icon(Icons.star, size: 16, color: Colors.amber),
-                    const SizedBox(width: 4),
-                    Text(
-                      '${eatery.rating} (${eatery.reviewsCount} reviews)',
-                      style: TextStyle(
-                        fontWeight: FontWeight.w700,
-                        fontSize: 13,
-                        color: Theme.of(context).colorScheme.onSurface,
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => EateryReviewsScreen(eatery: eatery),
+                          ),
+                        );
+                      },
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Icon(Icons.star, size: 16, color: Colors.amber),
+                          const SizedBox(width: 4),
+                          Text(
+                            '${eatery.rating} (${eatery.reviewsCount} reviews)',
+                            style: const TextStyle(
+                              fontWeight: FontWeight.w700,
+                              fontSize: 13,
+                              color: Color(0xFF0F7A5B),
+                              decoration: TextDecoration.underline,
+                            ),
+                          ),
+                          const SizedBox(width: 2),
+                          const Icon(Icons.chevron_right, size: 16, color: Color(0xFF0F7A5B)),
+                        ],
                       ),
                     ),
                     const SizedBox(width: 12),

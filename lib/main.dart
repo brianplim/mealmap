@@ -14,6 +14,7 @@ import 'screens/vendor/vendor_auth_screen.dart';
 import 'screens/search/search_screen.dart';
 import 'screens/admin/admin_portal_shell.dart';
 import 'services/notification_service.dart';
+import 'services/firestore_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -24,8 +25,21 @@ void main() async {
       );
     }
     await NotificationService.initialize();
+
+    final fetched = await FirestoreService.getEateries();
+    if (fetched.isNotEmpty) {
+      mockEateries.clear();
+      mockEateries.addAll(fetched);
+      eateryNotifier.value = List.from(mockEateries);
+    }
+
+    final fetchedOrders = await FirestoreService.getAllOrders();
+    if (fetchedOrders.isNotEmpty) {
+      globalOrders.clear();
+      globalOrders.addAll(fetchedOrders);
+    }
   } catch (e) {
-    debugPrint('Firebase initialization note: $e');
+    debugPrint('Firebase initialization / loading error: $e');
   }
   runApp(const MealMapApp());
 }

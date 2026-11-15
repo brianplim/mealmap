@@ -115,7 +115,7 @@ class _MapScreenContentState extends State<MapScreenContent> {
                             ),
                             if (sharingEnabled)
                               ...eateries
-                                  .where((e) => e.showOnMap)
+                                  .where((e) => e.showOnMap && e.isApproved)
                                   .map(
                                     (eatery) => Marker(
                                       point: eatery.location,

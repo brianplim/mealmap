@@ -39,6 +39,7 @@ class _SearchScreenState extends State<SearchScreen> {
   @override
   Widget build(BuildContext context) {
     final results = eateryNotifier.value.where((e) {
+      if (!e.isApproved) return false;
       final q = _query.toLowerCase();
       final matchesName = e.name.toLowerCase().contains(q);
       final matchesCuisine = e.cuisine.toLowerCase().contains(q);

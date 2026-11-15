@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
+import 'dart:io';
 import '../../models/app_models.dart';
 import '../../services/firestore_service.dart';
 
@@ -10,8 +12,26 @@ class OrdersScreen extends StatefulWidget {
 }
 
 class _OrdersScreenState extends State<OrdersScreen> {
+  @override
+  void initState() {
+    super.initState();
+    _loadOrders();
+  }
+
+  Future<void> _loadOrders() async {
+    final fetched = await FirestoreService.getAllOrders();
+    if (fetched.isNotEmpty && mounted) {
+      globalOrders.clear();
+      globalOrders.addAll(fetched);
+      setState(() {});
+    }
+  }
+
   void _showRatingDialog(BuildContext context, FoodOrder order) {
-    int selectedStars = 5;
+    int selectedStars = order.userRating ?? 5;
+    final commentController = TextEditingController(text: order.reviewComment ?? '');
+    String? reviewImagePath = order.reviewImagePath;
+
     showDialog(
       context: context,
       builder: (context) {
@@ -19,34 +39,87 @@ class _OrdersScreenState extends State<OrdersScreen> {
           builder: (context, setRatingState) {
             return AlertDialog(
               title: Text('Rate ${order.itemName}'),
-              content: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    'How was your food from ${order.eateryName}?',
-                    textAlign: TextAlign.center,
-                    style: const TextStyle(fontSize: 13, color: Colors.grey),
-                  ),
-                  const SizedBox(height: 16),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: List.generate(5, (index) {
-                      final starNum = index + 1;
-                      return IconButton(
-                        icon: Icon(
-                          starNum <= selectedStars ? Icons.star : Icons.star_border,
-                          color: Colors.amber,
-                          size: 32,
+              content: SingleChildScrollView(
+                child: SizedBox(
+                  width: 320,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Center(
+                        child: Text(
+                          'How was your food from ${order.eateryName}?',
+                          textAlign: TextAlign.center,
+                          style: const TextStyle(fontSize: 13, color: Colors.grey),
                         ),
-                        onPressed: () {
-                          setRatingState(() {
-                            selectedStars = starNum;
-                          });
-                        },
-                      );
-                    }),
+                      ),
+                      const SizedBox(height: 12),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: List.generate(5, (index) {
+                          final starNum = index + 1;
+                          return IconButton(
+                            icon: Icon(
+                              starNum <= selectedStars ? Icons.star : Icons.star_border,
+                              color: Colors.amber,
+                              size: 32,
+                            ),
+                            onPressed: () {
+                              setRatingState(() {
+                                selectedStars = starNum;
+                              });
+                            },
+                          );
+                        }),
+                      ),
+                      const SizedBox(height: 12),
+                      TextField(
+                        controller: commentController,
+                        maxLines: 2,
+                        decoration: InputDecoration(
+                          labelText: 'Review Statement / Feedback',
+                          hintText: 'e.g. Delicious food and fast delivery!',
+                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      Row(
+                        children: [
+                          ElevatedButton.icon(
+                            onPressed: () async {
+                              try {
+                                final picker = ImagePicker();
+                                final pickedFile = await picker.pickImage(source: ImageSource.gallery);
+                                if (pickedFile != null) {
+                                  setRatingState(() {
+                                    reviewImagePath = pickedFile.path;
+                                  });
+                                }
+                              } catch (e) {
+                                // ignore
+                              }
+                            },
+                            icon: const Icon(Icons.add_a_photo, size: 16),
+                            label: const Text('Add Photo', style: TextStyle(fontSize: 12)),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: const Color(0xFF0F7A5B),
+                              foregroundColor: Colors.white,
+                            ),
+                          ),
+                          if (reviewImagePath != null) ...[
+                            const SizedBox(width: 12),
+                            ClipRRect(
+                              borderRadius: BorderRadius.circular(8),
+                              child: reviewImagePath!.startsWith('http')
+                                  ? Image.network(reviewImagePath!, width: 45, height: 45, fit: BoxFit.cover)
+                                  : Image.file(File(reviewImagePath!), width: 45, height: 45, fit: BoxFit.cover),
+                            ),
+                          ],
+                        ],
+                      ),
+                    ],
                   ),
-                ],
+                ),
               ),
               actions: [
                 TextButton(
@@ -61,6 +134,8 @@ class _OrdersScreenState extends State<OrdersScreen> {
                   onPressed: () {
                     setState(() {
                       order.userRating = selectedStars;
+                      order.reviewComment = commentController.text.trim();
+                      order.reviewImagePath = reviewImagePath;
                     });
 
                     final matches = mockEateries.where(
@@ -73,6 +148,7 @@ class _OrdersScreenState extends State<OrdersScreen> {
                       FirestoreService.uploadEatery(eatery, eatery.location);
                     }
                     eateryNotifier.value = List.from(mockEateries);
+                    FirestoreService.uploadOrder(order);
 
                     Navigator.pop(context);
                     ScaffoldMessenger.of(context).showSnackBar(
@@ -181,6 +257,29 @@ class _OrdersScreenState extends State<OrdersScreen> {
                                       ),
                                     ),
                                   ),
+                                  const SizedBox(width: 8),
+                                  IconButton(
+                                    icon: const Icon(Icons.delete_outline, color: Colors.red, size: 20),
+                                    padding: EdgeInsets.zero,
+                                    constraints: const BoxConstraints(),
+                                    tooltip: 'Delete Order History',
+                                    onPressed: () async {
+                                      final ok = await showConfirmDialog(
+                                        context: context,
+                                        title: 'Delete Order History',
+                                        message: 'Are you sure you want to remove ${order.itemName} from your order history?',
+                                        confirmText: 'Delete',
+                                      );
+                                      if (ok && context.mounted) {
+                                        setState(() {
+                                          globalOrders.removeWhere((o) => o.id == order.id);
+                                        });
+                                        ScaffoldMessenger.of(context).showSnackBar(
+                                          const SnackBar(content: Text('Order removed from history')),
+                                        );
+                                      }
+                                    },
+                                  ),
                                 ],
                               ),
                               const SizedBox(height: 8),
@@ -249,6 +348,22 @@ class _OrdersScreenState extends State<OrdersScreen> {
                                     )),
                                   ],
                                 ),
+                                if (order.reviewComment != null && order.reviewComment!.isNotEmpty) ...[
+                                  const SizedBox(height: 4),
+                                  Text(
+                                    '"${order.reviewComment}"',
+                                    style: const TextStyle(fontSize: 12, fontStyle: FontStyle.italic, color: Color(0xFF1E2D2A)),
+                                  ),
+                                ],
+                                if (order.reviewImagePath != null && order.reviewImagePath!.isNotEmpty) ...[
+                                  const SizedBox(height: 6),
+                                  ClipRRect(
+                                    borderRadius: BorderRadius.circular(8),
+                                    child: order.reviewImagePath!.startsWith('http')
+                                        ? Image.network(order.reviewImagePath!, height: 80, width: 80, fit: BoxFit.cover)
+                                        : Image.file(File(order.reviewImagePath!), height: 80, width: 80, fit: BoxFit.cover),
+                                  ),
+                                ],
                               ],
                               const SizedBox(height: 12),
                               Row(

@@ -14,19 +14,17 @@ class VendorCreateOrderTab extends StatefulWidget {
 }
 
 class _VendorCreateOrderTabState extends State<VendorCreateOrderTab> {
-  final _eateryNameController = TextEditingController(text: 'ACES Canteen Bites');
   final _menuNameController = TextEditingController();
   final _priceController = TextEditingController();
   final _discountController = TextEditingController();
   final _deliveryFeeController = TextEditingController();
-  final _customCuisineController = TextEditingController();
+  final _cuisineController = TextEditingController(text: 'Filipino');
   bool _hasDiscount = true;
   bool _hasDeliveryFee = false;
-  bool _isCustomCuisine = false;
-  String _selectedCuisine = 'Filipino';
   String _selectedDealType = 'Discounts';
   String _imageUrl = 'https://images.unsplash.com/photo-1555939594-58d7cb561ad1?auto=format&fit=crop&w=400&q=80';
   LatLng _businessLocation = const LatLng(7.4578, 125.7921);
+  String _businessName = 'ACES Canteen Bites';
 
   @override
   void initState() {
@@ -38,9 +36,14 @@ class _VendorCreateOrderTabState extends State<VendorCreateOrderTab> {
     final user = FirebaseAuth.instance.currentUser;
     if (user != null) {
       final data = await FirestoreService.getVendorProfile(user.uid);
-      if (data != null && data['lat'] != null && data['lng'] != null && mounted) {
+      if (data != null && mounted) {
         setState(() {
-          _businessLocation = LatLng(data['lat'], data['lng']);
+          if (data['lat'] != null && data['lng'] != null) {
+            _businessLocation = LatLng(data['lat'], data['lng']);
+          }
+          if (data['businessName'] != null) {
+            _businessName = data['businessName'];
+          }
         });
       }
     }
@@ -48,12 +51,11 @@ class _VendorCreateOrderTabState extends State<VendorCreateOrderTab> {
 
   @override
   void dispose() {
-    _eateryNameController.dispose();
     _menuNameController.dispose();
     _priceController.dispose();
     _discountController.dispose();
     _deliveryFeeController.dispose();
-    _customCuisineController.dispose();
+    _cuisineController.dispose();
     super.dispose();
   }
 
@@ -144,9 +146,7 @@ class _VendorCreateOrderTabState extends State<VendorCreateOrderTab> {
 
     if (!ok) return;
 
-    final finalCuisine = _isCustomCuisine && _customCuisineController.text.trim().isNotEmpty
-        ? _customCuisineController.text.trim()
-        : _selectedCuisine;
+    final finalCuisine = _cuisineController.text.trim().isNotEmpty ? _cuisineController.text.trim() : 'Filipino';
 
     final rawPrice = _priceController.text.trim().replaceAll('₱', '');
     final formattedPrice = '₱$rawPrice';
@@ -160,7 +160,7 @@ class _VendorCreateOrderTabState extends State<VendorCreateOrderTab> {
 
     final newEatery = Eatery(
       id: 'vendor-${DateTime.now().millisecondsSinceEpoch}',
-      name: _eateryNameController.text.trim().isNotEmpty ? _eateryNameController.text.trim() : 'ACES Canteen Bites',
+      name: _businessName,
       cuisine: finalCuisine,
       distance: calculatedKm,
       rating: 0.0,
@@ -209,10 +209,9 @@ class _VendorCreateOrderTabState extends State<VendorCreateOrderTab> {
       _priceController.clear();
       _discountController.clear();
       _deliveryFeeController.clear();
-      _customCuisineController.clear();
+      _cuisineController.text = 'Filipino';
       setState(() {
         _hasDeliveryFee = false;
-        _isCustomCuisine = false;
       });
     }
   }
@@ -251,46 +250,29 @@ class _VendorCreateOrderTabState extends State<VendorCreateOrderTab> {
                 ),
                 const SizedBox(height: 16),
                 TextField(
-                  controller: _eateryNameController,
-                  decoration: InputDecoration(
-                    labelText: 'Eatery / Business Name',
-                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(14)),
-                  ),
-                ),
-                const SizedBox(height: 16),
-                DropdownButtonFormField<String>(
-                  initialValue: _isCustomCuisine ? 'Custom' : _selectedCuisine,
+                  controller: _cuisineController,
                   decoration: InputDecoration(
                     labelText: 'Cuisine Category',
+                    hintText: 'e.g. Filipino, Italian, BBQ',
                     border: OutlineInputBorder(borderRadius: BorderRadius.circular(14)),
-                  ),
-                  items: ['Filipino', 'Fast Food', 'Coffee', 'Asian', 'Mexican', 'Desserts', 'Custom'].map((c) {
-                    return DropdownMenuItem(value: c, child: Text(c));
-                  }).toList(),
-                  onChanged: (val) {
-                    if (val != null) {
-                      setState(() {
-                        if (val == 'Custom') {
-                          _isCustomCuisine = true;
-                        } else {
-                          _isCustomCuisine = false;
-                          _selectedCuisine = val;
-                        }
-                      });
-                    }
-                  },
-                ),
-                if (_isCustomCuisine) ...[
-                  const SizedBox(height: 12),
-                  TextField(
-                    controller: _customCuisineController,
-                    decoration: InputDecoration(
-                      labelText: 'Enter Custom Cuisine Category',
-                      hintText: 'e.g. Italian, BBQ, Seafood',
-                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(14)),
+                    suffixIcon: PopupMenuButton<String>(
+                      icon: const Icon(Icons.arrow_drop_down, color: Color(0xFF0F7A5B)),
+                      onSelected: (val) {
+                        setState(() {
+                          _cuisineController.text = val;
+                        });
+                      },
+                      itemBuilder: (context) {
+                        return ['Filipino', 'Fast Food', 'Coffee', 'Asian', 'Mexican', 'Desserts'].map((c) {
+                          return PopupMenuItem<String>(
+                            value: c,
+                            child: Text(c),
+                          );
+                        }).toList();
+                      },
                     ),
                   ),
-                ],
+                ),
                 const SizedBox(height: 16),
                 DropdownButtonFormField<String>(
                   initialValue: _selectedDealType,

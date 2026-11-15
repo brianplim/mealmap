@@ -285,6 +285,32 @@ class _VendorProfileTabState extends State<VendorProfileTab> {
 
   @override
   Widget build(BuildContext context) {
+    final userEmail = FirebaseAuth.instance.currentUser?.email;
+    final vendorEateries = userEmail != null
+        ? mockEateries.where((e) => e.vendorEmail == userEmail || e.name == _businessName).toList()
+        : mockEateries.where((e) => e.name == _businessName).toList();
+
+    final activeDealsCount = vendorEateries.where((e) => e.isApproved).length;
+    final vendorOrders = userEmail != null
+        ? globalOrders.where((o) => o.vendorEmail == userEmail || o.vendorEmail == null || o.vendorEmail == '').toList()
+        : globalOrders;
+
+    double avgRating = 0.0;
+    int totalReviews = 0;
+    for (var e in vendorEateries) {
+      totalReviews += e.reviewsCount;
+      if (e.reviewsCount > 0) {
+        avgRating += e.rating;
+      }
+    }
+    if (vendorEateries.isNotEmpty && totalReviews > 0) {
+      avgRating = double.parse((avgRating / vendorEateries.where((e) => e.reviewsCount > 0).length).toStringAsFixed(1));
+    } else {
+      avgRating = 0.0;
+    }
+
+    final ratingStr = totalReviews > 0 ? '$avgRating ★' : '0.0 ★';
+
     return SafeArea(
       child: Column(
         children: [
@@ -345,9 +371,9 @@ class _VendorProfileTabState extends State<VendorProfileTab> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
-                    _vendorStat('Active Deals', '${mockEateries.length}'),
-                    _vendorStat('Total Orders', '${globalOrders.length}'),
-                    _vendorStat('Rating', '4.9 ★'),
+                    _vendorStat('Active Deals', '$activeDealsCount'),
+                    _vendorStat('Total Orders', '${vendorOrders.length}'),
+                    _vendorStat('Rating', ratingStr),
                   ],
                 ),
               ],

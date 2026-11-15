@@ -11,6 +11,21 @@ class VendorDashboardTab extends StatefulWidget {
 }
 
 class _VendorDashboardTabState extends State<VendorDashboardTab> {
+  @override
+  void initState() {
+    super.initState();
+    _loadEateries();
+  }
+
+  Future<void> _loadEateries() async {
+    final fetched = await FirestoreService.getEateries();
+    if (fetched.isNotEmpty && mounted) {
+      mockEateries.clear();
+      mockEateries.addAll(fetched);
+      eateryNotifier.value = List.from(mockEateries);
+      setState(() {});
+    }
+  }
   void _showEateryDetailDialog(BuildContext context, Eatery eatery) {
     showDialog(
       context: context,
@@ -96,9 +111,13 @@ class _VendorDashboardTabState extends State<VendorDashboardTab> {
             child: ValueListenableBuilder<List<Eatery>>(
               valueListenable: eateryNotifier,
               builder: (context, eateries, child) {
-                final vendorEateries = currentUserEmail != null
+                final allVendorEateries = currentUserEmail != null
                     ? eateries.where((e) => e.vendorEmail == currentUserEmail || e.vendorEmail == null || e.vendorEmail == '').toList()
                     : eateries;
+
+                final approvedVendorEateries = allVendorEateries.where((e) => e.isApproved && !e.isDeletionRequested).toList();
+                final pendingVendorEateries = allVendorEateries.where((e) => !e.isApproved && !e.isDeletionRequested).toList();
+                final deletionRequestedEateries = allVendorEateries.where((e) => e.isDeletionRequested).toList();
 
                 final vendorOrders = currentUserEmail != null
                     ? globalOrders.where((o) => o.vendorEmail == currentUserEmail || o.vendorEmail == null || o.vendorEmail == '').toList()
@@ -143,7 +162,7 @@ class _VendorDashboardTabState extends State<VendorDashboardTab> {
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceAround,
                             children: [
-                              _statBox('Active Posts', '${vendorEateries.length}'),
+                              _statBox('Active Posts', '${approvedVendorEateries.length}'),
                               _statBox('Orders', '${vendorOrders.length}'),
                               _statBox('Sold Today', '${vendorOrders.where((o) => o.status.contains('Received') || o.status.contains('Taken')).length}'),
                             ],
@@ -151,25 +170,183 @@ class _VendorDashboardTabState extends State<VendorDashboardTab> {
                         ],
                       ),
                     ),
+                    if (pendingVendorEateries.isNotEmpty) ...[
+                      const SizedBox(height: 24),
+                      const Text(
+                        'Pending Admin Approval (Awaiting Confirmation)',
+                        style: TextStyle(fontWeight: FontWeight.w800, fontSize: 16, color: Colors.orange),
+                      ),
+                      const SizedBox(height: 12),
+                      ...pendingVendorEateries.map((eatery) => Container(
+                            margin: const EdgeInsets.only(bottom: 12),
+                            decoration: BoxDecoration(
+                              color: Theme.of(context).cardColor,
+                              borderRadius: BorderRadius.circular(14),
+                              border: Border.all(color: Colors.orange.withValues(alpha: 0.5)),
+                              boxShadow: [
+                                BoxShadow(color: Colors.black.withValues(alpha: 0.04), blurRadius: 4, offset: const Offset(0, 2)),
+                              ],
+                            ),
+                            child: GestureDetector(
+                              behavior: HitTestBehavior.opaque,
+                              onTap: () => _showEateryDetailDialog(context, eatery),
+                              child: Padding(
+                                padding: const EdgeInsets.all(12),
+                                child: Row(
+                                  children: [
+                                    ClipRRect(
+                                      borderRadius: BorderRadius.circular(10),
+                                      child: Image.network(
+                                        eatery.imageUrl,
+                                        width: 55,
+                                        height: 55,
+                                        fit: BoxFit.cover,
+                                        errorBuilder: (context, error, stackTrace) => placeholderImage(width: 55, height: 55),
+                                      ),
+                                    ),
+                                    const SizedBox(width: 12),
+                                    Expanded(
+                                      child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            eatery.name,
+                                            style: TextStyle(fontWeight: FontWeight.w800, fontSize: 14, color: Theme.of(context).colorScheme.onSurface),
+                                          ),
+                                          const SizedBox(height: 2),
+                                          Text(
+                                            eatery.description,
+                                            style: const TextStyle(fontSize: 11, color: Color(0xFF6E7D79)),
+                                            maxLines: 1,
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
+                                          const SizedBox(height: 4),
+                                          Container(
+                                            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                            decoration: BoxDecoration(
+                                              color: Colors.orange.withValues(alpha: 0.1),
+                                              borderRadius: BorderRadius.circular(6),
+                                            ),
+                                            child: const Text(
+                                              '⏳ Pending Admin Review (Tap to view details)',
+                                              style: TextStyle(fontSize: 9, fontWeight: FontWeight.bold, color: Colors.orange),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    IconButton(
+                                      icon: const Icon(Icons.delete_outline, color: Colors.red, size: 20),
+                                      onPressed: () async {
+                                        final ok = await showConfirmDialog(
+                                          context: context,
+                                          title: 'Delete Post',
+                                          message: 'Are you sure you want to delete "${eatery.name}"?',
+                                          confirmText: 'Delete',
+                                        );
+                                        if (ok && context.mounted) {
+                                          mockEateries.removeWhere((item) => item.id == eatery.id);
+                                          globalVendorPins.removeWhere((pin) => pin.id == eatery.id);
+                                          eateryNotifier.value = List.from(mockEateries);
+                                          FirestoreService.deleteEatery(eatery.id);
+                                          ScaffoldMessenger.of(context).showSnackBar(
+                                            SnackBar(content: Text('Removed ${eatery.name} from student feed')),
+                                          );
+                                        }
+                                      },
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          )),
+                    ],
+                    if (deletionRequestedEateries.isNotEmpty) ...[
+                      const SizedBox(height: 24),
+                      const Text(
+                        'Pending Deletion Request (Awaiting Admin)',
+                        style: TextStyle(fontWeight: FontWeight.w800, fontSize: 16, color: Colors.red),
+                      ),
+                      const SizedBox(height: 12),
+                      ...deletionRequestedEateries.map((eatery) => Container(
+                            margin: const EdgeInsets.only(bottom: 12),
+                            decoration: BoxDecoration(
+                              color: Theme.of(context).cardColor,
+                              borderRadius: BorderRadius.circular(14),
+                              border: Border.all(color: Colors.red.withValues(alpha: 0.5)),
+                              boxShadow: [
+                                BoxShadow(color: Colors.black.withValues(alpha: 0.04), blurRadius: 4, offset: const Offset(0, 2)),
+                              ],
+                            ),
+                            child: Padding(
+                              padding: const EdgeInsets.all(12),
+                              child: Row(
+                                children: [
+                                  ClipRRect(
+                                    borderRadius: BorderRadius.circular(10),
+                                    child: Image.network(
+                                      eatery.imageUrl,
+                                      width: 55,
+                                      height: 55,
+                                      fit: BoxFit.cover,
+                                      errorBuilder: (context, error, stackTrace) => placeholderImage(width: 55, height: 55),
+                                    ),
+                                  ),
+                                  const SizedBox(width: 12),
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          eatery.name,
+                                          style: TextStyle(fontWeight: FontWeight.w800, fontSize: 14, color: Theme.of(context).colorScheme.onSurface),
+                                        ),
+                                        const SizedBox(height: 2),
+                                        Text(
+                                          eatery.description,
+                                          style: const TextStyle(fontSize: 11, color: Color(0xFF6E7D79)),
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                        const SizedBox(height: 4),
+                                        Container(
+                                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                          decoration: BoxDecoration(
+                                            color: Colors.red.withValues(alpha: 0.1),
+                                            borderRadius: BorderRadius.circular(6),
+                                          ),
+                                          child: const Text(
+                                            '⏳ Deletion Request Pending Admin',
+                                            style: TextStyle(fontSize: 9, fontWeight: FontWeight.bold, color: Colors.red),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          )),
+                    ],
                     const SizedBox(height: 24),
                     const Text(
                       'Recent Posts & Active Specials',
                       style: TextStyle(fontWeight: FontWeight.w800, fontSize: 16, color: Color(0xFF1E2D2A)),
                     ),
                     const SizedBox(height: 12),
-                    if (vendorEateries.isEmpty)
+                    if (approvedVendorEateries.isEmpty)
                       Center(
                         child: Padding(
-                          padding: const EdgeInsets.only(top: 40),
+                          padding: const EdgeInsets.only(top: 20),
                           child: Text(
-                            'No active posts yet.\nUse "Create Order" tab to post your first menu item!',
+                            'No active published posts yet.\nItems appear here once approved by Admin!',
                             textAlign: TextAlign.center,
                             style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7)),
                           ),
                         ),
                       )
                     else
-                      ...vendorEateries.map((eatery) => Container(
+                      ...approvedVendorEateries.map((eatery) => Container(
                             margin: const EdgeInsets.only(bottom: 12),
                             decoration: BoxDecoration(
                               color: Theme.of(context).cardColor,
@@ -228,14 +405,23 @@ class _VendorDashboardTabState extends State<VendorDashboardTab> {
                                     ),
                                     IconButton(
                                       icon: const Icon(Icons.delete_outline, color: Colors.red, size: 20),
-                                      onPressed: () {
-                                        mockEateries.removeWhere((item) => item.id == eatery.id);
-                                        globalVendorPins.removeWhere((pin) => pin.id == eatery.id);
-                                        eateryNotifier.value = List.from(mockEateries);
-                                        FirestoreService.deleteEatery(eatery.id);
-                                        ScaffoldMessenger.of(context).showSnackBar(
-                                          SnackBar(content: Text('Removed ${eatery.name} from student feed')),
+                                      onPressed: () async {
+                                        final ok = await showConfirmDialog(
+                                          context: context,
+                                          title: 'Request Deletion from Admin',
+                                          message: 'Are you sure you want to request deletion of "${eatery.name}"? The Admin will review and process your request.',
+                                          confirmText: 'Request Delete',
                                         );
+                                        if (ok && context.mounted) {
+                                          setState(() {
+                                            eatery.isDeletionRequested = true;
+                                          });
+                                          FirestoreService.uploadEatery(eatery, eatery.location);
+                                          eateryNotifier.value = List.from(mockEateries);
+                                          ScaffoldMessenger.of(context).showSnackBar(
+                                            SnackBar(content: Text('Deletion request for "${eatery.name}" submitted to Admin!')),
+                                          );
+                                        }
                                       },
                                     ),
                                   ],

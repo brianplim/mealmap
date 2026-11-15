@@ -13,14 +13,15 @@ class ProfileScreenContent extends StatefulWidget {
 }
 
 class _ProfileScreenContentState extends State<ProfileScreenContent> {
-  String _name = 'Tagum Student';
-  String _handle = '@tagum_student23';
+  String _name = globalStudentName;
+  String _handle = 'student@gmail.com';
   String? _imagePath;
   bool _isNetworkImage = false;
 
   @override
   void initState() {
     super.initState();
+    _name = globalStudentName;
     _loadProfile();
   }
 
@@ -32,9 +33,10 @@ class _ProfileScreenContentState extends State<ProfileScreenContent> {
         _handle = email;
       });
       final data = await FirestoreService.getUserProfile(user.uid);
-      if (data != null && mounted) {
+      if (data != null && data['name'] != null && mounted) {
         setState(() {
-          _name = (data['name'] != null && data['name'].toString().isNotEmpty) ? data['name'] : _name;
+          _name = data['name'].toString();
+          globalStudentName = _name;
           _imagePath = data['avatarUrl'] ?? _imagePath;
           if (_imagePath != null && _imagePath!.startsWith('http')) {
             _isNetworkImage = true;
@@ -55,85 +57,53 @@ class _ProfileScreenContentState extends State<ProfileScreenContent> {
         return StatefulBuilder(
           builder: (context, setDialogState) {
             return AlertDialog(
-              title: const Text('Edit Profile'),
+              title: const Text('Edit Student Profile'),
               content: SingleChildScrollView(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    TextField(
-                      controller: nameController,
-                      decoration: const InputDecoration(labelText: 'Display Name'),
-                    ),
-                    const SizedBox(height: 12),
-                    TextField(
-                      controller: handleController,
-                      decoration: const InputDecoration(labelText: 'Username / Handle'),
-                    ),
-                    const SizedBox(height: 16),
-                    ElevatedButton.icon(
-                      onPressed: () async {
-                        try {
-                          final picker = ImagePicker();
-                          final pickedFile = await picker.pickImage(source: ImageSource.gallery);
-                          if (pickedFile != null) {
-                            setDialogState(() {
-                              tempImagePath = pickedFile.path;
-                              _isNetworkImage = false;
-                            });
+                child: SizedBox(
+                  width: 300,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      GestureDetector(
+                        onTap: () async {
+                          try {
+                            final picker = ImagePicker();
+                            final pickedFile = await picker.pickImage(source: ImageSource.gallery);
+                            if (pickedFile != null) {
+                              setDialogState(() {
+                                tempImagePath = pickedFile.path;
+                              });
+                            }
+                          } catch (e) {
+                            // ignore
                           }
-                        } catch (e) {
-                          if (context.mounted) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(content: Text('Gallery picker note: (${e.toString()})')),
-                            );
-                          }
-                        }
-                      },
-                      icon: const Icon(Icons.photo_library),
-                      label: const Text('Upload from Gallery'),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF0F7A5B),
-                        foregroundColor: Colors.white,
+                        },
+                        child: CircleAvatar(
+                          radius: 35,
+                          backgroundColor: const Color(0xFF0F7A5B),
+                          backgroundImage: tempImagePath != null
+                              ? (tempImagePath!.startsWith('http')
+                                  ? NetworkImage(tempImagePath!) as ImageProvider
+                                  : FileImage(File(tempImagePath!)))
+                              : null,
+                          child: tempImagePath == null
+                              ? const Icon(Icons.camera_alt, color: Colors.white, size: 28)
+                              : null,
+                        ),
                       ),
-                    ),
-                    const SizedBox(height: 16),
-                    const Text(
-                      'Or choose a preset avatar:',
-                      style: TextStyle(fontSize: 12, color: Colors.grey, fontWeight: FontWeight.bold),
-                    ),
-                    const SizedBox(height: 10),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-                        'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80',
-                        'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=200&q=80',
-                        'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=200&q=80',
-                      ].map((url) {
-                        final isSelected = tempImagePath == url;
-                        return GestureDetector(
-                          onTap: () {
-                            setDialogState(() {
-                              tempImagePath = url;
-                              _isNetworkImage = true;
-                            });
-                          },
-                          child: Container(
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              border: Border.all(
-                                color: isSelected ? const Color(0xFF0F7A5B) : Colors.transparent,
-                                width: 3,
-                              ),
-                            ),
-                            child: CircleAvatar(
-                              radius: 24,
-                              backgroundImage: NetworkImage(url),
-                            ),
-                          ),
-                        );
-                      }).toList(),
-                    ),
-                  ],
+                      const SizedBox(height: 16),
+                      TextField(
+                        controller: nameController,
+                        decoration: const InputDecoration(labelText: 'Full Name'),
+                      ),
+                      const SizedBox(height: 12),
+                      TextField(
+                        controller: handleController,
+                        enabled: false,
+                        decoration: const InputDecoration(labelText: 'Gmail Address (Fixed)'),
+                      ),
+                    ],
+                  ),
                 ),
               ),
               actions: [
@@ -145,9 +115,12 @@ class _ProfileScreenContentState extends State<ProfileScreenContent> {
                   onPressed: () async {
                     setState(() {
                       _name = nameController.text.trim();
-                      _handle = handleController.text.trim();
-                      if (tempImagePath != null) {
-                        _imagePath = tempImagePath;
+                      globalStudentName = _name;
+                      _imagePath = tempImagePath;
+                      if (_imagePath != null && _imagePath!.startsWith('http')) {
+                        _isNetworkImage = true;
+                      } else {
+                        _isNetworkImage = false;
                       }
                     });
                     final user = FirebaseAuth.instance.currentUser;
@@ -162,7 +135,7 @@ class _ProfileScreenContentState extends State<ProfileScreenContent> {
                     if (context.mounted) {
                       Navigator.pop(context);
                       ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Profile saved to Cloud Firestore!')),
+                        const SnackBar(content: Text('Profile updated successfully!')),
                       );
                     }
                   },
@@ -182,125 +155,121 @@ class _ProfileScreenContentState extends State<ProfileScreenContent> {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Column(
-        children: [
-          Container(
-            margin: const EdgeInsets.all(16),
-            padding: const EdgeInsets.symmetric(vertical: 20),
-            decoration: BoxDecoration(
-              color: const Color(0xFF0F7A5B),
-              borderRadius: BorderRadius.circular(18),
-            ),
-            child: Column(
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.only(right: 16),
-                      child: GestureDetector(
-                        onTap: _showEditProfileDialog,
-                        child: const Icon(Icons.edit, color: Colors.white, size: 18),
+    return Scaffold(
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      body: SafeArea(
+        child: Column(
+          children: [
+            Container(
+              margin: const EdgeInsets.all(16),
+              padding: const EdgeInsets.symmetric(vertical: 20),
+              decoration: BoxDecoration(
+                color: const Color(0xFF0F7A5B),
+                borderRadius: BorderRadius.circular(18),
+              ),
+              child: Column(
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.only(right: 16),
+                        child: GestureDetector(
+                          onTap: _showEditProfileDialog,
+                          child: const Icon(Icons.edit, color: Colors.white, size: 18),
+                        ),
                       ),
+                    ],
+                  ),
+                  GestureDetector(
+                    onTap: _showEditProfileDialog,
+                    child: CircleAvatar(
+                      radius: 32,
+                      backgroundColor: Colors.white,
+                      backgroundImage: _imagePath != null
+                          ? (_isNetworkImage
+                              ? NetworkImage(_imagePath!) as ImageProvider
+                              : FileImage(File(_imagePath!)))
+                          : null,
+                      child: _imagePath == null
+                          ? const Icon(Icons.person, size: 36, color: Color(0xFF0F7A5B))
+                          : null,
                     ),
-                  ],
-                ),
-                GestureDetector(
-                  onTap: _showEditProfileDialog,
-                  child: CircleAvatar(
-                    radius: 32,
-                    backgroundColor: Colors.white,
-                    backgroundImage: _imagePath != null
-                        ? (_isNetworkImage
-                            ? NetworkImage(_imagePath!) as ImageProvider
-                            : FileImage(File(_imagePath!)))
-                        : null,
-                    child: _imagePath == null
-                        ? const Icon(Icons.person, size: 36, color: Color(0xFF0F7A5B))
-                        : null,
                   ),
-                ),
-                const SizedBox(height: 10),
-                Text(
-                  _name,
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 18,
-                    fontWeight: FontWeight.w800,
+                  const SizedBox(height: 10),
+                  Text(
+                    _name,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 18,
+                      fontWeight: FontWeight.w800,
+                    ),
                   ),
-                ),
-                const SizedBox(height: 2),
-                Text(
-                  _handle,
-                  style: const TextStyle(
-                    color: Colors.white70,
-                    fontSize: 12,
+                  const SizedBox(height: 2),
+                  Text(
+                    _handle,
+                    style: const TextStyle(
+                      color: Colors.white70,
+                      fontSize: 12,
+                    ),
                   ),
-                ),
-                const SizedBox(height: 16),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    ProfileStat(count: '${globalFavoriteIds.length}', label: 'Favorites'),
-                    const ProfileStat(count: '0', label: 'Deals Viewed'),
-                    ProfileStat(count: '${globalNotifications.length}', label: 'Notifications'),
-                  ],
-                ),
-              ],
+                  const SizedBox(height: 16),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      ProfileStat(count: '${globalFavoriteIds.length + globalFavoriteDealIds.length}', label: 'Favorites'),
+                      ProfileStat(count: '${globalNotifications.length}', label: 'Notifications'),
+                    ],
+                  ),
+                ],
+              ),
             ),
-          ),
-          Expanded(
-            child: ListView(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              children: [
-                ProfileMenuItem(
-                  icon: Icons.delivery_dining,
-                  label: 'Delivery & Orders Status',
-                  badge: '${globalOrders.where((o) => !o.status.contains('Taken') && !o.status.contains('Delivered')).length}',
-                  onTap: () => Navigator.pushNamed(context, '/orders'),
-                ),
-                ProfileMenuItem(
-                  icon: Icons.notifications_none,
-                  label: 'Notifications',
-                  badge: globalNotifications.isNotEmpty ? '${globalNotifications.length}' : null,
-                  onTap: () async {
-                    await Navigator.pushNamed(context, '/notifications');
-                    setState(() {});
-                  },
-                ),
-                ProfileMenuItem(
-                  icon: Icons.settings_outlined,
-                  label: 'Settings',
-                  onTap: () => Navigator.pushNamed(context, '/settings'),
-                ),
-                ProfileMenuItem(
-                  icon: Icons.map_outlined,
-                  label: 'ACES College Map',
-                  onTap: () => launchAcesMap(context),
-                ),
-                ProfileMenuItem(
-                  icon: Icons.logout,
-                  label: 'Log Out',
-                  textColor: Colors.red,
-                  iconColor: Colors.red,
-                  onTap: () async {
-                    final ok = await showConfirmDialog(
-                      context: context,
-                      title: 'Log Out',
-                      message: 'Are you sure you want to log out?',
-                      confirmText: 'Log Out',
-                      confirmColor: Colors.red,
-                    );
-                    if (ok && context.mounted) {
-                      Navigator.pushNamedAndRemoveUntil(context, '/', (route) => false);
-                    }
-                  },
-                ),
-              ],
+            Expanded(
+              child: ListView(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                children: [
+                  ProfileMenuItem(
+                    icon: Icons.notifications_none,
+                    label: 'Notifications',
+                    badge: globalNotifications.isNotEmpty ? '${globalNotifications.length}' : null,
+                    onTap: () async {
+                      await Navigator.pushNamed(context, '/notifications');
+                      setState(() {});
+                    },
+                  ),
+                  ProfileMenuItem(
+                    icon: Icons.settings_outlined,
+                    label: 'Settings',
+                    onTap: () => Navigator.pushNamed(context, '/settings'),
+                  ),
+                  ProfileMenuItem(
+                    icon: Icons.map_outlined,
+                    label: 'ACES College Map',
+                    onTap: () => launchAcesMap(context),
+                  ),
+                  ProfileMenuItem(
+                    icon: Icons.logout,
+                    label: 'Log Out',
+                    textColor: Colors.red,
+                    iconColor: Colors.red,
+                    onTap: () async {
+                      final ok = await showConfirmDialog(
+                        context: context,
+                        title: 'Log Out',
+                        message: 'Are you sure you want to log out?',
+                        confirmText: 'Log Out',
+                        confirmColor: Colors.red,
+                      );
+                      if (ok && context.mounted) {
+                        Navigator.pushNamedAndRemoveUntil(context, '/', (route) => false);
+                      }
+                    },
+                  ),
+                ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -357,17 +326,15 @@ class ProfileMenuItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return Card(
       margin: const EdgeInsets.only(bottom: 12),
+      elevation: 0,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: InkWell(
         onTap: onTap,
         borderRadius: BorderRadius.circular(12),
-        child: Container(
+        child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-          decoration: BoxDecoration(
-            color: Theme.of(context).cardColor,
-            borderRadius: BorderRadius.circular(12),
-          ),
           child: Row(
             children: [
               Icon(icon, size: 20, color: iconColor),

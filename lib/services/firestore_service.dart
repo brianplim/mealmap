@@ -35,6 +35,7 @@ class FirestoreService {
         'deliveryFee': eatery.deliveryFee,
         'dealType': eatery.dealType,
         'isApproved': eatery.isApproved,
+        'isDeletionRequested': eatery.isDeletionRequested,
         'menu': eatery.menu.map((m) => {'name': m.name, 'price': m.price, 'imageUrl': m.imageUrl}).toList(),
       });
     } catch (e) {
@@ -52,6 +53,7 @@ class FirestoreService {
         final lng = data['lng'] ?? 125.7921;
         final showMap = data['showOnMap'] ?? false;
         final isAppr = data['isApproved'] ?? true;
+        final isDelReq = data['isDeletionRequested'] ?? false;
         final deliveryFee = data['deliveryFee'] ?? 'Free Delivery';
         final calculatedKm = calculateKmFromAces(LatLng(lat, lng));
         final menuList = (data['menu'] as List<dynamic>? ?? []).map((m) => MenuItem(
@@ -77,6 +79,7 @@ class FirestoreService {
           deliveryFee: deliveryFee,
           dealType: data['dealType'] ?? 'Discounts',
           isApproved: isAppr,
+          isDeletionRequested: isDelReq,
           menu: menuList,
         ));
       }
@@ -107,9 +110,40 @@ class FirestoreService {
         'timestamp': order.timestamp,
         'vendorEmail': order.vendorEmail,
         'prepTime': order.prepTime,
+        'userRating': order.userRating,
+        'reviewComment': order.reviewComment,
+        'reviewImagePath': order.reviewImagePath,
       });
     } catch (e) {
       debugPrint('Firestore uploadOrder error: $e');
+    }
+  }
+
+  static Future<List<FoodOrder>> getAllOrders() async {
+    try {
+      final snapshot = await _db.collection('orders').get();
+      List<FoodOrder> orders = [];
+      for (var doc in snapshot.docs) {
+        final data = doc.data();
+        orders.add(FoodOrder(
+          id: data['id'] ?? doc.id,
+          eateryName: data['eateryName'] ?? '',
+          itemName: data['itemName'] ?? '',
+          price: data['price'] ?? '',
+          fulfillmentType: data['fulfillmentType'] ?? 'Delivery',
+          status: data['status'] ?? 'Out for Delivery',
+          timestamp: data['timestamp'] ?? 'Just now',
+          vendorEmail: data['vendorEmail'],
+          prepTime: data['prepTime'] ?? '15 mins',
+          userRating: data['userRating'],
+          reviewComment: data['reviewComment'],
+          reviewImagePath: data['reviewImagePath'],
+        ));
+      }
+      return orders;
+    } catch (e) {
+      debugPrint('Firestore getAllOrders error: $e');
+      return [];
     }
   }
 
@@ -129,6 +163,9 @@ class FirestoreService {
           timestamp: data['timestamp'] ?? 'Just now',
           vendorEmail: data['vendorEmail'],
           prepTime: data['prepTime'] ?? '15 mins',
+          userRating: data['userRating'],
+          reviewComment: data['reviewComment'],
+          reviewImagePath: data['reviewImagePath'],
         ));
       }
       return orders;
