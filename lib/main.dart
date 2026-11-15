@@ -7,6 +7,7 @@ import 'screens/auth/auth_screen.dart';
 import 'screens/shell/main_shell.dart';
 import 'screens/restaurant/restaurant_detail_screen.dart';
 import 'screens/filter/deals_filter_screen.dart';
+import 'screens/deals/deals_screen.dart';
 import 'screens/notifications/notifications_screen.dart';
 import 'screens/settings/settings_screen.dart';
 import 'screens/vendor/vendor_portal_shell.dart';
@@ -100,6 +101,15 @@ class MealMapApp extends StatelessWidget {
             '/vendor-auth': (context) => const VendorAuthScreen(),
             '/search': (context) => const SearchScreen(),
             '/admin': (context) => const AdminPortalShell(),
+            '/deals': (context) => Scaffold(
+              appBar: AppBar(
+                title: const Text('Tagum Daily Deals'),
+                backgroundColor: const Color(0xFF0F7A5B),
+                foregroundColor: Colors.white,
+                elevation: 0,
+              ),
+              body: const DailyDealsScreenContent(),
+            ),
           },
         );
       },
