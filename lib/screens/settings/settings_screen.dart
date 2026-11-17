@@ -22,6 +22,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   Future<void> _changePassword() async {
     final passwordController = TextEditingController();
+    final confirmPasswordController = TextEditingController();
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -32,7 +33,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
             TextField(
               controller: passwordController,
               obscureText: true,
-              decoration: const InputDecoration(labelText: 'New Password'),
+              decoration: const InputDecoration(labelText: 'New Password', hintText: 'At least 6 characters'),
+            ),
+            const SizedBox(height: 12),
+            TextField(
+              controller: confirmPasswordController,
+              obscureText: true,
+              decoration: const InputDecoration(labelText: 'Confirm New Password'),
             ),
           ],
         ),
@@ -41,23 +48,50 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ElevatedButton(
             style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF0F7A5B), foregroundColor: Colors.white),
             onPressed: () async {
+              final newPass = passwordController.text.trim();
+              final confirmPass = confirmPasswordController.text.trim();
+              if (newPass.isEmpty) {
+                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Please enter a valid new password')));
+                return;
+              }
+              if (newPass.length < 6) {
+                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Password must be at least 6 characters long')));
+                return;
+              }
+              if (newPass != confirmPass) {
+                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Passwords do not match')));
+                return;
+              }
+
               try {
                 final user = FirebaseAuth.instance.currentUser;
-                if (user != null && passwordController.text.trim().isNotEmpty) {
-                  await user.updatePassword(passwordController.text.trim());
+                if (user != null) {
+                  await user.updatePassword(newPass);
+
+                  await FirebaseFirestore.instance.collection('users').doc(user.uid).set({
+                    'passwordUpdatedAt': FieldValue.serverTimestamp(),
+                  }, SetOptions(merge: true));
+
+                  await FirebaseFirestore.instance.collection('vendors').doc(user.uid).set({
+                    'passwordUpdatedAt': FieldValue.serverTimestamp(),
+                  }, SetOptions(merge: true));
+
                   if (context.mounted) {
                     Navigator.pop(context);
-                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Password updated successfully!')));
-                  }
-                } else {
-                  if (context.mounted) {
-                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Please enter a valid new password')));
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Password updated successfully in Auth & Database!')),
+                    );
                   }
                 }
               } catch (e) {
+                final errStr = e.toString().toLowerCase();
+                String errDisplay = 'Error updating password: ${e.toString()}';
+                if (errStr.contains('requires-recent-login')) {
+                  errDisplay = 'Please re-log in to your account first before changing password for security.';
+                }
                 if (context.mounted) {
                   Navigator.pop(context);
-                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error updating password: ${e.toString()}')));
+                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(errDisplay), backgroundColor: Colors.red));
                 }
               }
             },

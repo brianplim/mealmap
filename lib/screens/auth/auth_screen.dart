@@ -22,6 +22,8 @@ class _AuthScreenState extends State<AuthScreen> {
   bool _isLoading = false;
   bool _obscurePassword = true;
   bool _obscureConfirmPassword = true;
+  String? _emailError;
+  String? _passwordError;
 
   @override
   void initState() {
@@ -39,37 +41,30 @@ class _AuthScreenState extends State<AuthScreen> {
   }
 
   Future<void> _submit() async {
+    setState(() {
+      _emailError = null;
+      _passwordError = null;
+    });
+
     if (_emailController.text.trim().isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please enter your email address')),
-      );
+      setState(() => _emailError = 'Please enter your email address');
       return;
     }
     if (!_emailController.text.trim().toLowerCase().endsWith('@gmail.com')) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Please enter a valid Gmail address ending in @gmail.com'),
-        ),
-      );
+      setState(() => _emailError = 'Please enter a valid @gmail.com address');
       return;
     }
     if (_passwordController.text.trim().isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please enter your password')),
-      );
+      setState(() => _passwordError = 'Please enter your password');
       return;
     }
     if (!_isLogin) {
       if (_confirmPasswordController.text.trim().isEmpty) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Please confirm your password')),
-        );
+        setState(() => _passwordError = 'Please confirm your password');
         return;
       }
       if (_passwordController.text != _confirmPasswordController.text) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(const SnackBar(content: Text('Passwords do not match')));
+        setState(() => _passwordError = 'Passwords do not match');
         return;
       }
     }
@@ -142,11 +137,18 @@ class _AuthScreenState extends State<AuthScreen> {
           String displayMsg = 'Incorrect email or password. Please try again.';
           if (errorStr.contains('email-already-in-use')) {
             displayMsg = 'This email address is already registered.';
+            setState(() => _emailError = displayMsg);
           } else if (errorStr.contains('user-not-found')) {
             displayMsg = 'No account found with this email. Please register first.';
+            setState(() => _emailError = displayMsg);
+          } else {
+            setState(() {
+              _passwordError = 'Incorrect password. Please try again.';
+              _emailError = 'Incorrect email or password';
+            });
           }
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(displayMsg)),
+            SnackBar(content: Text(displayMsg), backgroundColor: Colors.red),
           );
         }
       }
@@ -219,11 +221,24 @@ class _AuthScreenState extends State<AuthScreen> {
                     TextField(
                       controller: _emailController,
                       keyboardType: TextInputType.emailAddress,
+                      onChanged: (val) {
+                        if (_emailError != null) setState(() => _emailError = null);
+                      },
                       decoration: InputDecoration(
                         labelText: 'Email Address',
                         hintText: 'example@gmail.com',
+                        errorText: _emailError,
+                        errorStyle: const TextStyle(color: Colors.red, fontSize: 11),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(14),
+                        ),
+                        errorBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(14),
+                          borderSide: const BorderSide(color: Colors.red, width: 1.5),
+                        ),
+                        focusedErrorBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(14),
+                          borderSide: const BorderSide(color: Colors.red, width: 2),
                         ),
                       ),
                     ),
@@ -231,10 +246,23 @@ class _AuthScreenState extends State<AuthScreen> {
                     TextField(
                       controller: _passwordController,
                       obscureText: _obscurePassword,
+                      onChanged: (val) {
+                        if (_passwordError != null) setState(() => _passwordError = null);
+                      },
                       decoration: InputDecoration(
                         labelText: 'Password',
+                        errorText: _passwordError,
+                        errorStyle: const TextStyle(color: Colors.red, fontSize: 11),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(14),
+                        ),
+                        errorBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(14),
+                          borderSide: const BorderSide(color: Colors.red, width: 1.5),
+                        ),
+                        focusedErrorBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(14),
+                          borderSide: const BorderSide(color: Colors.red, width: 2),
                         ),
                         suffixIcon: IconButton(
                           icon: Icon(

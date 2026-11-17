@@ -18,6 +18,8 @@ class _VendorAuthScreenState extends State<VendorAuthScreen> {
   final _passwordController = TextEditingController();
   final _businessNameController = TextEditingController();
   bool _isLoading = false;
+  String? _emailError;
+  String? _passwordError;
 
   @override
   void dispose() {
@@ -28,17 +30,21 @@ class _VendorAuthScreenState extends State<VendorAuthScreen> {
   }
 
   Future<void> _submit() async {
-    if (_emailController.text.trim().isEmpty ||
-        _passwordController.text.trim().isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please enter email and password')),
-      );
+    setState(() {
+      _emailError = null;
+      _passwordError = null;
+    });
+
+    if (_emailController.text.trim().isEmpty) {
+      setState(() => _emailError = 'Please enter your vendor email');
       return;
     }
     if (!_emailController.text.trim().toLowerCase().endsWith('@gmail.com')) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Incorrect email or password. Please try again.')),
-      );
+      setState(() => _emailError = 'Please enter a valid @gmail.com address');
+      return;
+    }
+    if (_passwordController.text.trim().isEmpty) {
+      setState(() => _passwordError = 'Please enter your password');
       return;
     }
 
@@ -112,11 +118,18 @@ class _VendorAuthScreenState extends State<VendorAuthScreen> {
           String displayMsg = 'Incorrect email or password. Please try again.';
           if (errorStr.contains('email-already-in-use')) {
             displayMsg = 'This email address is already registered.';
+            setState(() => _emailError = displayMsg);
           } else if (errorStr.contains('user-not-found')) {
             displayMsg = 'No account found with this email. Please register first.';
+            setState(() => _emailError = displayMsg);
+          } else {
+            setState(() {
+              _passwordError = 'Incorrect password. Please try again.';
+              _emailError = 'Incorrect email or password';
+            });
           }
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(displayMsg)),
+            SnackBar(content: Text(displayMsg), backgroundColor: Colors.red),
           );
         }
       }
@@ -188,8 +201,13 @@ class _VendorAuthScreenState extends State<VendorAuthScreen> {
                   ],
                   TextField(
                     controller: _emailController,
+                    onChanged: (val) {
+                      if (_emailError != null) setState(() => _emailError = null);
+                    },
                     decoration: InputDecoration(
                       labelText: 'Vendor Email',
+                      errorText: _emailError,
+                      errorStyle: const TextStyle(color: Colors.red, fontSize: 11),
                       prefixIcon: const Icon(
                         Icons.email_outlined,
                         color: Color(0xFF0F7A5B),
@@ -197,14 +215,27 @@ class _VendorAuthScreenState extends State<VendorAuthScreen> {
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(14),
                       ),
+                      errorBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(14),
+                        borderSide: const BorderSide(color: Colors.red, width: 1.5),
+                      ),
+                      focusedErrorBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(14),
+                        borderSide: const BorderSide(color: Colors.red, width: 2),
+                      ),
                     ),
                   ),
                   const SizedBox(height: 16),
                   TextField(
                     controller: _passwordController,
                     obscureText: _obscurePassword,
+                    onChanged: (val) {
+                      if (_passwordError != null) setState(() => _passwordError = null);
+                    },
                     decoration: InputDecoration(
                       labelText: 'Password',
+                      errorText: _passwordError,
+                      errorStyle: const TextStyle(color: Colors.red, fontSize: 11),
                       prefixIcon: const Icon(
                         Icons.lock_outline,
                         color: Color(0xFF0F7A5B),
@@ -222,6 +253,14 @@ class _VendorAuthScreenState extends State<VendorAuthScreen> {
                       ),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(14),
+                      ),
+                      errorBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(14),
+                        borderSide: const BorderSide(color: Colors.red, width: 1.5),
+                      ),
+                      focusedErrorBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(14),
+                        borderSide: const BorderSide(color: Colors.red, width: 2),
                       ),
                     ),
                   ),
