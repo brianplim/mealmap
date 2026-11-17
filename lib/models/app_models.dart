@@ -176,9 +176,6 @@ class AppLogo extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final logoColor = isDark ? Colors.white : const Color(0xFF1E2D2A);
-
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -186,7 +183,6 @@ class AppLogo extends StatelessWidget {
           width: size,
           height: size,
           decoration: BoxDecoration(
-            color: logoColor,
             shape: BoxShape.circle,
             boxShadow: [
               BoxShadow(
@@ -196,23 +192,14 @@ class AppLogo extends StatelessWidget {
               ),
             ],
           ),
-          child: Stack(
-            alignment: Alignment.center,
-            children: [
-              Container(
-                width: size * 0.55,
-                height: size * 0.55,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  border: Border.all(color: isDark ? const Color(0xFF121816) : Colors.white, width: 3),
-                ),
-              ),
-              Icon(
-                Icons.restaurant_menu,
-                size: size * 0.45,
-                color: isDark ? const Color(0xFF121816) : Colors.white,
-              ),
-            ],
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(size / 2),
+            child: Image.asset(
+              'assets/icon/icon.png',
+              width: size,
+              height: size,
+              fit: BoxFit.cover,
+            ),
           ),
         ),
         const SizedBox(height: 12),
