@@ -253,6 +253,7 @@ class _VendorProfileTabState extends State<VendorProfileTab> {
                             hasStudentDiscount: mockEateries[i].hasStudentDiscount,
                             location: _businessLocation,
                             vendorEmail: mockEateries[i].vendorEmail,
+                            vendorLogoUrl: _imagePath,
                             showOnMap: mockEateries[i].showOnMap,
                             deliveryFee: mockEateries[i].deliveryFee,
                             dealType: mockEateries[i].dealType,

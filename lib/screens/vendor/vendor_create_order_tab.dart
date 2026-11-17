@@ -25,6 +25,7 @@ class _VendorCreateOrderTabState extends State<VendorCreateOrderTab> {
   String _imageUrl = 'https://images.unsplash.com/photo-1555939594-58d7cb561ad1?auto=format&fit=crop&w=400&q=80';
   LatLng _businessLocation = const LatLng(7.4578, 125.7921);
   String _businessName = 'ACES Canteen Bites';
+  String? _vendorLogoUrl;
 
   @override
   void initState() {
@@ -43,6 +44,9 @@ class _VendorCreateOrderTabState extends State<VendorCreateOrderTab> {
           }
           if (data['businessName'] != null) {
             _businessName = data['businessName'];
+          }
+          if (data['logoUrl'] != null) {
+            _vendorLogoUrl = data['logoUrl'];
           }
         });
       }
@@ -173,6 +177,7 @@ class _VendorCreateOrderTabState extends State<VendorCreateOrderTab> {
       hasStudentDiscount: _hasDiscount,
       location: _businessLocation,
       vendorEmail: userEmail,
+      vendorLogoUrl: _vendorLogoUrl,
       showOnMap: true,
       deliveryFee: deliveryFeeStr,
       dealType: _selectedDealType,

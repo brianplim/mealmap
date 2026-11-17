@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'dart:io';
 import '../../models/app_models.dart';
 import '../../services/firestore_service.dart';
 import 'eatery_reviews_screen.dart';
@@ -371,6 +372,19 @@ class _RestaurantDetailScreenState extends State<RestaurantDetailScreen> {
               children: [
                 Row(
                   children: [
+                    CircleAvatar(
+                      radius: 20,
+                      backgroundColor: const Color(0xFF0F7A5B),
+                      backgroundImage: eatery.vendorLogoUrl != null && eatery.vendorLogoUrl!.isNotEmpty
+                          ? (eatery.vendorLogoUrl!.startsWith('http')
+                              ? NetworkImage(eatery.vendorLogoUrl!) as ImageProvider
+                              : FileImage(File(eatery.vendorLogoUrl!)))
+                          : null,
+                      child: eatery.vendorLogoUrl == null || eatery.vendorLogoUrl!.isEmpty
+                          ? const Icon(Icons.storefront, color: Colors.white, size: 20)
+                          : null,
+                    ),
+                    const SizedBox(width: 10),
                     Expanded(
                       child: Text(
                         eatery.name,

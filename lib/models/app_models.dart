@@ -23,6 +23,7 @@ class Eatery {
   final List<MenuItem> menu;
   final LatLng location;
   final String? vendorEmail;
+  final String? vendorLogoUrl;
   final bool showOnMap;
   final String dealType;
   final String deliveryFee;
@@ -43,6 +44,7 @@ class Eatery {
     required this.menu,
     this.location = const LatLng(7.4578, 125.7921),
     this.vendorEmail,
+    this.vendorLogoUrl,
     this.showOnMap = true,
     this.deliveryFee = 'Free Delivery',
     this.dealType = 'Discounts',

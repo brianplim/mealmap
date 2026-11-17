@@ -31,6 +31,7 @@ class FirestoreService {
         'lat': location.latitude,
         'lng': location.longitude,
         'vendorEmail': eatery.vendorEmail,
+        'vendorLogoUrl': eatery.vendorLogoUrl,
         'showOnMap': eatery.showOnMap,
         'deliveryFee': eatery.deliveryFee,
         'dealType': eatery.dealType,
@@ -75,6 +76,7 @@ class FirestoreService {
           hasStudentDiscount: data['hasStudentDiscount'] ?? true,
           location: LatLng(lat, lng),
           vendorEmail: data['vendorEmail'],
+          vendorLogoUrl: data['vendorLogoUrl'],
           showOnMap: showMap,
           deliveryFee: deliveryFee,
           dealType: data['dealType'] ?? 'Discounts',
@@ -203,6 +205,7 @@ class FirestoreService {
             'lng': location.longitude,
             'distance': distance,
             'name': businessName,
+            'vendorLogoUrl': logoUrl,
           });
         }
       }
