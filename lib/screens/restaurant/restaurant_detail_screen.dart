@@ -315,13 +315,10 @@ class _RestaurantDetailScreenState extends State<RestaurantDetailScreen> {
         children: [
           Stack(
             children: [
-              Image.network(
+              displayEateryImage(
                 eatery.imageUrl,
                 height: 240,
                 width: double.infinity,
-                fit: BoxFit.cover,
-                errorBuilder: (context, error, stackTrace) =>
-                    placeholderImage(width: double.infinity, height: 240),
               ),
               SafeArea(
                 child: Padding(
@@ -496,13 +493,10 @@ class _RestaurantDetailScreenState extends State<RestaurantDetailScreen> {
                               children: [
                                 ClipRRect(
                                   borderRadius: BorderRadius.circular(12),
-                                  child: Image.network(
+                                  child: displayEateryImage(
                                     item.imageUrl,
                                     width: 70,
                                     height: 70,
-                                    fit: BoxFit.cover,
-                                    errorBuilder: (context, error, stackTrace) =>
-                                        placeholderImage(width: 70, height: 70),
                                   ),
                                 ),
                                 const SizedBox(width: 14),

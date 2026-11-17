@@ -39,13 +39,7 @@ class _VendorDashboardTabState extends State<VendorDashboardTab> {
               children: [
                 ClipRRect(
                   borderRadius: BorderRadius.circular(12),
-                  child: Image.network(
-                    eatery.imageUrl,
-                    height: 160,
-                    width: double.infinity,
-                    fit: BoxFit.cover,
-                    errorBuilder: (context, error, stackTrace) => placeholderImage(width: double.infinity, height: 160),
-                  ),
+                  child: displayEateryImage(eatery.imageUrl, width: double.infinity, height: 160),
                 ),
                 const SizedBox(height: 12),
                 Text(
@@ -284,13 +278,7 @@ class _VendorDashboardTabState extends State<VendorDashboardTab> {
                                 children: [
                                   ClipRRect(
                                     borderRadius: BorderRadius.circular(10),
-                                    child: Image.network(
-                                      eatery.imageUrl,
-                                      width: 55,
-                                      height: 55,
-                                      fit: BoxFit.cover,
-                                      errorBuilder: (context, error, stackTrace) => placeholderImage(width: 55, height: 55),
-                                    ),
+                                    child: displayEateryImage(eatery.imageUrl, width: 55, height: 55),
                                   ),
                                   const SizedBox(width: 12),
                                   Expanded(

@@ -138,14 +138,7 @@ class _FavoritesScreenContentState extends State<FavoritesScreenContent> {
                               children: [
                                 ClipRRect(
                                   borderRadius: BorderRadius.circular(10),
-                                  child: Image.network(
-                                    eatery.imageUrl,
-                                    width: 60,
-                                    height: 60,
-                                    fit: BoxFit.cover,
-                                    errorBuilder: (context, error, stackTrace) =>
-                                        placeholderImage(width: 60, height: 60),
-                                  ),
+                                  child: displayEateryImage(eatery.imageUrl, width: 60, height: 60),
                                 ),
                                 const SizedBox(width: 12),
                                 Expanded(

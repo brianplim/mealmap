@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:latlong2/latlong.dart';
+import 'dart:io';
 
 final ValueNotifier<ThemeMode> themeNotifier = ValueNotifier(ThemeMode.light);
 final ValueNotifier<List<Eatery>> eateryNotifier = ValueNotifier(mockEateries);
@@ -152,6 +153,29 @@ Widget placeholderImage({required double width, required double height}) {
       child: Icon(Icons.restaurant, color: Color(0xFF0F7A5B), size: 24),
     ),
   );
+}
+
+Widget displayEateryImage(String path, {required double width, required double height, BoxFit fit = BoxFit.cover}) {
+  if (path.isEmpty) {
+    return placeholderImage(width: width, height: height);
+  }
+  if (path.startsWith('http')) {
+    return Image.network(
+      path,
+      width: width,
+      height: height,
+      fit: fit,
+      errorBuilder: (c, e, s) => placeholderImage(width: width, height: height),
+    );
+  } else {
+    return Image.file(
+      File(path),
+      width: width,
+      height: height,
+      fit: fit,
+      errorBuilder: (c, e, s) => placeholderImage(width: width, height: height),
+    );
+  }
 }
 
 Future<void> launchAcesMap(BuildContext context) async {

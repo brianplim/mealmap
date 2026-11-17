@@ -225,14 +225,7 @@ class DealItemCard extends StatelessWidget {
             children: [
               ClipRRect(
                 borderRadius: BorderRadius.circular(12),
-                child: Image.network(
-                  image,
-                  width: 65,
-                  height: 65,
-                  fit: BoxFit.cover,
-                  errorBuilder: (context, error, stackTrace) =>
-                      placeholderImage(width: 65, height: 65),
-                ),
+                child: displayEateryImage(image, width: 65, height: 65),
               ),
               const SizedBox(width: 12),
               Expanded(

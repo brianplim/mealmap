@@ -297,13 +297,10 @@ class _HomeScreenContentState extends State<HomeScreenContent> {
                                         borderRadius: const BorderRadius.vertical(
                                           top: Radius.circular(16),
                                         ),
-                                        child: Image.network(
+                                        child: displayEateryImage(
                                           eatery.imageUrl,
                                           height: 140,
                                           width: double.infinity,
-                                          fit: BoxFit.cover,
-                                          errorBuilder: (context, error, stackTrace) =>
-                                              placeholderImage(width: double.infinity, height: 140),
                                         ),
                                       ),
                                       Padding(

@@ -225,17 +225,10 @@ class _SearchScreenState extends State<SearchScreen> {
                                 children: [
                                   ClipRRect(
                                     borderRadius: BorderRadius.circular(12),
-                                    child: Image.network(
+                                    child: displayEateryImage(
                                       eatery.imageUrl,
                                       width: 60,
                                       height: 60,
-                                      fit: BoxFit.cover,
-                                      errorBuilder:
-                                          (context, error, stackTrace) =>
-                                              placeholderImage(
-                                                width: 60,
-                                                height: 60,
-                                              ),
                                     ),
                                   ),
                                   const SizedBox(width: 12),

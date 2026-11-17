@@ -392,13 +392,7 @@ class _AdminPortalShellState extends State<AdminPortalShell> {
               children: [
                 ClipRRect(
                   borderRadius: BorderRadius.circular(12),
-                  child: Image.network(
-                    eatery.imageUrl,
-                    height: 160,
-                    width: double.infinity,
-                    fit: BoxFit.cover,
-                    errorBuilder: (context, error, stackTrace) => placeholderImage(width: double.infinity, height: 160),
-                  ),
+                  child: displayEateryImage(eatery.imageUrl, width: double.infinity, height: 160),
                 ),
                 const SizedBox(height: 12),
                 Text(
@@ -484,7 +478,7 @@ class _AdminPortalShellState extends State<AdminPortalShell> {
                 children: [
                   ClipRRect(
                     borderRadius: BorderRadius.circular(8),
-                    child: Image.network(eatery.imageUrl, width: 60, height: 60, fit: BoxFit.cover, errorBuilder: (c, e, s) => placeholderImage(width: 60, height: 60)),
+                    child: displayEateryImage(eatery.imageUrl, width: 60, height: 60),
                   ),
                   const SizedBox(width: 12),
                   Expanded(
@@ -561,7 +555,7 @@ class _AdminPortalShellState extends State<AdminPortalShell> {
               children: [
                 ClipRRect(
                   borderRadius: BorderRadius.circular(8),
-                  child: Image.network(eatery.imageUrl, width: 60, height: 60, fit: BoxFit.cover, errorBuilder: (c, e, s) => placeholderImage(width: 60, height: 60)),
+                  child: displayEateryImage(eatery.imageUrl, width: 60, height: 60),
                 ),
                 const SizedBox(width: 12),
                 Expanded(
@@ -633,7 +627,7 @@ class _AdminPortalShellState extends State<AdminPortalShell> {
           child: ListTile(
             leading: ClipRRect(
               borderRadius: BorderRadius.circular(8),
-              child: Image.network(eatery.imageUrl, width: 50, height: 50, fit: BoxFit.cover, errorBuilder: (c, e, s) => placeholderImage(width: 50, height: 50)),
+              child: displayEateryImage(eatery.imageUrl, width: 50, height: 50),
             ),
             title: Text(eatery.name, style: const TextStyle(fontWeight: FontWeight.bold)),
             subtitle: Text('${eatery.cuisine} • ${eatery.distance} km • Rating: ${eatery.rating}★'),
