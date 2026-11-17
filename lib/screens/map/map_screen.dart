@@ -300,8 +300,8 @@ class _MapScreenContentState extends State<MapScreenContent> {
           children: [
             const Icon(
               Icons.location_on,
-              color: Color(0xFFD81B60),
-              size: 46,
+              color: Color(0xFFE53935),
+              size: 48,
               shadows: [
                 Shadow(
                   color: Colors.black45,
@@ -311,21 +311,11 @@ class _MapScreenContentState extends State<MapScreenContent> {
               ],
             ),
             Positioned(
-              top: 6,
-              child: Container(
-                width: 20,
-                height: 20,
-                decoration: const BoxDecoration(
-                  color: Colors.white,
-                  shape: BoxShape.circle,
-                ),
-                child: const Center(
-                  child: Icon(
-                    Icons.restaurant_menu,
-                    color: Color(0xFFD81B60),
-                    size: 12,
-                  ),
-                ),
+              top: 8,
+              child: const Icon(
+                Icons.restaurant,
+                color: Colors.white,
+                size: 18,
               ),
             ),
           ],
