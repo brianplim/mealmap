@@ -12,6 +12,8 @@ class RestaurantDetailScreen extends StatefulWidget {
 }
 
 class _RestaurantDetailScreenState extends State<RestaurantDetailScreen> {
+  String? _selectedImageUrl;
+
   void _showOrderDialog(BuildContext context, Eatery eatery, MenuItem item) {
     String fulfillment = 'Delivery';
     int quantity = 1;
@@ -316,7 +318,7 @@ class _RestaurantDetailScreenState extends State<RestaurantDetailScreen> {
           Stack(
             children: [
               displayEateryImage(
-                eatery.imageUrl,
+                _selectedImageUrl ?? eatery.imageUrl,
                 height: 240,
                 width: double.infinity,
               ),
@@ -474,7 +476,11 @@ class _RestaurantDetailScreenState extends State<RestaurantDetailScreen> {
                   ...menuItems.map((item) => Padding(
                         padding: const EdgeInsets.only(bottom: 12),
                         child: InkWell(
-                          onTap: () => _showOrderDialog(context, eatery, item),
+                          onTap: () {
+                            setState(() {
+                              _selectedImageUrl = item.imageUrl.isNotEmpty ? item.imageUrl : eatery.imageUrl;
+                            });
+                          },
                           borderRadius: BorderRadius.circular(16),
                           child: Container(
                             padding: const EdgeInsets.all(12),
@@ -524,18 +530,21 @@ class _RestaurantDetailScreenState extends State<RestaurantDetailScreen> {
                                     ],
                                   ),
                                 ),
-                                Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                                  decoration: BoxDecoration(
-                                    color: const Color(0xFF0F7A5B),
-                                    borderRadius: BorderRadius.circular(10),
-                                  ),
-                                  child: const Text(
-                                    'Order',
-                                    style: TextStyle(
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 12,
+                                GestureDetector(
+                                  onTap: () => _showOrderDialog(context, eatery, item),
+                                  child: Container(
+                                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                                    decoration: BoxDecoration(
+                                      color: const Color(0xFF0F7A5B),
+                                      borderRadius: BorderRadius.circular(10),
+                                    ),
+                                    child: const Text(
+                                      'Order',
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 12,
+                                      ),
                                     ),
                                   ),
                                 ),
