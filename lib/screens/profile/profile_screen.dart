@@ -29,9 +29,17 @@ class _ProfileScreenContentState extends State<ProfileScreenContent> {
     final user = FirebaseAuth.instance.currentUser;
     if (user != null) {
       final email = user.email ?? 'student@gmail.com';
+      final emailPrefix = email.split('@')[0];
+      final defaultDerivedName = emailPrefix.isNotEmpty ? emailPrefix[0].toUpperCase() + emailPrefix.substring(1) : 'Student';
+
       setState(() {
         _handle = email;
+        if (_name == 'Tagum Student' || _name.isEmpty) {
+          _name = defaultDerivedName;
+          globalStudentName = _name;
+        }
       });
+
       final data = await FirestoreService.getUserProfile(user.uid);
       if (data != null && data['name'] != null && mounted) {
         setState(() {

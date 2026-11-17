@@ -72,10 +72,19 @@ class _AuthScreenState extends State<AuthScreen> {
     setState(() => _isLoading = true);
     try {
       if (_isLogin) {
-        await FirebaseAuth.instance.signInWithEmailAndPassword(
+        final cred = await FirebaseAuth.instance.signInWithEmailAndPassword(
           email: _emailController.text.trim(),
           password: _passwordController.text.trim(),
         );
+        if (cred.user != null) {
+          final data = await FirestoreService.getUserProfile(cred.user!.uid);
+          if (data != null && data['name'] != null) {
+            globalStudentName = data['name'].toString();
+          } else {
+            final emailPrefix = (_emailController.text.trim()).split('@')[0];
+            globalStudentName = emailPrefix.isNotEmpty ? emailPrefix[0].toUpperCase() + emailPrefix.substring(1) : 'Student';
+          }
+        }
         if (mounted) {
           Navigator.pushReplacementNamed(context, '/home');
         }
@@ -85,9 +94,14 @@ class _AuthScreenState extends State<AuthScreen> {
           password: _passwordController.text.trim(),
         );
         if (cred.user != null) {
+          final emailPrefix = _emailController.text.trim().split('@')[0];
+          final fullName = _nameController.text.trim().isNotEmpty
+              ? _nameController.text.trim()
+              : (emailPrefix.isNotEmpty ? emailPrefix[0].toUpperCase() + emailPrefix.substring(1) : 'Student');
+          globalStudentName = fullName;
           await FirestoreService.saveUserProfile(
             cred.user!.uid,
-            _nameController.text.trim().isNotEmpty ? _nameController.text.trim() : 'Student',
+            fullName,
             _emailController.text.trim(),
             '',
           );
