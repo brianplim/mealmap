@@ -134,17 +134,18 @@ class _AuthScreenState extends State<AuthScreen> {
         }
       } else {
         if (mounted) {
-          String displayMsg = 'Incorrect email or password. Please try again.';
+          String displayMsg = 'Incorrect password. Please try again.';
           if (errorStr.contains('email-already-in-use')) {
             displayMsg = 'This email address is already registered.';
             setState(() => _emailError = displayMsg);
-          } else if (errorStr.contains('user-not-found')) {
+          } else if (errorStr.contains('user-not-found') || errorStr.contains('invalid-email')) {
             displayMsg = 'No account found with this email. Please register first.';
             setState(() => _emailError = displayMsg);
           } else {
+            // Email is valid/exists in database; only password is incorrect
             setState(() {
+              _emailError = null;
               _passwordError = 'Incorrect password. Please try again.';
-              _emailError = 'Incorrect email or password';
             });
           }
           ScaffoldMessenger.of(context).showSnackBar(
