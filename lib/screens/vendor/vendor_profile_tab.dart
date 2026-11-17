@@ -387,7 +387,7 @@ class _VendorProfileTabState extends State<VendorProfileTab> {
                 _menuItem(
                   icon: Icons.settings_outlined,
                   label: 'Settings',
-                  onTap: _showEditProfileDialog,
+                  onTap: () => Navigator.pushNamed(context, '/settings'),
                 ),
                 ValueListenableBuilder<bool>(
                   valueListenable: vendorNotifReadNotifier,
