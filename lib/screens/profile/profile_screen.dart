@@ -121,8 +121,15 @@ class _ProfileScreenContentState extends State<ProfileScreenContent> {
                 ),
                 ElevatedButton(
                   onPressed: () async {
+                    final newName = nameController.text.trim();
+                    if (newName.isEmpty) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('Please enter a valid name')),
+                      );
+                      return;
+                    }
                     setState(() {
-                      _name = nameController.text.trim();
+                      _name = newName;
                       globalStudentName = _name;
                       _imagePath = tempImagePath;
                       if (_imagePath != null && _imagePath!.startsWith('http')) {
@@ -143,7 +150,7 @@ class _ProfileScreenContentState extends State<ProfileScreenContent> {
                     if (context.mounted) {
                       Navigator.pop(context);
                       ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Profile updated successfully!')),
+                        const SnackBar(content: Text('Profile updated & saved to database!')),
                       );
                     }
                   },
